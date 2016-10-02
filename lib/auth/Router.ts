@@ -15,6 +15,7 @@ import Promise = require('bluebird');
 import {DBInit} from './DBInit';
 import {Emailer} from './Emailer';
 import {DBController} from './DBController';
+import * as Types from '../Types';
 
 /*
  Router:
@@ -45,12 +46,8 @@ import {DBController} from './DBController';
 
 module NAuth2
 {
-
-
-
     export class Router
     {
-
         protected DBController:DBController;
 
         /*
@@ -75,7 +72,7 @@ module NAuth2
             return fn;
         }
 
-        constructor(protected cfg:INAuth2Config)
+        constructor(protected cfg:Types.INAuth2Config)
         {
             this.DBController = new DBController(this.cfg.dbConfig);
         }
@@ -86,34 +83,35 @@ module NAuth2
         {
             var self = this;
             self.router = express.Router();
-            self.router.post('/login', self.loginCallback);
+            this.router.post('/login', this.wrap(this.DBController.login));
 
             /*
 
              */
             self.router.post('/register', this.wrap(this.DBController.register));
-            self.router.post('/forgotPassword', self.forgotPasswordCallback);
-            self.router.post('/changePassword', self.forgotPasswordCallback);
+            self.router.post('/forgotPassword', this.wrap(this.DBController.forgotPassword));
+            self.router.post('/changePassword', this.wrap(this.DBController.changePassword));
 
-            self.router.get('/users', self.getUserCallback);
-            self.router.get('/user', self.getUserCallback);
-            self.router.post('/user', self.saveUserCallback);
-            self.router.put('/user', self.saveUserCallback);
-            self.router.delete('/user', self.deleteUserCallback);
+            self.router.get('/users', this.wrap(this.DBController.getUser));
+            self.router.get('/user', this.wrap(this.DBController.getUser));
+            self.router.post('/user', this.wrap(this.DBController.saveUser));
+            self.router.put('/user', this.wrap(this.DBController.saveUser));
+            self.router.delete('/user', this.wrap(this.DBController.deleteUser));
 
-            self.router.get('/roles', self.getUserCallback);
-            self.router.get('/role', self.getUserCallback);
-            self.router.post('/role', self.getUserCallback);
-            self.router.put('/role', self.getUserCallback);
-            self.router.delete('/role', self.getUserCallback);
+            self.router.get('/roles', this.wrap(this.DBController.getRole));
+            self.router.get('/role', this.wrap(this.DBController.getRole));
+            self.router.post('/role', this.wrap(this.DBController.saveRole));
+            self.router.put('/role', this.wrap(this.DBController.saveRole));
+            self.router.delete('/role', this.wrap(this.DBController.deleteRole));
 
-            self.router.get('/domains', self.getUserCallback);
-            self.router.get('/domain', self.getUserCallback);
-            self.router.post('/domain', self.getUserCallback);
-            self.router.put('/domain', self.getUserCallback);
-            self.router.delete('/domain', self.getUserCallback);
+            self.router.get('/domains', this.wrap(this.DBController.getDomain));
+            self.router.get('/domain', this.wrap(this.DBController.getDomain));
+            self.router.post('/domain', this.wrap(this.DBController.saveDomain));
+            self.router.put('/domain', this.wrap(this.DBController.saveDomain));
+            self.router.delete('/domain', this.wrap(this.DBController.deleteDomain));
 
-            self.router.get('/captcha', self.getUserCallback);
+            // TODO use captcha API
+            // self.router.get('/captcha', self.getUserCallback);
         }
 
         getEmailTemplate()

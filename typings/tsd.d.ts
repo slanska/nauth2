@@ -10,3 +10,4 @@
 /// <reference path="nodemailer/nodemailer.d.ts" />
 /// <reference path="hapi/hapi.d.ts" />
 /// <reference path="passport/passport.d.ts" />
+/// <reference path="lodash/lodash.d.ts" />

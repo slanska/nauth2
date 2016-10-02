@@ -31,10 +31,12 @@
     "catbox": "^7.1.2",
     "catbox-memory": "git+https://github.com/hapijs/catbox-memory.git",
     "knex": "^0.12.2",
+    "lodash": "^4.16.2",
     "passport": "^0.3.2",
     "wildcard-subdomains": "^1.0.0"
   },
   "devDependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "pg": "^6.1.0",
     "sqlite3": "^3.1.4"
