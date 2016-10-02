@@ -1,6 +1,8 @@
 ## nauth2
 **Node.js server library for handling authentication and authorization in multi-tenant, multi-domain environment**
   
+## Status: early development  
+  
 ### What its name stands for?
   
 Node.js AUTHentication/AUTHorization (double 'auth')
@@ -200,6 +202,7 @@ different stages of flow:
 ### Internals. Database structure
 NAuth2 stores user data in the relational database. The following tables
 are used:
+
 
 #### NAuth2_Domains
 #### NAuth2_Users
