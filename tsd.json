@@ -1,0 +1,45 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "express-serve-static-core/express-serve-static-core.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "express/express.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "node/node.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "mime/mime.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "knex/knex.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "bluebird/bluebird-2.0.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "nodemailer/nodemailer.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "nodemailer-direct-transport/nodemailer-direct-transport.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "nodemailer-smtp-transport/nodemailer-smtp-transport.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "hapi/hapi.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    },
+    "passport/passport.d.ts": {
+      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+    }
+  }
+}

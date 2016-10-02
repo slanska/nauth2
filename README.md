@@ -48,15 +48,21 @@ concise way to deal with multi-domain model.
 ### How to use
 
 ``` javascript
+var express = require('express');
+app = express();
+
 var nauth2 = require('nauth2');
 
 var cfg = {
     /*
     Connection string for auth database.
-    Check Knex documentation for details
+    Check Knex documentation for details.
+    By default: sqlite3 database
     */
     dbConnection:
     {
+    client: 'sqlite3',
+    file: ''
     },
     
     /*
@@ -128,7 +134,7 @@ var cfg = {
      templatePath: ''
 };
 var router = new nauth2.Router(cfg);
-router.use();
+router.use(app);
 
 ```
 
@@ -200,7 +206,7 @@ are used:
 #### NAuth2_Roles
 #### NAuth2_DomainUsers
 #### NAuth2_UserRoles
-#### NAuth2_AuthLog
+#### NAuth2_Log
 #### NAuth2_Config
 
 ### Internals. Caching
