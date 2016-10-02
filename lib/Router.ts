@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-01.
  */
 
-///<reference path="../../typings/tsd.d.ts"/>
+///<reference path="../typings/tsd.d.ts"/>
 
 import express = require('express');
 import knex = require('knex');
@@ -10,12 +10,12 @@ import Nodemailer = require('nodemailer');
 import NodemailerSmtpTransport = require('nodemailer-smtp-transport');
 var HapiCatBox = require('catbox');
 var HapiCatBoxMem = require('catbox-memory');
-import Passport = require('passport');
+// import Passport = require('passport');
 import Promise = require('bluebird');
 import {DBInit} from './DBInit';
 import {Emailer} from './Emailer';
 import {DBController} from './DBController';
-import * as Types from '../Types';
+import * as Types from './Types';
 
 /*
  Router:

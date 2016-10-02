@@ -11,3 +11,4 @@
 /// <reference path="hapi/hapi.d.ts" />
 /// <reference path="passport/passport.d.ts" />
 /// <reference path="lodash/lodash.d.ts" />
+/// <reference path="shortid/shortid.d.ts" />

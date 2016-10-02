@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-01.
  */
 
-///<reference path="../../typings/tsd.d.ts"/>
+///<reference path="../typings/tsd.d.ts"/>
 
 import knex = require('knex');
 

@@ -30,9 +30,11 @@
     "captchapng": "0.0.1",
     "catbox": "^7.1.2",
     "catbox-memory": "git+https://github.com/hapijs/catbox-memory.git",
+    "express-jwt": "^5.0.0",
+    "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",
     "lodash": "^4.16.2",
-    "passport": "^0.3.2",
+    "shortid": "^2.2.6",
     "wildcard-subdomains": "^1.0.0"
   },
   "devDependencies": {

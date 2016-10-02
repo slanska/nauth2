@@ -2,11 +2,11 @@
  * Created by slanska on 2016-10-02.
  */
 
-///<reference path="../Types.d.ts"/>
+///<reference path="./Types.d.ts"/>
 
-import * as Types from '../Types';
+import * as Types from './Types';
 import knex = require('knex');
-import {Tables, Columns} from '../Consts';
+import {Tables, Users} from './Consts';
 import Promise = require('bluebird');
 
 module NAuth2
@@ -27,7 +27,7 @@ module NAuth2
 
             // self.db.table(Tables.Users).insert(data).then();
 
-            var result = self.db.select(Tables.Users).where(Columns.Email, req.body.email).first()
+            var result = self.db.select(Tables.Users).where(Users.Email, req.body.email).first()
                 .then(()=>
                 {
                     // email found
