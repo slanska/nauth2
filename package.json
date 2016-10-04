@@ -27,9 +27,8 @@
   "homepage": "https://github.com/slanska/nauth2#readme",
   "dependencies": {
     "bunyan": "^1.8.1",
+    "cache-manager": "^2.1.2",
     "captchapng": "0.0.1",
-    "catbox": "^7.1.2",
-    "catbox-memory": "git+https://github.com/hapijs/catbox-memory.git",
     "express-jwt": "^5.0.0",
     "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",

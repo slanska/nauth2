@@ -5,17 +5,14 @@
 ///<reference path="../typings/tsd.d.ts"/>
 
 import express = require('express');
-import knex = require('knex');
 import Nodemailer = require('nodemailer');
 import NodemailerSmtpTransport = require('nodemailer-smtp-transport');
-var HapiCatBox = require('catbox');
-var HapiCatBoxMem = require('catbox-memory');
-// import Passport = require('passport');
 import Promise = require('bluebird');
 import {DBInit} from './DBInit';
 import {Emailer} from './Emailer';
 import {DBController} from './DBController';
 import * as Types from './Types';
+var wildcardSubdomains = require('wildcard-subdomains');
 
 /*
  Router:
@@ -46,8 +43,23 @@ import * as Types from './Types';
 
 module NAuth2
 {
+    /*
+
+     */
     export class Router
     {
+        private isAuthenticated(req, res, next)
+        {
+        }
+
+        private IsAdmin(req, res, next)
+        {
+        }
+
+        private IsDomainAdmin(req, res, next)
+        {
+        }
+
         protected DBController:DBController;
 
         /*
@@ -72,9 +84,14 @@ module NAuth2
             return fn;
         }
 
-        constructor(protected cfg:Types.INAuth2Config)
+        constructor(protected app:express.Application, protected cfg:Types.INAuth2Config)
         {
             this.DBController = new DBController(this.cfg.dbConfig);
+            if (this.cfg.subDomains)
+            {
+                // This will add new parameter to request - :subdomain
+                this.app.use(wildcardSubdomains(cfg.subDomains));
+            }
         }
 
         protected router:express.IRouter;
@@ -98,37 +115,54 @@ module NAuth2
             self.router.put('/user', this.wrap(this.DBController.saveUser));
             self.router.delete('/user', this.wrap(this.DBController.deleteUser));
 
+            // Subdomain support
+            self.router.get(`/${self.cfg.subDomains.namespace}/:domain/auth/users`, this.wrap(this.DBController.getUser));
+            self.router.get('/user', this.wrap(this.DBController.getUser));
+            self.router.post('/user', this.wrap(this.DBController.saveUser));
+            self.router.put('/user', this.wrap(this.DBController.saveUser));
+            self.router.delete('/user', this.wrap(this.DBController.deleteUser));
+
             self.router.get('/roles', this.wrap(this.DBController.getRole));
             self.router.get('/role', this.wrap(this.DBController.getRole));
             self.router.post('/role', this.wrap(this.DBController.saveRole));
             self.router.put('/role', this.wrap(this.DBController.saveRole));
             self.router.delete('/role', this.wrap(this.DBController.deleteRole));
 
+            /*
+             Must be authenticated. Domains will be filtered based on user permissions
+             */
             self.router.get('/domains', this.wrap(this.DBController.getDomain));
             self.router.get('/domain', this.wrap(this.DBController.getDomain));
             self.router.post('/domain', this.wrap(this.DBController.saveDomain));
             self.router.put('/domain', this.wrap(this.DBController.saveDomain));
             self.router.delete('/domain', this.wrap(this.DBController.deleteDomain));
 
+            /*
+             Must be Domain Admin or Domain User Admin
+             */
+            self.router.get('/userdomains', this.wrap(this.DBController.getDomain));
+            self.router.get('/userdomain', this.wrap(this.DBController.getDomain));
+            self.router.post('/userdomain', this.wrap(this.DBController.saveDomain));
+            self.router.put('/userdomain', this.wrap(this.DBController.saveDomain));
+            self.router.delete('/userdomain', this.wrap(this.DBController.deleteDomain));
+
+            /*
+             Must be System User Admin
+             */
+            self.router.get('/userroles', this.wrap(this.DBController.getDomain));
+            self.router.get('/userrole', this.wrap(this.DBController.getDomain));
+            self.router.post('/userrole', this.wrap(this.DBController.saveDomain));
+            self.router.put('/userrole', this.wrap(this.DBController.saveDomain));
+            self.router.delete('/userrole', this.wrap(this.DBController.deleteDomain));
+
+            self.router.get('/auth/log', this.wrap(this.DBController.deleteDomain));
+
             // TODO use captcha API
             // self.router.get('/captcha', self.getUserCallback);
         }
 
-        getEmailTemplate()
-        {
 
-        }
 
-        sendEmail()
-        {
-
-        }
-
-        initDatabase()
-        {
-            var self = this;
-            knex(self.cfg.dbConfig);
-        }
     }
 }
 

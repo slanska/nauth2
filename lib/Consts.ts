@@ -26,7 +26,18 @@ module NAuth2
     export module Domains
     {
         export const DomainID = 'DomainID';
-        
+        export const Active = 'Active';
+        export const Name = 'Name';
+        export const Domain = 'Domain';
+        export const Description = 'Description';
+        export const FavIconLink = 'FavIconLink';
+        export const Title = 'Title';
+        export const Created = 'Created';
+        export const MaxPageCount = 'MaxPageAccount';
+        export const DBServer = 'DBServer';
+        export const DBFileName = 'DBFileName';
+        export const UserCreateMode = 'UserCreateNode';
+        export const MembershipID = 'MembershipID';
     }
 
 

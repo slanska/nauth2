@@ -46,7 +46,37 @@ export interface IRegisterResult
 
 export interface INAuth2Config
 {
+    /*
+     Optional configuration for subdomains.
+     Based on configuration: https://github.com/patmood/wildcard-subdomains
+     */
+    subDomains?:{
+        /*
+         Ignore 'www' subdomain
+         Default: true
+         */
+        www?:boolean;
+
+        /*
+         Prepended to the path
+         Default: '_sub'
+         */
+        namespace?:string;
+    };
+
+    /*
+
+     */
+    templatePath?:string;
+
+    /*
+
+     */
     dbConfig:knex.Config;
+
+    /*
+
+     */
     emailConfig:NodemailerSmtpTransport.SmtpOptions;
 }
 
@@ -54,10 +84,15 @@ export interface IForgotPasswordResponse
 {
 }
 
+export interface IReqParams
+{
+    subdomain?:string;
+}
+
 /*
  Typed extension of Express request
  */
-export interface Request<T, P, Q> extends express.Request
+export interface Request<T, P extends IReqParams, Q> extends express.Request
 {
     body:T;
     params:P;
