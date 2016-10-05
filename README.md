@@ -39,8 +39,9 @@ that should be kept on client side and passed with every call.
 ### Domains explained
 
 NAuth2 introduces concept of **domains**, areas that need to be controlled individually for every user.
-Domains can be applications, or features, or geographical locations. Though NAuth2
-does not have specific requirements for domain internal processing, it is normally
+Domains can be applications in multi-tenant environment, or geographical locations (stores/branches)
+in a large corporation/chain store. Using domains is optional. 
+Though NAuth2 does not have specific requirements for domain internal processing, it is normally
 expected that domain is specified in REST URL, like _website.address/**domain**_ 
 or _**domain**.website.address_. Domain determines context of request being processed. 
 A user may have different roles assigned depending on domain. NAuth2 provides 
