@@ -14,6 +14,8 @@ import {DBController} from './DBController';
 import * as Types from './Types';
 var wildcardSubdomains = require('wildcard-subdomains');
 
+var config = require('./config');
+
 /*
  Router:
  -  registers routes with handlers

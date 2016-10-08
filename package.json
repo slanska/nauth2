@@ -4,7 +4,9 @@
   "description": "Node.js server library for handling authentication and authorization in multi-tenant, multi-domain environment",
   "main": "testapp",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "TypeScript": "tsc --watch",
+    "postinstall": "tsc"
   },
   "repository": {
     "type": "git",
@@ -26,19 +28,25 @@
   },
   "homepage": "https://github.com/slanska/nauth2#readme",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "bunyan": "^1.8.1",
     "cache-manager": "^2.1.2",
     "captchapng": "0.0.1",
+    "express": "^4.14.0",
     "express-jwt": "^5.0.0",
+    "feathers": "^2.0.2",
+    "feathers-authentication": "^0.7.11",
+    "feathers-hooks": "^1.5.8",
+    "feathers-knex": "^2.3.0",
+    "feathers-rest": "^1.5.0",
     "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",
     "lodash": "^4.16.2",
     "shortid": "^2.2.6",
+    "watch": "^1.0.1",
     "wildcard-subdomains": "^1.0.0"
   },
   "devDependencies": {
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
     "pg": "^6.1.0",
     "sqlite3": "^3.1.4"
   }
