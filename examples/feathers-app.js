@@ -3,12 +3,21 @@
  */
 "use strict";
 ///<reference path="../typings/tsd.d.ts"/>
-var express = require('express');
-var app = express();
-var cfg = require('./config')[process.env.NODE_ENV || 'development'];
-var NAuth = require('../lib/Router');
-var r = new NAuth.Router(app, cfg);
-r.use(app);
+var feathers = require('feathers');
+var rest = require('feathers-rest');
+var hooks = require('feathers-hooks');
+var bodyParser = require('body-parser');
+var authentication = require('feathers-authentication');
+var nauth2 = require('../lib/index');
+var config = require('./config')[process.env.NODE_ENV || 'development'];
+var app = feathers()
+    .configure(rest())
+    .configure(hooks())
+    .configure(authentication())
+    .configure(nauth2(config))
+    .use(bodyParser.json())
+    .use(bodyParser.urlencoded({ extended: true }));
+app.set('query parser', 'extended');
 var port = process.env.PORT || 8800;
 app.listen(port, function () {
     console.log("Listening on " + port);

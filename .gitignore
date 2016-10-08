@@ -33,3 +33,7 @@ typings/nodemailer/
 typings/passport/
 typings/serve-static/
 typings/shortid/
+/lib/Types.js
+/lib/Types.js.map
+lib/Types.js
+lib/Types.js.map

@@ -1,6 +1,13 @@
-var DB = require('../../lib/Consts');
+/**
+ * Created by slanska on 2016-10-08.
+ */
 
-function createDatabase(knex)
+///<reference path="../../typings/knex/knex.d.ts"/>
+
+var DB = require('../../lib/Consts');
+var Knex = require("knex");
+
+export function up(knex:Knex)
 {
     "use strict";
 
@@ -20,19 +27,19 @@ function createDatabase(knex)
             tbl.enu(DB.Domains.UserCreateMode, []);
             tbl.string(DB.Domains.MembershipID);
             /*
-             [Active] BOOLEAN DEFAULT 1, 
-             [Name] TEXT NOT NULL, 
-             [Domain] TEXT NOT NULL, 
-             [Description] TEXT, 
-             [FavIconLink] TEXT, 
-             [Title] TEXT, 
-             [ID] TEXT NOT NULL, 
-             [Created] DATETIME DEFAULT (julianday()), 
-             [MaxPageCount] INTEGER DEFAULT ((100 * 1024 / 8)), 
-             [DBServer] TEXT, 
-             [DBFileName] TEXT, 
-             [UserCreateMode] INTEGER DEFAULT 0, 
-             [MembershipID] TEXT NOT NULL CONSTRAINT [fkMembership_AppDomain] REFERENCES [Membership]([ID]) ON DELETE RESTRICT ON UPDATE RESTRICT, 
+             [Active] BOOLEAN DEFAULT 1,
+             [Name] TEXT NOT NULL,
+             [Domain] TEXT NOT NULL,
+             [Description] TEXT,
+             [FavIconLink] TEXT,
+             [Title] TEXT,
+             [ID] TEXT NOT NULL,
+             [Created] DATETIME DEFAULT (julianday()),
+             [MaxPageCount] INTEGER DEFAULT ((100 * 1024 / 8)),
+             [DBServer] TEXT,
+             [DBFileName] TEXT,
+             [UserCreateMode] INTEGER DEFAULT 0,
+             [MembershipID] TEXT NOT NULL CONSTRAINT [fkMembership_AppDomain] REFERENCES [Membership]([ID]) ON DELETE RESTRICT ON UPDATE RESTRICT,
 
              */
         })
@@ -80,13 +87,7 @@ function createDatabase(knex)
         });
 }
 
-
-exports.up = function (knex, Promise)
-{
-    return createDatabase(knex);
-};
-
-exports.down = function (knex, Promise)
+export function down(knex:Knex)
 {
     return Promise.all([
         knex.schema.dropTableIfExists(DB.Tables.Domains),
@@ -97,4 +98,8 @@ exports.down = function (knex, Promise)
         knex.schema.dropTableIfExists(DB.Tables.Log),
         knex.schema.dropTableIfExists(DB.Tables.Config)
     ]);
-};
+
+}
+
+
+

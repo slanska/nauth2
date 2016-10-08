@@ -2,9 +2,17 @@
  * Created by slanska on 2016-10-04.
  */
 
-import NAuth2 = require('./Router');
+///<reference path="./Types.d.ts"/>
 
-export = (app)=>
+import Router = require("./Router");
+import {INAuth2Config} from "./Types";
+
+function nauth2(cfg:INAuth2Config)
 {
-    return new NAuth2.Router(app, null);
-};
+    return function()
+    {
+        new Router(this, cfg);
+    }
+}
+
+export = nauth2;

@@ -2,12 +2,12 @@
  * Created by slanska on 2016-10-02.
  */
 
-///<reference path="./Types.d.ts"/>
-
 import * as Types from './Types';
 import knex = require('knex');
 import {Tables, Users} from './Consts';
 import Promise = require('bluebird');
+var knexServiceFactory = require('feathers-knex');
+import feathers = require("feathers");
 
 module NAuth2
 {
@@ -15,82 +15,109 @@ module NAuth2
     {
         protected db:knex;
 
-        constructor(protected cfg:knex.Config)
+        Path:{
+            Users:string,
+            Roles:string,
+            UserRoles:string;
+            Log:string;
+            Domains?:string;
+            DomainUsers?:string;
+        };
+
+        Services:{
+            Users:feathers.Service;
+            Roles:feathers.Service;
+            UserRoles:feathers.Service;
+            Log:feathers.Service;
+            Domains:feathers.Service;
+            DomainUsers:feathers.Service;
+        };
+
+        constructor(protected app:feathers.ApplicationCore, protected cfg:Types.INAuth2Config)
         {
-            this.db = knex(cfg);
-        }
+            this.db = knex(cfg.dbConfig);
 
-        register(req:Types.Request<Types.IRegisterPayload, any, any>):Promise<Types.IRegisterResult>
-        {
+            this.Path = {
+                Users: `${cfg.basePath}/users`,
+                Roles: `${cfg.basePath}/roles`,
+                UserRoles: `${cfg.basePath}/userroles`,
+                Log: `${cfg.basePath}/log`
+            };
 
-            var self = this;
+            this.Services = {} as any;
 
-            // self.db.table(Tables.Users).insert(data).then();
-
-            var result = self.db.select(Tables.Users).where(Users.Email, req.body.email).first()
-                .then(()=>
+            // Users
+            this.Services.Users = knexServiceFactory(
                 {
-                    // email found
+                    Model: this.db,
+                    name: 'Users',
+                    id: 'UserID',
+                    paginate: {max: 200, "default": 50}
                 });
-            return result as any;
-        }
 
-        login(req:Types.Request<Types.ILoginPayload, any, any>):Promise<Types.ILoginResult>
-        {
-            var result;
+            this.app.use(this.Path.Users, this.Services.Users);
 
 
-            return result as any;
+            // Roles
+            this.Services.Roles = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: 'Roles',
+                    id: 'RoleID',
+                    paginate: {max: 200, "default": 50}
+                });
 
-        }
+            this.app.use(this.Path.Roles, this.Services.Roles);
 
-        forgotPassword(req:Types.Request<Types.IForgotPasswordPayload, any, any>):Promise<Types.IForgotPasswordResponse>
-        {
-            return null;
-        }
+            // UserRoles
+            this.Services.UserRoles = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: 'UserRoles',
+                    id: ['UserID', 'RoleID'],
+                    paginate: {max: 200, "default": 50}
+                });
 
-        /*
-         TODO user request
-         */
-        getUser(req:Types.Request<any, Types.IUserParams, Types.IUserQuery>)
-        {
-        }
+            this.app.use(this.Path.UserRoles, this.Services.UserRoles);
 
-        saveUser(req:Types.Request< Types.IUserProfile, any, any>)
-        {
-        }
+            // Log
+            this.Services.Log = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: 'Log',
+                    id: 'LogID',
+                    paginate: {max: 200, "default": 50}
+                });
 
-        deleteUser(req:Types.Request<any, Types.IUserParams, Types.IUserQuery>):Promise<Types.ISaveResult>
-        {
-            return null;
-        }
+            this.app.use(this.Path.Log, this.Services.Log);
 
-        changePassword(req:Types.Request<Types.IChangePasswordPayload, any, any>)
-        {
-        }
+            if (cfg.subDomains)
+            {
+                this.Path.Domains = `${cfg.basePath}/domains`;
+                this.Path.DomainUsers = `${cfg.basePath}/domainusers`;
 
-        getRole(req:Types.Request<any, Types.IRoleParams, Types.IRolesQuery>)
-        {
-        }
+                // Domains
+                this.Services.Domains = knexServiceFactory(
+                    {
+                        Model: this.db,
+                        name: 'Domains',
+                        id: 'DomainID',
+                        paginate: {max: 200, "default": 50}
+                    });
 
-        saveRole(req:Types.Request<any, Types.IRoleParams, Types.IRolesQuery>)
-        {
-        }
+                this.app.use(this.Path.Domains, this.Services.Domains);
 
-        deleteRole(req:Types.Request<any, Types.IRoleParams, Types.IRolesQuery>)
-        {
-        }
+                // DomainUsers
+                this.Services.DomainUsers = knexServiceFactory(
+                    {
+                        Model: this.db,
+                        name: 'DomainUsers',
+                        id: ['DomainID', 'UserID'],
+                        paginate: {max: 200, "default": 50}
+                    });
 
-        getDomain(req:Types.Request<any, Types.IRoleParams, Types.IRolesQuery>)
-        {
-        }
-
-        saveDomain(req:Types.Request<any, Types.IRoleParams, Types.IRolesQuery>)
-        {
-        }
-
-        deleteDomain(req:Types.Request<any, Types.IRoleParams, Types.IRolesQuery>)
-        {
+                this.app.use(this.Path.DomainUsers, this.Services.DomainUsers);
+            }
         }
     }
 }
