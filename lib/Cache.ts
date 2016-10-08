@@ -7,4 +7,4 @@
 import cache = require('cache-manager');
 
 // var cfg:typeof cache = {store: 'memory', ttl: 10};
-cache.caching({});
+// cache.caching({});

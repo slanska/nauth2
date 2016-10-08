@@ -2,12 +2,10 @@
  * Created by slanska on 2016-10-04.
  */
 
-///<reference path="./Types.d.ts"/>
-
 import Router = require("./Router");
-import {INAuth2Config} from "./Types";
+import * as Types from "./Types";
 
-function nauth2(cfg:INAuth2Config)
+function nauth2(cfg:Types.INAuth2Config)
 {
     return function()
     {

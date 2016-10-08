@@ -10,6 +10,7 @@ import feathers = require("feathers");
 var wildcardSubdomains = require('wildcard-subdomains');
 import path = require('path');
 import * as Types from "./Types";
+var authentication = require('feathers-authentication');
 
 var config = require('./config');
 
@@ -62,6 +63,8 @@ class Router
 
     constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
     {
+        app.configure(authentication());
+
         this.cfg.basePath = this.cfg.basePath || '/auth';
         this.cfg.newMemberRoles = this.cfg.newMemberRoles || [];
         this.cfg.registerMode = this.cfg.registerMode || Types.RegisterMode.ByAdminOnly;

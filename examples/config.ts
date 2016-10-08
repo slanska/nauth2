@@ -2,16 +2,15 @@
  * Created by slanska on 2016-10-04.
  */
 
-///<reference path="../lib/Types.d.ts"/>
-
 import NAuth = require('../lib/Router');
 import * as Types from '../lib/Types';
+import path = require('path');
 
 var d = {} as Types.INAuth2Config;
 d.subDomains = {};
 d.dbConfig = {};
 d.dbConfig.client = 'sqlite3';
-d.dbConfig.connection = {filename: ''}; // TODO
+d.dbConfig.connection = {filename: path.join(__dirname, '../data/nauth2.db')}; // TODO
 
 var s = {} as Types.INAuth2Config;
 

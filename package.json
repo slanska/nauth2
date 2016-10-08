@@ -36,6 +36,7 @@
     "express-jwt": "^5.0.0",
     "feathers": "^2.0.2",
     "feathers-authentication": "^0.7.11",
+    "feathers-errors": "^2.4.0",
     "feathers-hooks": "^1.5.8",
     "feathers-knex": "^2.3.0",
     "feathers-mailer": "^1.0.5",

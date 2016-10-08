@@ -7,16 +7,27 @@ var feathers = require('feathers');
 var rest = require('feathers-rest');
 var hooks = require('feathers-hooks');
 var bodyParser = require('body-parser');
-var authentication = require('feathers-authentication');
+var errors = require('feathers-errors/handler');
 var nauth2 = require('../lib/index');
 var config = require('./config')[process.env.NODE_ENV || 'development'];
 var app = feathers()
     .configure(rest())
     .configure(hooks())
-    .configure(authentication())
-    .configure(nauth2(config))
     .use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }));
+    .use(bodyParser.urlencoded({ extended: true }))
+    .configure(nauth2(config));
+// Just like Express your error middleware needs to be
+// set up last in your middleware chain.
+// app.use(errors({
+//     html: function (error, req, res, next)
+//     {
+//         // render your error view with the error object
+//         res.render('error', error);
+//     }
+// }));
+process.on('unhandledRejection', function (reason, p) {
+    console.log("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+});
 app.set('query parser', 'extended');
 var port = process.env.PORT || 8800;
 app.listen(port, function () {

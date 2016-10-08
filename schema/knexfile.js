@@ -19,7 +19,7 @@ module.exports = {
     staging: {
         client: 'postgresql',
         connection: {
-            database: 'nauth2',
+            database: 'nauth2-stag',
             user: 'username',
             password: 'password'
         },
@@ -35,7 +35,7 @@ module.exports = {
     production: {
         client: 'postgresql',
         connection: {
-            database: 'my_db',
+            database: 'nauth2-prod',
             user: 'username',
             password: 'password'
         },
