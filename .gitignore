@@ -41,3 +41,5 @@ lib/Types.js.map
 /examples/feathers-app.js
 /examples/config.js.map
 /examples/config.js
+/lib/UsersService.js
+/lib/UsersService.js.map

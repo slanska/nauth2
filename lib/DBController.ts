@@ -29,12 +29,20 @@ module NAuth2
         };
 
         Services:{
+
             Users:feathers.Service;
             Roles:feathers.Service;
             UserRoles:feathers.Service;
             Log:feathers.Service;
             Domains:feathers.Service;
             DomainUsers:feathers.Service;
+
+            /*
+             Internally used service to operate on users. Not exposed via REST.
+             Consumed by other REST services (/users & /register) which add custom validation
+             and authorization on top of users service
+             */
+            InternalUsers:feathers.Service;
         };
 
         protected registerUser(data, params)
