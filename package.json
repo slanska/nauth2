@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "TypeScript": "tsc --watch",
-    "postinstall": "tsc"
+    "postinstall": "tsc",
+    "knex:migrate": "cd ./schema && knex migrate:latest --debug"
   },
   "repository": {
     "type": "git",
@@ -32,8 +33,7 @@
     "bunyan": "^1.8.1",
     "cache-manager": "^2.1.2",
     "captchapng": "0.0.1",
-    "express": "^4.14.0",
-    "express-jwt": "^5.0.0",
+    "cors": "^2.8.1",
     "feathers": "^2.0.2",
     "feathers-authentication": "^0.7.11",
     "feathers-errors": "^2.4.0",
@@ -50,6 +50,8 @@
     "wildcard-subdomains": "^1.0.0"
   },
   "devDependencies": {
+    "faker": "^3.1.0",
+    "nodemailer-wellknown": "^0.2.0",
     "pg": "^6.1.0",
     "sqlite3": "^3.1.4"
   }

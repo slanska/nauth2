@@ -2,104 +2,115 @@
  * Created by slanska on 2016-10-08.
  */
 
-///<reference path="../../typings/knex/knex.d.ts"/>
-
-var DB = require('../../lib/Consts');
-var Knex = require("knex");
-
-export function up(knex:Knex)
+exports.up = function (knex, Promise)
 {
     "use strict";
 
-    return knex.schema.createTable(DB.Tables.Domains,
-        (tbl)=>
-        {
-            tbl.string(DB.Domains.DomainID).notNullable().primary();
-            tbl.boolean(DB.Domains.Active).notNullable().defaultTo(true);
-            tbl.string(DB.Domains.Name).notNullable().unique().index();
-            tbl.string(DB.Domains.Description);
-            tbl.string(DB.Domains.FavIconLink);
-            tbl.string(DB.Domains.Title);
-            tbl.timestamps();
-            tbl.integer(DB.Domains.MaxPageCount).defaultTo(100 * 1024 / 8);
-            tbl.string(DB.Domains.DBServer);
-            tbl.string(DB.Domains.Description);
-            tbl.enu(DB.Domains.UserCreateMode, []);
-            tbl.string(DB.Domains.MembershipID);
-            /*
-             [Active] BOOLEAN DEFAULT 1,
-             [Name] TEXT NOT NULL,
-             [Domain] TEXT NOT NULL,
-             [Description] TEXT,
-             [FavIconLink] TEXT,
-             [Title] TEXT,
-             [ID] TEXT NOT NULL,
-             [Created] DATETIME DEFAULT (julianday()),
-             [MaxPageCount] INTEGER DEFAULT ((100 * 1024 / 8)),
-             [DBServer] TEXT,
-             [DBFileName] TEXT,
-             [UserCreateMode] INTEGER DEFAULT 0,
-             [MembershipID] TEXT NOT NULL CONSTRAINT [fkMembership_AppDomain] REFERENCES [Membership]([ID]) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    console.log('up');
 
-             */
-        })
-        .then(()=>
-        {
-        })
-        .then(()=>
-        {
-            return knex.schema.createTable(DB.Tables.Users,
-                (tbl)=>
-                {
-                });
+    return knex.schema
+        .createTable('NAuth2_Domains',
+            function (tbl)
+            {
+                console.log('Domains');
+                tbl.increments('domainId');
+                tbl.boolean('active').notNullable().defaultTo(true);
+                tbl.string('name', 64).notNullable().unique();
+                tbl.string('description', 200).nullable();
+                tbl.string('favIconLink', 200).nullable();
+                tbl.string('title', 64).nullable();
+                tbl.string('path', 64).notNullable().unique();
+                tbl.json('extData').nullable();
+                tbl.integer('userCreateMode').notNullable().defaultTo(0);
+                tbl.integer('changePwdEveryDays').defaultTo(0);
 
-        })
-        .then(()=>
-        {
-            return knex.schema.createTable(DB.Tables.Roles,
-                (tbl)=>
-                {
-                });
-        })
-        .then(()=>
-        {
-            return knex.schema.createTable(DB.Tables.DomainUsers, (tbl)=>
+                tbl.timestamps();
+            })
+        .createTable('NAuth2_Users',
+            function (tbl)
             {
-            });
-        })
-        .then(()=>
-        {
-            return knex.schema.createTable(DB.Tables.UserRoles, (tbl)=>
+                tbl.increments('userID');
+                tbl.string('email').notNullable().unique();
+                tbl.string('pwdHash').notNullable();
+                tbl.string('pwdSalt').notNullable();
+                tbl.string('prevPwdHash').nullable();
+                tbl.date('pwdExpireOn').nullable();
+                tbl.boolean('changePwdOnNextLogin').nullable();
+                tbl.boolean('suspended').notNullable().defaultTo(false);
+                tbl.string('nickName', 40).nullable();
+                tbl.string('firstName', 40).nullable();
+                tbl.string('lastName', 40).nullable();
+                tbl.date('birthDate').nullable();
+                tbl.string('gender', 1).nullable();
+                tbl.string('avatar', 200).nullable();
+                tbl.json('extData').nullable();
+                tbl.timestamps();
+            })
+        .createTable('NAuth2_Roles',
+            function (tbl)
             {
-            });
-        })
-        .then(()=>
-        {
-            return knex.schema.createTable(DB.Tables.Log, (tbl)=>
+                tbl.increments('roleID');
+                tbl.integer('domainID').nullable().references('domainId').inTable('NAuth2_Domains').index();
+                tbl.string('name', 40).notNullable().unique();
+                tbl.string('title', 64).notNullable();
+                tbl.boolean('systemRole').defaultTo(false);
+                tbl.timestamps();
+            })
+        .createTable('NAuth2_DomainUsers',
+            function (tbl)
             {
-            });
-        })
-        .then(()=>
-        {
-            return knex.schema.createTable(DB.Tables.Config, (tbl)=>
+                tbl.integer('domainId').notNullable().references('domainId').inTable('NAuth2_Domains');
+                tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users').index();
+                tbl.timestamps();
+                tbl.primary(['domainId', 'userId'])
+            })
+        .createTable('NAuth2_UserRoles',
+            function (tbl)
             {
+                tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users');
+                tbl.integer('roleId').notNullable().references('roleId').inTable('NAuth2_Roles').index();
+                tbl.timestamps();
+                tbl.primary(['userId', 'roleId']);
+            })
+        .createTable('NAuth2_Log',
+            function (tbl)
+            {
+                tbl.bigIncrements('logID');
+                var col = tbl.dateTime('created_at').notNullable();
+                if (knex.client === 'sqlite')
+                    col.defaultTo(knex.raw("date('now')"));
+                else if (knex.client === 'postgres')
+                    col.defaultTo(knex.raw('now()'));
+                tbl.binary('clientIpAddr', 6).nullable();
+                tbl.integer('userId').nullable().references('userId').inTable('NAuth2_Users');
+                tbl.integer('roleId').nullable().references('roleId').inTable('NAuth2_Roles');
+                tbl.integer('domainId').nullable().references('domainId').inTable('NAuth2_Domains');
+                tbl.enu('op', ['createUser', 'updateUser', 'removeUser', 'createRole', 'updateRole', 'removeRole',
+                    'grantRole', 'revokeRole', 'createDomain', 'updateDomain', 'removeDomain',
+                    'addUserToDomain', 'removeUserFromFromDomain','userRegistered', 'userLoggedIn']).notNullable();
             });
-        });
+
+// .then(function ()
+// {
+//     // Init roles
+//
+//     return knex['NAuth2_Roles'].insert([
+//         {},
+//         {}
+//     ]);
+// });
 }
+;
 
-export function down(knex:Knex)
+exports.down = function (knex, Promise)
 {
-    return Promise.all([
-        knex.schema.dropTableIfExists(DB.Tables.Domains),
-        knex.schema.dropTableIfExists(DB.Tables.Users),
-        knex.schema.dropTableIfExists(DB.Tables.UserRoles),
-        knex.schema.dropTableIfExists(DB.Tables.Roles),
-        knex.schema.dropTableIfExists(DB.Tables.DomainUsers),
-        knex.schema.dropTableIfExists(DB.Tables.Log),
-        knex.schema.dropTableIfExists(DB.Tables.Config)
-    ]);
+    console.log('down');
 
-}
-
-
-
+    return knex.schema
+        .dropTableIfExists('NAuth2_UserRoles')
+        .dropTableIfExists('NAuth2_DomainUsers')
+        .dropTableIfExists('NAuth2_Domains')
+        .dropTableIfExists('NAuth2_Users')
+        .dropTableIfExists('NAuth2_Roles')
+        .dropTableIfExists('NAuth2_Log');
+};

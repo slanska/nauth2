@@ -4,10 +4,12 @@
 
 ///<reference path="./express/express.d.ts"/>
 ///<reference path="./knex/knex.d.ts"/>
+///<reference path="./nodemailer/nodemailer.d.ts"/>
 
 declare module "feathers"
 {
     import * as express from 'express';
+    import * as nodemailer from 'nodemailer';
 
     namespace f
     {
@@ -72,12 +74,71 @@ declare module "feathers-hooks"
 
 declare module "feathers-authentication"
 {
-    export = null;
+    interface AuthConfig
+    {
+        /*
+         JWT token configuration
+         */
+        token:{
+            /*
+             (required) (default: a strong auto generated one) - Your secret used to sign JWT's.
+             If this gets compromised you need to rotate it immediately!
+             */
+            secret:string,
+
+            /*
+             (default: '[]') [optional] - An array of fields from your user object that should be included in the JWT payload.
+             */
+            payload?:string[],
+
+            /*
+             (default: 'password') [optional] - The database field containing the password on the user service.
+             */
+            passwordField?:string,
+
+            /*
+             (default: 'feathers') [optional] - The JWT issuer field
+             */
+            issuer?:string,
+
+            /*
+             (default: 'HS256') [optional] - The accepted JWT hash algorithm.
+             List of supported values is defined on: https://github.com/auth0/node-jsonwebtoken
+             */
+            algorithm?:'HS256'| 'HS384' | 'HS512' | 'RS256' | 'RS384'| 'RS512'| 'ES256'| 'ES384'| 'ES512',
+
+            /*
+             (default:'1d') [optional] - The time a token is valid for
+             */
+            expiresIn:string
+
+        }
+
+        /*
+         (default: 'email') [optional] - The database field on the user service you want to use as the username.
+         */
+        usernameField?:string,
+
+        /*
+         (default: 'password') [optional] - The database field containing the password on the user service.
+         */
+        passwordField?:string,
+
+        /*
+         (default: 'false') [optional] - Whether the local Passport auth strategy should use sessions.
+         */
+        session?:boolean
+    }
+
+    function f(cfg?:AuthConfig);
+
+    export = f;
 }
 
 declare module "feathers-rest"
 {
     export = null;
+
 }
 
 declare module "feathers-knex"
@@ -117,6 +178,17 @@ declare module "feathers-knex"
     }
 
     function f(cfg:ServiceConfig):feathers.Service;
+
+    export = f;
+}
+
+declare module "feathers-mailer"
+{
+    namespace f
+    {
+        function create(email:nodemailer.SendMailOptions, params?);
+    }
+    function f(transport:nodemailer.Transport, defaults?);
 
     export = f;
 }

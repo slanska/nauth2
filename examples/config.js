@@ -3,6 +3,7 @@
  */
 "use strict";
 var path = require('path');
+var knexConfig = require('../schema/knexfile');
 var d = {};
 d.subDomains = {};
 d.dbConfig = {};

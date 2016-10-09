@@ -50,29 +50,34 @@ namespace Types
      Modes for user registration
 
      */
-    export enum RegisterMode {
+    export enum UserCreateMode {
+        /*
+         For domains 'Auto' mode means that system wide setting will be used. For system level setting, 'Auto' is treated as 'ByAdminOnly'
+         */
+        Auto = 0,
+
         /*
          Only authorized users can add new user. /register is not allowed
          */
-        ByAdminOnly,
+        ByAdminOnly = 1,
 
         /*
          New user can register and email with confirmation link will be sent. Once link is processed,
          user becomes a registered member
          */
-        SelfAndConfirm,
+        SelfAndConfirm = 2,
 
         /*
          Prospective member fill registration form, user admin(s) will be notified via email and
          either approve or reject a new user. User will be notified via email
          */
-        SelfAndApproveByAdmin,
+        SelfAndApproveByAdmin = 3,
 
         /*
          A new user fills registration form and immediately becomes registered. User admin(s) will
          get notified via email
          */
-        SelfStart
+        SelfStart = 4
     }
 
     /*
@@ -92,6 +97,12 @@ namespace Types
          Default: 'auth'
          */
         basePath?:string;
+
+        /*
+         (required) (default: a strong auto generated one) - Your secret used to sign JWT's.
+         If this gets compromised you need to rotate it immediately!
+         */
+        tokenSecret?:string,
 
         /*
          Optional configuration for subdomains.
@@ -130,7 +141,7 @@ namespace Types
          Defines how new users will be registered.
          Default: ByAdminOnly
          */
-        registerMode?:RegisterMode;
+        userCreateMode?:UserCreateMode;
 
         /*
          Path to email templates.

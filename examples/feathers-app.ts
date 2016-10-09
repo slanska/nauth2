@@ -10,6 +10,7 @@ var hooks = require('feathers-hooks');
 var bodyParser = require('body-parser');
 var errors = require('feathers-errors/handler');
 import nauth2 = require('../lib/index');
+var cors = require('cors');
 
 var config = require('./config')[process.env.NODE_ENV || 'development'];
 
@@ -21,6 +22,8 @@ var app = feathers()
     // Hooks MUST be configured before authentication
     .configure(hooks())
 
+    .use(cors())
+
     // Turn on JSON parser for REST services
     .use(bodyParser.json())
 
@@ -31,13 +34,13 @@ var app = feathers()
 
 // Just like Express your error middleware needs to be
 // set up last in your middleware chain.
-// app.use(errors({
-//     html: function (error, req, res, next)
-//     {
-//         // render your error view with the error object
-//         res.render('error', error);
-//     }
-// }));
+app.use(errors({
+    html: function (error, req, res, next)
+    {
+        // render your error view with the error object
+        res.json(error);
+    }
+}));
 
 process.on('unhandledRejection', (reason, p) =>
 {

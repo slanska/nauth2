@@ -2,11 +2,16 @@
  * Created by slanska on 2016-10-01.
  */
 
-module NAuth2
+import * as Types from './Types';
+var Mailer = require('feathers-mailer');
+
+class Emailer
 {
-    export class Emailer
+    constructor()
     {
+        Mailer();
     }
 }
 
-export = NAuth2;
+
+export = Emailer;

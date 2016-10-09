@@ -4,7 +4,7 @@
 
 import * as Types from './Types';
 import knex = require('knex');
-import {Tables, Users} from './Consts';
+import * as DB from './Consts';
 import Promise = require('bluebird');
 var knexServiceFactory = require('feathers-knex');
 import feathers = require("feathers");
@@ -50,7 +50,7 @@ module NAuth2
             this.Services.Users = knexServiceFactory(
                 {
                     Model: this.db,
-                    name: 'Users',
+                    name: DB.Tables.Users,
                     id: 'UserID',
                     paginate: {max: 200, "default": 50}
                 });
@@ -62,7 +62,7 @@ module NAuth2
             this.Services.Roles = knexServiceFactory(
                 {
                     Model: this.db,
-                    name: 'Roles',
+                    name: DB.Tables.Roles,
                     id: 'RoleID',
                     paginate: {max: 200, "default": 50}
                 });
@@ -73,7 +73,7 @@ module NAuth2
             this.Services.UserRoles = knexServiceFactory(
                 {
                     Model: this.db,
-                    name: 'UserRoles',
+                    name: DB.Tables.UserRoles,
                     id: ['UserID', 'RoleID'],
                     paginate: {max: 200, "default": 50}
                 });
@@ -84,7 +84,7 @@ module NAuth2
             this.Services.Log = knexServiceFactory(
                 {
                     Model: this.db,
-                    name: 'Log',
+                    name: DB.Tables.Log,
                     id: 'LogID',
                     paginate: {max: 200, "default": 50}
                 });
@@ -94,13 +94,13 @@ module NAuth2
             if (cfg.subDomains)
             {
                 this.Path.Domains = `${cfg.basePath}/domains`;
-                this.Path.DomainUsers = `${cfg.basePath}/domainusers`;
+                this.Path.DomainUsers = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/users`;
 
                 // Domains
                 this.Services.Domains = knexServiceFactory(
                     {
                         Model: this.db,
-                        name: 'Domains',
+                        name: DB.Tables.Domains,
                         id: 'DomainID',
                         paginate: {max: 200, "default": 50}
                     });
@@ -111,7 +111,7 @@ module NAuth2
                 this.Services.DomainUsers = knexServiceFactory(
                     {
                         Model: this.db,
-                        name: 'DomainUsers',
+                        name: DB.Tables.DomainUsers,
                         id: ['DomainID', 'UserID'],
                         paginate: {max: 200, "default": 50}
                     });

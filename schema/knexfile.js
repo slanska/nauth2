@@ -1,18 +1,16 @@
 // Update with your config settings.
 
-module.exports = {
+var path = require('path');
 
+module.exports = {
     development: {
         client: 'sqlite3',
         connection: {
-            filename: './data/nauth2.db'
+            filename: path.join(__dirname, '../data/nauth2.db')
         },
         pool: {
             min: 2,
-            max: 10,
-            afterCreate: ()=>
-            {
-            }
+            max: 10
         }
     },
 
@@ -47,5 +45,6 @@ module.exports = {
             tableName: 'knex_migrations'
         }
     }
-
 };
+
+

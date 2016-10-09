@@ -12,8 +12,6 @@ module NAuth2
         export const Roles = 'NAuth2_Roles';
         export const UserRoles = 'NAuth2_UserRoles';
         export const Log = 'NAuth2_Log';
-        export const Config = 'NAuth2_Config';
-
     }
 
     export module Users
@@ -36,8 +34,8 @@ module NAuth2
         export const MaxPageCount = 'MaxPageAccount';
         export const DBServer = 'DBServer';
         export const DBFileName = 'DBFileName';
-        export const UserCreateMode = 'UserCreateNode';
-        export const MembershipID = 'MembershipID';
+        export const UserCreateMode = 'userCreateNode';
+        export const Path = 'path';
     }
 
 

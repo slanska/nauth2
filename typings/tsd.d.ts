@@ -12,5 +12,6 @@
 /// <reference path="lodash/lodash.d.ts" />
 /// <reference path="shortid/shortid.d.ts" />
 /// <reference path="cache-manager/cache-manager.d.ts" />
+/// <reference path="faker/faker.d.ts" />
 ///<reference path="feathers.d.ts"/>
 
