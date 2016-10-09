@@ -87,20 +87,41 @@ exports.up = function (knex, Promise)
                 tbl.integer('domainId').nullable().references('domainId').inTable('NAuth2_Domains');
                 tbl.enu('op', ['createUser', 'updateUser', 'removeUser', 'createRole', 'updateRole', 'removeRole',
                     'grantRole', 'revokeRole', 'createDomain', 'updateDomain', 'removeDomain',
-                    'addUserToDomain', 'removeUserFromFromDomain','userRegistered', 'userLoggedIn']).notNullable();
-            });
+                    'addUserToDomain', 'removeUserFromFromDomain', 'userRegistered', 'userLoggedIn']).notNullable();
+            })
+        .then(function ()
+        {
+            // Init roles
 
-// .then(function ()
-// {
-//     // Init roles
-//
-//     return knex['NAuth2_Roles'].insert([
-//         {},
-//         {}
-//     ]);
-// });
-}
-;
+            return knex.insert([
+                /*
+                 Can do everything on the database: create/remove domains/users/roles, grant/revoke any roles etc.
+                 */
+                {name: 'SystemAdmin', title: 'System Admin', systemRole: true},
+
+                /*
+                 Can create/remove users, grant/revoke roles, assign roles (except system roles). CANNOT manage domains/domain users and domain roles
+                 */
+                {name: 'UserAdmin', title: 'User Admin', systemRole: true},
+
+                /*
+                 Can create/remove domains, grant/revoke domain roles, assign users to domains
+                 */
+                {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true},
+
+                /*
+                 Can delete domain, manage users and roles within domain
+                 */
+                {name: 'DomainAdmin', title: 'Domain Admin', systemRole: true},
+
+                /*
+                 Can manage users and roles within domain
+                 */
+                {name: 'Domain User Admin', title: 'Domain User Admin', systemRole: true}
+            ]).into('NAuth2_Roles');
+
+        });
+};
 
 exports.down = function (knex, Promise)
 {

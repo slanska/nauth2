@@ -10,6 +10,7 @@ import feathers = require("feathers");
 var wildcardSubdomains = require('wildcard-subdomains');
 import path = require('path');
 import * as Types from "./Types";
+import Emailer = require("./Emailer");
 var authentication = require('feathers-authentication');
 
 var config = require('./config');
@@ -60,6 +61,7 @@ class Router
     }
 
     protected DBController:DBController;
+    protected Emailer: Emailer;
 
     constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
     {
@@ -86,6 +88,8 @@ class Router
 
         // Register services
         this.DBController = new DBController(this.app, this.cfg);
+        this.Emailer = new Emailer(this.app, this.cfg);
+
 
     }
 }

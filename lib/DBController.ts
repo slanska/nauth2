@@ -22,6 +22,10 @@ module NAuth2
             Log:string;
             Domains?:string;
             DomainUsers?:string;
+            Register?:string;
+            Login:string;
+            DomainRegister?:string;
+            DomainLogin?:string;
         };
 
         Services:{
@@ -33,6 +37,27 @@ module NAuth2
             DomainUsers:feathers.Service;
         };
 
+        protected registerUser(data, params)
+        {
+            var self = this;
+            return self.Services.Users.create(data, params);
+        }
+
+        protected loginUser()
+        {
+            return Promise.resolve('Obana!');
+        }
+
+        protected domainLoginUser()
+        {
+            return Promise.resolve('Obana!');
+        }
+
+        protected domainRegisterUser()
+        {
+            return Promise.resolve('Obana!');
+        }
+
         constructor(protected app:feathers.ApplicationCore, protected cfg:Types.INAuth2Config)
         {
             this.db = knex(cfg.dbConfig);
@@ -41,7 +66,8 @@ module NAuth2
                 Users: `${cfg.basePath}/users`,
                 Roles: `${cfg.basePath}/roles`,
                 UserRoles: `${cfg.basePath}/userroles`,
-                Log: `${cfg.basePath}/log`
+                Log: `${cfg.basePath}/log`,
+                Login: `${cfg.basePath}/login`
             };
 
             this.Services = {} as any;
@@ -56,7 +82,9 @@ module NAuth2
                 });
 
             this.app.use(this.Path.Users, this.Services.Users);
-
+            this.Services.Users.before = {
+                // create: this.authorizeUsers
+            };
 
             // Roles
             this.Services.Roles = knexServiceFactory(
@@ -91,10 +119,34 @@ module NAuth2
 
             this.app.use(this.Path.Log, this.Services.Log);
 
+            switch (cfg.userCreateMode)
+            {
+                case Types.UserCreateMode.Auto:
+                case  Types.UserCreateMode.ByAdminOnly:
+                    this.Path.Register = `${cfg.basePath}/register`;
+                    this.app.use(this.Path.Register, {
+                        create: this.registerUser.bind(this)
+                    });
+
+                    var svc = this.app.service(this.Path.Register)
+                        .before({
+                            //create: check confirm password, check captcha, remove confirm password & captcha
+                        })
+                        .after({
+                            //create: send email - to user if selfComplete, to admin(s) if approveByAdmin
+                        });
+                    break;
+            }
+
+            this.app.use(this.Path.Login, {
+                create: this.loginUser.bind(this)
+            });
+
             if (cfg.subDomains)
             {
                 this.Path.Domains = `${cfg.basePath}/domains`;
                 this.Path.DomainUsers = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/users`;
+                this.Path.DomainLogin = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/login`;
 
                 // Domains
                 this.Services.Domains = knexServiceFactory(
@@ -117,6 +169,22 @@ module NAuth2
                     });
 
                 this.app.use(this.Path.DomainUsers, this.Services.DomainUsers);
+
+                this.app.use(this.Path.DomainLogin, {
+                    create: this.domainLoginUser.bind(this)
+                });
+
+                switch (cfg.userCreateMode)
+                {
+                    case Types.UserCreateMode.Auto :
+                    case  Types.UserCreateMode.ByAdminOnly:
+
+                        this.Path.DomainRegister = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/register`;
+                        this.app.use(this.Path.DomainRegister, {
+                            create: this.domainRegisterUser.bind(this)
+                        });
+                        break;
+                }
             }
         }
     }

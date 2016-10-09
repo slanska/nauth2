@@ -7,9 +7,9 @@ var Mailer = require('feathers-mailer');
 
 class Emailer
 {
-    constructor()
+    constructor(app, cfg)
     {
-        Mailer();
+        // TODO Mailer();
     }
 }
 
