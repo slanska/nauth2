@@ -11,41 +11,6 @@ import * as express from 'express';
 
 namespace Types
 {
-    interface ILoginPayload
-    {
-        email:string,
-        password:string;
-    }
-
-    interface IRegisterPayload
-    {
-        email:string;
-        password:string;
-        confirmPassword:string;
-
-        // Optional
-        firstName?:string;
-        lastName?:string;
-        addressLine1?:string;
-        addressLine2?:string;
-        city?:string;
-        postalCode?:string;
-        country?:string;
-        stateOrProvince?:string;
-
-        captcha?:string;
-        captchaToVerify?:string;
-    }
-
-    interface ILoginResult
-    {
-        token:string;
-    }
-
-    interface IRegisterResult
-    {
-    }
-
     /*
      Modes for user registration
 
@@ -157,65 +122,39 @@ namespace Types
 
          */
         emailConfig:NodemailerSmtpTransport.SmtpOptions;
+
+        /*
+         Regular expression for good password validation.
+         Default rules:
+         1) The password length must be greater than or equal to 8
+         2) The password must contain one or more uppercase characters
+         3) The password must contain one or more lowercase characters
+         4) The password must contain one or more numeric values
+         5) The password must contain one or more special characters
+
+         Default rules regexp:
+         /(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/
+
+         NOTE: custom rules can be string or RegExp. If specified as string, make sure that all backslashes and presented properly
+         (i.e. doubled). I.e. expression above in string format should be set as:
+         '(?=^.{8,}$)(?=.*\\d)(?=.*[!@#$%^&*]+)(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$'
+
+         If password does not match rules, message 'WeakPassword' from templates/phrases.json will be sent back
+         */
+        passwordRules?:string|RegExp
     }
 
-    interface IForgotPasswordResponse
-    {
-    }
-
-    interface IReqParams
-    {
-        subdomain?:string;
-    }
-
-    /*
-     Typed extension of Express request
+     /*
+     Captcha information used to verify whether there is a human being on the other side of connection
+     When returned from server, hash hash and imageBase64
+     When sent back to server, should have original hash and value, entered by user
      */
-    interface Request<T, P extends IReqParams, Q> extends express.Request
+    export interface ICaptcha
     {
-        body:T;
-        params:P;
-        query:Q;
-    }
-
-    interface ISaveResult
-    {
-
-    }
-
-    interface IUserProfile
-    {
-    }
-
-    interface IForgotPasswordPayload
-    {
-    }
-
-    interface IUserParams
-    {
-        userID:string;
-    }
-
-    interface IUserQuery
-    {
-
-    }
-
-    interface  IChangePasswordPayload
-    {
-        oldPassword:string;
-        newPassword:string;
-        confirmNewPassword:string;
-    }
-
-    interface IRoleParams
-    {
-    }
-
-    interface IRolesQuery
-    {
+        hash:string
+        value?:string,
+        imageBase64?:string
     }
 }
 
 export = Types;
-

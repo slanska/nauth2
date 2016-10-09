@@ -11,7 +11,8 @@ var wildcardSubdomains = require('wildcard-subdomains');
 import path = require('path');
 import * as Types from "./Types";
 import Emailer = require("./Emailer");
-var authentication = require('feathers-authentication');
+import authentication = require('feathers-authentication');
+import Captcha = require('./Captcha');
 
 var config = require('./config');
 
@@ -47,21 +48,23 @@ var config = require('./config');
  */
 class Router
 {
-    private isAuthenticated(req, res, next)
-    {
-
-    }
-
-    private IsAdmin(req, res, next)
-    {
-    }
-
-    private IsDomainAdmin(req, res, next)
-    {
-    }
+    // private isAuthenticated(req, res, next)
+    // {
+    //
+    // }
+    //
+    // private IsAdmin(req, res, next)
+    // {
+    // }
+    //
+    // private IsDomainAdmin(req, res, next)
+    // {
+    // }
 
     protected DBController:DBController;
     protected Emailer: Emailer;
+    
+    public AuthConfig:authentication.AuthConfig = {} as authentication.AuthConfig;
 
     constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
     {
@@ -71,6 +74,7 @@ class Router
         this.cfg.newMemberRoles = this.cfg.newMemberRoles || [];
         this.cfg.userCreateMode = this.cfg.userCreateMode || Types.UserCreateMode.ByAdminOnly;
         this.cfg.templatePath = this.cfg.templatePath || path.join(__dirname, '../templates');
+        this.cfg.passwordRules = new RegExp(this.cfg.passwordRules as any || '(?=^.{8,}$)(?=.*\\d)(?=.*[!@#$%^&*]+)(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$');
 
         if (this.cfg.subDomains)
         {
@@ -87,12 +91,12 @@ class Router
         // 3. Authentication
 
         // Register services
-        this.DBController = new DBController(this.app, this.cfg);
+        this.DBController = new DBController(this.app, this.cfg, this.AuthConfig);
         this.Emailer = new Emailer(this.app, this.cfg);
 
-
+        var captchaPath = `${this.cfg.basePath}/captcha`;
+        Captcha.init(this.app, captchaPath, process.env.NODE_ENV || 'development');
     }
 }
-
 
 export = Router;

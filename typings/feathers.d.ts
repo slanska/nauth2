@@ -13,7 +13,6 @@ declare module "feathers"
 
     namespace f
     {
-
         interface Service
         {
             create?:(data, params, callback?:express.NextFunction)=>any;
@@ -92,19 +91,105 @@ declare module "feathers-hooks"
             /*
              - The id (for get, remove, update and patch)
              */
-            id:string | number
+            id:string | number,
+
+            /*
+             Can be optionally set in 'before' hook to stop flow, or used in 'after' hook to process returned data
+             */
+            result?:any
         }
 
+        type HookFunction = ((p:HookParams)=>any) | (((p:HookParams)=>any)[]);
         interface Hook
         {
-            create?:(data, params, callback?:express.NextFunction)=>any;
-            find?:(params, callback?)=>any;
-            get?:(id, params, callback?)=>any;
-            remove?:(id, params, callback?)=>any;
-            patch?:(id, data, params, callback?)=>any;
-            update?:(id, data, params, callback?)=>any;
-            all?:(p:HookParams)=>any;
+            create?:HookFunction;
+            find?:HookFunction;
+            get?:HookFunction;
+            remove?:HookFunction;
+            patch?:HookFunction;
+            update?:HookFunction;
+            all?:HookFunction;
         }
+
+        /*
+         Predefined hooks
+         */
+
+        /*
+         uses a property from the result (or every item if it is a list) to retrieve a single related object from
+         a service and add it to the original object. It is meant to be used as an after hook on any service method.
+         @param  fieldName (required) - The field name you want to populate the related object on to.
+         @param service (required) - The service you want to populate the object from.
+         @param field (default: 'fieldName') [optional] - The field you want to look up the related object
+         by from the service. By default it is the same as the target fieldName.
+         */
+        function populate(fieldName:string, service:feathers.Service, field?:string);
+
+        /*
+         Disables access to a service method completely or for a specific provider. All providers
+         (REST, Socket.io and Primus) set the params.provider property which is what disable checks for.
+         There are several ways to use the disable hook:
+         @param providers (default: disables everything) [optional] - The transports that you want to
+         disable this service method for. Options are:
+         socketio - will disable the method for the Socket.IO provider
+         primus - will disable the method for the Primus provider
+         rest - will disable the method for the REST provider
+         external - will disable access from all providers making a service method only usable internally.
+         @param callback (default: runs when not called internally) [optional] -
+         A function that receives the hook object where you can put your own logic to determine whether this hook should run.
+         Returns either true or false.
+         */
+        function disable(providers?:'socketio' | 'primus' | 'rest' | 'external', callback?:Function);
+
+        /*
+         Remove the given fields either from the data submitted (as a before hook for create, update or patch)
+         or from the result (as an after hook). If the data is an array or a paginated find result the hook will
+         remove the field for every item.
+         @param fields (required) - The fields that you want to remove from the object(s).
+         @param callback (default: runs when not called internally) [optional] -
+         A function that receives the hook object where you can put your own logic to determine whether this hook should run.
+         Returns either true or false.
+         */
+        function remove(...fields:string[]);
+        function remove(fields:string, callback?:Function);
+
+        /*
+         Remove the given fields from the query params. Can be used as a before hook for any service method.
+         @param fields (required) - The fields that you want to remove from the query object.
+         @param callback (default: runs when not called internally) [optional] - A function that receives the hook object
+         where you can put your own logic to determine whether this hook should run. Returns either true or false.
+         */
+        function removeQuery(...fields:string[]);
+        function removeQuery(fields:string, callback?:Function);
+
+        /*
+         Discard all other fields except for the provided fields either from the data submitted
+         (as a before hook for create, update or patch) or from the result (as an after hook).
+         If the data is an array or a paginated find result the hook will remove the field for every item.
+         @param fields (required) - The fields that you want to retain from the object(s). All other fields will be discarded.
+         @param callback (default: runs when not called internally) [optional] - A function that receives
+         the hook object where you can put your own logic to determine whether this hook should run. Returns either true or false.
+         */
+        function pluck(...fields:string[]);
+        function pluck(fields:string, callback?:Function);
+
+        /*
+         Discard all other fields except for the given fields from the query params.
+         Can be used as a before hook for any service method.
+         @param fields (required) - The fields that you want to retain from the query object. All other fields will be discarded.
+         @param callback (default: runs when not called internally) [optional] - A function that receives the hook object
+         where you can put your own logic to determine whether this hook should run. Returns either true or false.
+         */
+        function pluckQuery(...fields:string[]);
+        function pluckQuery(fields:string, callback?:Function);
+
+        /*
+         Lowercases the given fields either in the data submitted (as a before hook for create, update or patch)
+         or in the result (as an after hook). If the data is an array or a paginated find result
+         the hook will lowercase the field for every item.
+         @param fields (required) - The fields that you want to lowercase from the retrieved object(s).
+         */
+        function lowerCase(...fields:string[]);
     }
     export = f;
 }
@@ -113,226 +198,229 @@ declare module "feathers-authentication"
 {
     import * as Hooks from 'feathers-hooks';
 
-    interface AuthConfig
-    {
-        /*
-         [optional] - The local auth provider config. By default this is included in a Feathers app. If set to false it will not be initialized.
-         */
-        local?:{
-            /*
-             (default: 'email') [optional] - The database field on the user service you want to use as the username.
-             */
-            usernameField?:string,
-
-            /*
-             (default: 'password') [optional] - The database field containing the password on the user service.
-             */
-            passwordField?:string,
-
-            /*
-             (default: 'false') [optional] - Whether the local Passport auth strategy should use sessions.
-             */
-            session?:boolean
-        },
-
-        /*
-         (default: '/auth/success') [optional] -
-         The endpoint to redirect to after successful authentication or signup.
-         Only used for requests not over Ajax or sockets.
-         */
-        successRedirect?:string,
-
-        /*
-         (default: '/auth/failure') [optional] - The endpoint to redirect to for a failed authentication or signup.
-         Only used for requests not over Ajax or sockets. Can be set to false to disable redirects.
-         */
-        failureRedirect?:string,
-
-        /*
-         (default: true) [optional] - Can be set to false to disable setting up the default success redirect route handler.
-         Required if you want to render your own custom page on auth success.
-         */
-        shouldSetupSuccessRoute?:boolean,
-
-        /*
-         (default: true) [optional] - Can be set to false to disable setting up the default failure redirect route handler.
-         Required if you want to render your own custom page on auth failure.
-         */
-        shouldSetupFailureRoute ?:boolean,
-
-        /*
-         (default:'_id') [optional] - the id field for you user's id. This is use by many of the authorization hooks.
-         */
-        idField ?:string,
-
-        /*
-         (default:'/auth/local') [optional] - The local authentication endpoint used to create new tokens
-         using local auth
-         */
-        localEndpoint?:string,
-
-        /*
-         (default:'/users') [optional] - The user service endpoint
-         */
-        userEndpoint?:string,
-
-        /*
-         (default:'/auth/token') [optional] - The JWT auth service endpoint
-         */
-        tokenEndpoint?:string,
-
-        /*
-         (default:'authorization') [optional] - The header field to check for the token. This is case sensitive.
-         */
-        header?:string,
-
-        /*
-         (default:see options) [optional] -
-         The cookie options used when sending the JWT in a cookie for OAuth or plain form posts.
-         You can disable sending the cookie by setting this to false.
-         */
-        cookie?:{
-            /*
-             (default: 'feathers-jwt') [optional] - The cookie name. This is case sensitive.
-             */
-            name?:string,
-
-            /*
-             (default: 'false') [optional] - Prevents JavaScript from accessing the cookie on the client.
-             Should be set to true if you are not using OAuth or Form Posts for authentication.
-             */
-            httpOnly?:boolean,
-
-            /*
-             (default: 'true' in production) [optional] - Marks the cookie to be used with HTTPS only.
-             */
-            secure?:boolean,
-
-            /*
-             (default: 30 seconds from current time) [optional] - The time when the cookie should expire.
-             Must be a valid Date object.
-             */
-            expires?:Date
-        },
-
-        /*
-         JWT token configuration
-         */
-        token?:{
-            /*
-             (required) (default: a strong auto generated one) - Your secret used to sign JWT's.
-             If this gets compromised you need to rotate it immediately!
-             */
-            secret:string,
-
-            /*
-             (default: '[]') [optional] - An array of fields from your user object that should be included in the JWT payload.
-             */
-            payload?:string[],
-
-            /*
-             (default: 'password') [optional] - The database field containing the password on the user service.
-             */
-            passwordField?:string,
-
-            /*
-             (default: 'feathers') [optional] - The JWT issuer field
-             */
-            issuer?:string,
-
-            /*
-             (default: 'HS256') [optional] - The accepted JWT hash algorithm.
-             List of supported values is defined on: https://github.com/auth0/node-jsonwebtoken
-             */
-            algorithm?:'HS256'| 'HS384' | 'HS512' | 'RS256' | 'RS384'| 'RS512'| 'ES256'| 'ES384'| 'ES512',
-
-            /*
-             (default:'1d') [optional] - The time a token is valid for
-             Examples: ''
-             */
-            expiresIn:string
-
-        },
-
-        /*
-         Optional list of roles to verify against. Used by hasRoleOrRestrict hook
-         */
-        roles?:[string|number],
-
-        /*
-         Name for query parameter to set user ID (used by queryWithCurrentUser hook)
-         */
-        as?:string,
-
-        /*
-         Used by restrictToOwner hook to extract owner ID/IDs to verify that current user is tha owner of data.
-         Value can be array of IDs (multiple owners)
-         */
-        ownerField?:string
-    }
-
-    function f(cfg?:AuthConfig);
+    function f(cfg?:f.AuthConfig);
 
     /*
      Standard hooks for user authentication.
      Most of them accept authentication configuration as a parameter.
      If config is not passed, hooks will use default configuration, as defined for service 'auth'
      */
-    namespace f.hooks
+    namespace f
     {
-        function associateCurrentUser(cfg?:AuthConfig);
+        export interface AuthConfig
+        {
+            /*
+             [optional] - The local auth provider config. By default this is included in a Feathers app. If set to false it will not be initialized.
+             */
+            local?:{
+                /*
+                 (default: 'email') [optional] - The database field on the user service you want to use as the username.
+                 */
+                usernameField?:string,
 
-        /*
-         Hashes password with generated salt. Uses passwordField attribute in p.data and replaces it
-         with hashed value. Note: looks like it does not store salt
-         */
-        function hashPassword(cfg?:AuthConfig);
+                /*
+                 (default: 'password') [optional] - The database field containing the password on the user service.
+                 */
+                passwordField?:string,
 
-        /*
-         Uses cfg.userEndpoint to access User service and retrieve user information
-         */
-        function populateUser(cfg?:AuthConfig);
+                /*
+                 (default: 'false') [optional] - Whether the local Passport auth strategy should use sessions.
+                 */
+                session?:boolean
+            },
 
-        /*
-         Sets current user ID from payload to query using cfg.as for attribute name
-         */
-        function queryWithCurrentUser(cfg?:AuthConfig);
+            /*
+             (default: '/auth/success') [optional] -
+             The endpoint to redirect to after successful authentication or signup.
+             Only used for requests not over Ajax or sockets.
+             */
+            successRedirect?:string,
 
-        /*
-         Checks if there is registered user
-         */
-        function restrictToAuthenticated();
+            /*
+             (default: '/auth/failure') [optional] - The endpoint to redirect to for a failed authentication or signup.
+             Only used for requests not over Ajax or sockets. Can be set to false to disable redirects.
+             */
+            failureRedirect?:string,
 
-        /*
-         Checks if data.owner attribute (determined by cfg.ownerField) is id of current user
-         */
-        function restrictToOwner(cfg?:AuthConfig);
+            /*
+             (default: true) [optional] - Can be set to false to disable setting up the default success redirect route handler.
+             Required if you want to render your own custom page on auth success.
+             */
+            shouldSetupSuccessRoute?:boolean,
 
-        /*
-         Checks if current user has one of allowed roles in the config
-         */
-        function restrictToRoles(cfg?:AuthConfig);
+            /*
+             (default: true) [optional] - Can be set to false to disable setting up the default failure redirect route handler.
+             Required if you want to render your own custom page on auth failure.
+             */
+            shouldSetupFailureRoute ?:boolean,
 
-        /*
-         Checks if JWT is valid and sets HookParams.params.payload to token's payload
-         */
-        function verifyToken(cfg?:AuthConfig);
+            /*
+             (default:'_id') [optional] - the id field for you user's id. This is use by many of the authorization hooks.
+             */
+            idField ?:string,
 
-        /*
-         Only for find or get methods
-         NOT SURE what this hook is doing
-         */
-        function verifyOrRestrict();
+            /*
+             (default:'/auth/local') [optional] - The local authentication endpoint used to create new tokens
+             using local auth
+             */
+            localEndpoint?:string,
 
-        /*
-         Only for find or get methods
-         */
-        function populateOrRestrict(cfg?:AuthConfig);
+            /*
+             (default:'/users') [optional] - The user service endpoint
+             */
+            userEndpoint?:string,
 
-        /*
-         Only for find or get methods
-         */
-        function hasRoleOrRestrict(cfg?:AuthConfig);
+            /*
+             (default:'/auth/token') [optional] - The JWT auth service endpoint
+             */
+            tokenEndpoint?:string,
+
+            /*
+             (default:'authorization') [optional] - The header field to check for the token. This is case sensitive.
+             */
+            header?:string,
+
+            /*
+             (default:see options) [optional] -
+             The cookie options used when sending the JWT in a cookie for OAuth or plain form posts.
+             You can disable sending the cookie by setting this to false.
+             */
+            cookie?:{
+                /*
+                 (default: 'feathers-jwt') [optional] - The cookie name. This is case sensitive.
+                 */
+                name?:string,
+
+                /*
+                 (default: 'false') [optional] - Prevents JavaScript from accessing the cookie on the client.
+                 Should be set to true if you are not using OAuth or Form Posts for authentication.
+                 */
+                httpOnly?:boolean,
+
+                /*
+                 (default: 'true' in production) [optional] - Marks the cookie to be used with HTTPS only.
+                 */
+                secure?:boolean,
+
+                /*
+                 (default: 30 seconds from current time) [optional] - The time when the cookie should expire.
+                 Must be a valid Date object.
+                 */
+                expires?:Date
+            },
+
+            /*
+             JWT token configuration
+             */
+            token?:{
+                /*
+                 (required) (default: a strong auto generated one) - Your secret used to sign JWT's.
+                 If this gets compromised you need to rotate it immediately!
+                 */
+                secret:string,
+
+                /*
+                 (default: '[]') [optional] - An array of fields from your user object that should be included in the JWT payload.
+                 */
+                payload?:string[],
+
+                /*
+                 (default: 'password') [optional] - The database field containing the password on the user service.
+                 */
+                passwordField?:string,
+
+                /*
+                 (default: 'feathers') [optional] - The JWT issuer field
+                 */
+                issuer?:string,
+
+                /*
+                 (default: 'HS256') [optional] - The accepted JWT hash algorithm.
+                 List of supported values is defined on: https://github.com/auth0/node-jsonwebtoken
+                 */
+                algorithm?:'HS256'| 'HS384' | 'HS512' | 'RS256' | 'RS384'| 'RS512'| 'ES256'| 'ES384'| 'ES512',
+
+                /*
+                 (default:'1d') [optional] - The time a token is valid for
+                 Examples: ''
+                 */
+                expiresIn:string
+
+            },
+
+            /*
+             Optional list of roles to verify against. Used by hasRoleOrRestrict hook
+             */
+            roles?:[string|number],
+
+            /*
+             Name for query parameter to set user ID (used by queryWithCurrentUser hook)
+             */
+            as?:string,
+
+            /*
+             Used by restrictToOwner hook to extract owner ID/IDs to verify that current user is tha owner of data.
+             Value can be array of IDs (multiple owners)
+             */
+            ownerField?:string
+        }
+
+        export namespace hooks
+        {
+            export function associateCurrentUser(cfg?:AuthConfig);
+
+            /*
+             Hashes password with generated salt. Uses passwordField attribute in p.data and replaces it
+             with hashed value. Note: looks like it does not store salt
+             */
+            export function hashPassword(cfg?:AuthConfig);
+
+            /*
+             Uses cfg.userEndpoint to access User service and retrieve user information
+             */
+            export function populateUser(cfg?:AuthConfig);
+
+            /*
+             Sets current user ID from payload to query using cfg.as for attribute name
+             */
+            export function queryWithCurrentUser(cfg?:AuthConfig);
+
+            /*
+             Checks if there is registered user
+             */
+            export function restrictToAuthenticated();
+
+            /*
+             Checks if data.owner attribute (determined by cfg.ownerField) is id of current user
+             */
+            export function restrictToOwner(cfg?:AuthConfig);
+
+            /*
+             Checks if current user has one of allowed roles in the config
+             */
+            export function restrictToRoles(cfg?:AuthConfig);
+
+            /*
+             Checks if JWT is valid and sets HookParams.params.payload to token's payload
+             */
+            export function verifyToken(cfg?:AuthConfig);
+
+            /*
+             Only for find or get methods
+             NOT SURE what this hook is doing
+             */
+            export function verifyOrRestrict();
+
+            /*
+             Only for find or get methods
+             */
+            export function populateOrRestrict(cfg?:AuthConfig);
+
+            /*
+             Only for find or get methods
+             */
+            export function hasRoleOrRestrict(cfg?:AuthConfig);
+        }
     }
 
     export = f;
@@ -340,6 +428,7 @@ declare module "feathers-authentication"
 
 declare module "feathers-rest"
 {
+    // TODO
     export = null;
 
 }
@@ -394,6 +483,36 @@ declare module "feathers-mailer"
         function create(email:nodemailer.SendMailOptions, params?);
     }
     function f(transport:nodemailer.Transport, defaults?);
+
+    export = f;
+}
+
+/*
+ Standard errors
+ */
+declare module "feathers-errors"
+{
+    interface Error
+    {
+        new(message, data?)
+    }
+
+    namespace f
+    {
+        var BadRequest:Error;
+        var NotAuthenticated:Error;
+        var PaymentError:Error;
+        var Forbidden:Error;
+        var NotFound:Error;
+        var MethodNotAllowed:Error;
+        var NotAcceptable:Error;
+        var Timeout:Error;
+        var Conflict:Error;
+        var Unprocessable:Error;
+        var GeneralError:Error;
+        var NotImplemented:Error;
+        var Unavailable:Error;
+    }
 
     export = f;
 }

@@ -53,7 +53,8 @@ exports.up = function (knex, Promise)
                 tbl.integer('domainID').nullable().references('domainId').inTable('NAuth2_Domains').index();
                 tbl.string('name', 40).notNullable().unique();
                 tbl.string('title', 64).notNullable();
-                tbl.boolean('systemRole').defaultTo(false);
+                tbl.boolean('systemRole').notNullable().defaultTo(false);
+                tbl.boolean('domainSpecific').notNullable().defaultTo(false);
                 tbl.timestamps();
             })
         .createTable('NAuth2_DomainUsers',
@@ -97,27 +98,27 @@ exports.up = function (knex, Promise)
                 /*
                  Can do everything on the database: create/remove domains/users/roles, grant/revoke any roles etc.
                  */
-                {name: 'SystemAdmin', title: 'System Admin', systemRole: true},
+                {name: 'SystemAdmin', title: 'System Admin', systemRole: true, domainSpecific:false},
 
                 /*
                  Can create/remove users, grant/revoke roles, assign roles (except system roles). CANNOT manage domains/domain users and domain roles
                  */
-                {name: 'UserAdmin', title: 'User Admin', systemRole: true},
+                {name: 'UserAdmin', title: 'User Admin', systemRole: true, domainSpecific:false},
 
                 /*
                  Can create/remove domains, grant/revoke domain roles, assign users to domains
                  */
-                {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true},
+                {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true, domainSpecific:false},
 
                 /*
                  Can delete domain, manage users and roles within domain
                  */
-                {name: 'DomainAdmin', title: 'Domain Admin', systemRole: true},
+                {name: 'DomainAdmin', title: 'Domain Admin', systemRole: true, domainSpecific: true},
 
                 /*
                  Can manage users and roles within domain
                  */
-                {name: 'Domain User Admin', title: 'Domain User Admin', systemRole: true}
+                {name: 'Domain User Admin', title: 'Domain User Admin', systemRole: true, domainSpecific: true}
             ]).into('NAuth2_Roles');
 
         });

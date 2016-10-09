@@ -1,1 +1,3 @@
-{}
+{
+  "WeakPassword": "Password must: 1) have length equal to 8 or greater\n2) contain one or more uppercase characters\n3) contain one or more lowercase characters\n4) contain one or more numeric values\n5) contain one or more special characters"
+}

@@ -20,7 +20,8 @@
     "node.js",
     "express.js",
     "user",
-    "management"
+    "management",
+    "sub-domains"
   ],
   "author": "slanska",
   "license": "MIT",

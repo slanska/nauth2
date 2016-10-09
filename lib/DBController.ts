@@ -8,6 +8,9 @@ import * as DB from './Consts';
 import Promise = require('bluebird');
 var knexServiceFactory = require('feathers-knex');
 import feathers = require("feathers");
+import nhooks = require('./hooks/index');
+import hooks = require('feathers-hooks');
+import auth  = require('feathers-authentication');
 
 module NAuth2
 {
@@ -45,28 +48,67 @@ module NAuth2
             InternalUsers:feathers.Service;
         };
 
-        protected registerUser(data, params)
+        protected createUserService():feathers.Service
+        {
+            return knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: DB.Tables.Users,
+                    id: 'UserID',
+                    paginate: {max: 200, "default": 50}
+                });
+        }
+
+        /*
+         Configures service for POST /auth/register
+         */
+        protected createUserRegistrationService():feathers.Service
         {
             var self = this;
-            return self.Services.Users.create(data, params);
+            this.app.use(this.Path.Register, this.createUserService());
+            var result = this.app.service(this.Path.Register);
+
+            // Assign hooks
+            result.before = {
+                all: nhooks.supportedMethods('create'),
+                create: [
+                    nhooks.verifyCaptcha('captcha'),
+                    nhooks.verifyNewPassword(self.cfg, 'password', 'confirmPassword'),
+                    hooks.remove('captcha', 'confirmPassword'),
+                    auth.hooks.hashPassword(self.authCfg)
+                ]
+            };
+
+            result.after = {
+                create: [
+                    // TODO send email conditionally
+                    nhooks.sendEmail('registerComplete'),
+                    nhooks.sendEmail('newUserNotification')
+                ]
+            };
+
+            return result;
         }
 
-        protected loginUser()
+        protected createUserLoginService()
         {
             return Promise.resolve('Obana!');
         }
 
-        protected domainLoginUser()
+        protected createDomainUserLoginService()
         {
             return Promise.resolve('Obana!');
         }
 
-        protected domainRegisterUser()
+        /*
+         Configures service for POST /_sub/:domain/auth/register
+         */
+        protected createDomainUserRegistrationService()
         {
             return Promise.resolve('Obana!');
         }
 
-        constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config)
+        constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config, protected authCfg:auth.AuthConfig)
         {
             this.db = knex(cfg.dbConfig);
 
@@ -81,13 +123,7 @@ module NAuth2
             this.Services = {} as any;
 
             // Users
-            this.Services.Users = knexServiceFactory(
-                {
-                    Model: this.db,
-                    name: DB.Tables.Users,
-                    id: 'UserID',
-                    paginate: {max: 200, "default": 50}
-                });
+            this.Services.Users = this.createUserService();
 
             this.app.use(this.Path.Users, this.Services.Users);
             this.Services.Users.before = {
@@ -133,23 +169,23 @@ module NAuth2
                 case  Types.UserCreateMode.ByAdminOnly:
                     this.Path.Register = `${cfg.basePath}/register`;
                     this.app.use(this.Path.Register, {
-                        create: this.registerUser.bind(this)
+                        create: this.createUserRegistrationService.bind(this)
                     });
 
                     var svc = this.app.service(this.Path.Register);
                     svc.before = {};
                     svc.after = {};
-                        // .before({
-                        //     //create: check confirm password, check captcha, remove confirm password & captcha
-                        // })
-                        // .after({
-                        //     //create: send email - to user if selfComplete, to admin(s) if approveByAdmin
-                        // });
+                    // .before({
+                    //     //create: check confirm password, check captcha, remove confirm password & captcha
+                    // })
+                    // .after({
+                    //     //create: send email - to user if selfComplete, to admin(s) if approveByAdmin
+                    // });
                     break;
             }
 
             this.app.use(this.Path.Login, {
-                create: this.loginUser.bind(this)
+                create: this.createUserLoginService.bind(this)
             });
 
             if (cfg.subDomains)
@@ -181,7 +217,7 @@ module NAuth2
                 this.app.use(this.Path.DomainUsers, this.Services.DomainUsers);
 
                 this.app.use(this.Path.DomainLogin, {
-                    create: this.domainLoginUser.bind(this)
+                    create: this.createDomainUserLoginService.bind(this)
                 });
 
                 switch (cfg.userCreateMode)
@@ -191,7 +227,7 @@ module NAuth2
 
                         this.Path.DomainRegister = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/register`;
                         this.app.use(this.Path.DomainRegister, {
-                            create: this.domainRegisterUser.bind(this)
+                            create: this.createDomainUserRegistrationService.bind(this)
                         });
                         break;
                 }

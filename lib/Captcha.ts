@@ -2,37 +2,35 @@
  * Created by slanska on 2015-11-02.
  */
 
-/// <reference path="../typings/tsd.d.ts" />
-
 import express = require('express');
 import crypto = require('crypto');
 var captchapng = require('captchapng');
+import * as Types from './Types';
+import Promise = require('bluebird');
 
-var _hashSalt = crypto.randomBytes(128).toString('base64');
-
-/*
-
- */
-declare interface ICaptchaResponse
-{
-    hash:string;
-    image:Buffer;
-    value?:string;
-}
+var _hashSalt = crypto.randomBytes(32).toString('base64');
+var pbkdf2Async = Promise.promisify(crypto.pbkdf2);
 
 /*
 
  */
 class Captcha
 {
+    static calcHash(value):Promise<Buffer>
+    {
+        return pbkdf2Async(value, _hashSalt, 256, 32, 'sha256');
+    }
+
     /*
 
      */
-    static verify(originalHash:string, codeToVerify:string):boolean
+    static verify(originalHash:string, codeToVerify:string):Promise<boolean>
     {
-        var hashToVerify = crypto.pbkdf2Sync(codeToVerify, _hashSalt, 4096, 128, 'sha256').toString('base64');
-
-        return hashToVerify === originalHash;
+        return Captcha.calcHash(codeToVerify)
+            .then(hashToVerify=>
+            {
+                return hashToVerify.toString('base64') === originalHash
+            });
     }
 
     /*
@@ -40,35 +38,34 @@ class Captcha
      */
     static init(app:express.Application, path = '/captcha', debug = false)
     {
-        app.use(path, function (req, res, next)
-        {
-            // Generate random value
-
-            var value = (Math.round(Math.random() * 9000 + 1000)).toString();
-            var hash = crypto.pbkdf2Sync(value, _hashSalt, 4096, 128, 'sha256').toString('base64');
-
-
-            var p = new captchapng(80, 30, value); // width,height,numeric captcha
-            p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
-            p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
-
-            var img = p.getBase64();
-            var imgbase64 = new Buffer(img, 'base64');
-
-            var result:ICaptchaResponse = {
-                hash: hash,
-                image: imgbase64
-            };
-
-            if (debug)
+        app.use(path,
+            function (req, res, next)
             {
-                result.value = value;
-            }
+                // Generate random value: 0001-9999
+                var value = (Math.round(Math.random() * 9000 + 1000)).toString();
+                Captcha.calcHash(value)
+                    .then(hash=>
+                    {
+                        var p = new captchapng(80, 30, value); // width,height,numeric captcha
+                        p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
+                        p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
 
-            res.status(200).json(result);
-            res.end();
+                        var img = p.getBase64();
 
-        });
+                        var result:Types.ICaptcha = {
+                            hash: hash.toString('base64'),
+                            imageBase64: img
+                        };
+
+                        if (debug)
+                        {
+                            result.value = value;
+                        }
+
+                        res.status(200).json(result);
+                        res.end();
+                    });
+            });
     }
 }
 
