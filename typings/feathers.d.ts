@@ -30,14 +30,6 @@ declare module "feathers"
         }
 
         /*
-         Extending standard Express router handler to have additional declaration used by feathers.js
-         */
-        interface IRouterHandler<T>
-        {
-            (path:string, service:Service):Service;
-        }
-
-        /*
          Intermediate class to have feathers.js specific declarations only.
          */
         interface ApplicationCore
@@ -119,6 +111,8 @@ declare module "feathers-hooks"
 
 declare module "feathers-authentication"
 {
+    import * as Hooks from 'feathers-hooks';
+
     interface AuthConfig
     {
         /*
@@ -172,7 +166,8 @@ declare module "feathers-authentication"
         idField ?:string,
 
         /*
-         (default:'/auth/local') [optional] - The local authentication endpoint used to create new tokens using local auth
+         (default:'/auth/local') [optional] - The local authentication endpoint used to create new tokens
+         using local auth
          */
         localEndpoint?:string,
 
@@ -253,15 +248,92 @@ declare module "feathers-authentication"
 
             /*
              (default:'1d') [optional] - The time a token is valid for
+             Examples: ''
              */
             expiresIn:string
 
-        }
+        },
 
+        /*
+         Optional list of roles to verify against. Used by hasRoleOrRestrict hook
+         */
+        roles?:[string|number],
 
+        /*
+         Name for query parameter to set user ID (used by queryWithCurrentUser hook)
+         */
+        as?:string,
+
+        /*
+         Used by restrictToOwner hook to extract owner ID/IDs to verify that current user is tha owner of data.
+         Value can be array of IDs (multiple owners)
+         */
+        ownerField?:string
     }
 
     function f(cfg?:AuthConfig);
+
+    /*
+     Standard hooks for user authentication.
+     Most of them accept authentication configuration as a parameter.
+     If config is not passed, hooks will use default configuration, as defined for service 'auth'
+     */
+    namespace f.hooks
+    {
+        function associateCurrentUser(cfg?:AuthConfig);
+
+        /*
+         Hashes password with generated salt. Uses passwordField attribute in p.data and replaces it
+         with hashed value. Note: looks like it does not store salt
+         */
+        function hashPassword(cfg?:AuthConfig);
+
+        /*
+         Uses cfg.userEndpoint to access User service and retrieve user information
+         */
+        function populateUser(cfg?:AuthConfig);
+
+        /*
+         Sets current user ID from payload to query using cfg.as for attribute name
+         */
+        function queryWithCurrentUser(cfg?:AuthConfig);
+
+        /*
+         Checks if there is registered user
+         */
+        function restrictToAuthenticated();
+
+        /*
+         Checks if data.owner attribute (determined by cfg.ownerField) is id of current user
+         */
+        function restrictToOwner(cfg?:AuthConfig);
+
+        /*
+         Checks if current user has one of allowed roles in the config
+         */
+        function restrictToRoles(cfg?:AuthConfig);
+
+        /*
+         Checks if JWT is valid and sets HookParams.params.payload to token's payload
+         */
+        function verifyToken(cfg?:AuthConfig);
+
+        /*
+         Only for find or get methods
+         NOT SURE what this hook is doing
+         */
+        function verifyOrRestrict();
+
+        /*
+         Only for find or get methods
+         */
+        function populateOrRestrict(cfg?:AuthConfig);
+
+        /*
+         Only for find or get methods
+         */
+        function hasRoleOrRestrict(cfg?:AuthConfig);
+    }
 
     export = f;
 }

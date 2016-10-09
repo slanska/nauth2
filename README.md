@@ -17,16 +17,16 @@ and at the same time, to provide all its features out of box with minimum effort
 
 ### Features
 
-* Library to be used in Express.js applications as a middleware for general purpose user management
+* Library to be used in [feathers.js](https://github.com/feathersjs/feathers)-based 
+applications as a middleware for general purpose user management
 * Light alternative to [Stormpath](https://stormpath.com), [Forgerock](https://www.forgerock.com)
-or [Loopback](https://loopback.io)
-* Uses [Passport](http://passportjs.org/) for  
+or [Loopback](http://loopback.io/doc/en/lb2/Authentication-authorization-and-permissions.html)   
 * REST API for user registration, login, forgot password, change password and other typical 
 tasks related to user management
 * Stores all user information in a relational database (PostgreSQL, MySQL/MariaDB, Sqlite3, Oracle), 
 hosted by you (uses [Knex](http://knexjs.org) for database access)
 * Email notification for registration completion, forgotten passwords etc. 
-(uses [nodemailer](https://nodemailer.com) for email sending)
+(uses [nodemailer](https://nodemailer.com) for email sending), using customizable HTML templates
 * Implements concept of domains. Every user can be associated with number of
 domains and have separately defined rules for accesing them. 
 * Captcha support (generate image and code to be used on client)

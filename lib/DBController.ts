@@ -66,7 +66,7 @@ module NAuth2
             return Promise.resolve('Obana!');
         }
 
-        constructor(protected app:feathers.ApplicationCore, protected cfg:Types.INAuth2Config)
+        constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config)
         {
             this.db = knex(cfg.dbConfig);
 
@@ -136,13 +136,15 @@ module NAuth2
                         create: this.registerUser.bind(this)
                     });
 
-                    var svc = this.app.service(this.Path.Register)
-                        .before({
-                            //create: check confirm password, check captcha, remove confirm password & captcha
-                        })
-                        .after({
-                            //create: send email - to user if selfComplete, to admin(s) if approveByAdmin
-                        });
+                    var svc = this.app.service(this.Path.Register);
+                    svc.before = {};
+                    svc.after = {};
+                        // .before({
+                        //     //create: check confirm password, check captcha, remove confirm password & captcha
+                        // })
+                        // .after({
+                        //     //create: send email - to user if selfComplete, to admin(s) if approveByAdmin
+                        // });
                     break;
             }
 
