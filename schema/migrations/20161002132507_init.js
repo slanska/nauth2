@@ -31,8 +31,8 @@ exports.up = function (knex, Promise)
             {
                 tbl.increments('userID');
                 tbl.string('email').notNullable().unique();
-                tbl.string('pwdHash').notNullable();
-                tbl.string('pwdSalt').notNullable();
+                tbl.string('password').notNullable();
+                // tbl.string('pwdSalt').notNullable();
                 tbl.string('prevPwdHash').nullable();
                 tbl.date('pwdExpireOn').nullable();
                 tbl.boolean('changePwdOnNextLogin').nullable();

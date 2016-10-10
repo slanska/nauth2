@@ -81,6 +81,12 @@ module NAuth2
 
             result.after({
                 create: [
+                    /*
+                    set default roles
+                    create log entry
+
+                    if domain register - add to domain, assign domain policy
+                     */
                     // TODO send email conditionally
                     nhooks.sendEmail('registerComplete'),
                     nhooks.sendEmail('newUserNotification')
