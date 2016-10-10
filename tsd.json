@@ -52,6 +52,18 @@
     },
     "faker/faker.d.ts": {
       "commit": "e623c6b3164bb8c6da508f84f7865eaaa97e1a0f"
+    },
+    "chai-http/chai-http.d.ts": {
+      "commit": "e623c6b3164bb8c6da508f84f7865eaaa97e1a0f"
+    },
+    "assertion-error/assertion-error.d.ts": {
+      "commit": "e623c6b3164bb8c6da508f84f7865eaaa97e1a0f"
+    },
+    "chai/chai.d.ts": {
+      "commit": "e623c6b3164bb8c6da508f84f7865eaaa97e1a0f"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "e623c6b3164bb8c6da508f84f7865eaaa97e1a0f"
     }
   }
 }

@@ -19,7 +19,7 @@ function verifyCaptcha(captchaField = 'captcha')
         var captcha = p.data[captchaField] as Types.ICaptcha;
         if (!captcha)
         {
-            throw new errors.BadRequest('Invalid captcha value');
+            throw new errors.BadRequest('Missing captcha value');
         }
 
         return Captcha.verify(captcha.hash, captcha.value)

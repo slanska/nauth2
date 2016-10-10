@@ -14,7 +14,7 @@ function supportMethods(...onlyMethods:string[])
 {
     var result = (p:hooks.HookParams)=>
     {
-        if (onlyMethods.indexOf(p.method) <= 0)
+        if (onlyMethods.indexOf(p.method) < 0)
         {
             throw new errors.NotImplemented(`'${p.method}' not supported`);
         }

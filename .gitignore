@@ -57,3 +57,13 @@ lib/Types.js.map
 /lib/hooks/sendEmail.js
 /lib/hooks/afterUserRegistration.js
 /lib/hooks/afterUserRegistration.js.map
+/test/02_Register.js.map
+/test/02_Register.js
+/test/01_DBController.js
+/test/01_DBController.js.map
+/examples/index.js
+/examples/index.js.map
+/lib/hooks/verifyUniqueUserEmail.js.map
+/lib/hooks/verifyUniqueUserEmail.js
+/lib/hooks/verifyEmail.js
+/lib/hooks/verifyEmail.js.map

@@ -10,6 +10,8 @@ import {HookParams} from "feathers-hooks";
 /*
  Implements proxy users service available via REST API
  */
+
+// TODO needed?
 class UsersService
 {
     private authorize(p:HookParams)
@@ -22,9 +24,9 @@ class UsersService
      */
     constructor(protected internalUserService:feathers.Service)
     {
-        this.internalUserService.before = {
+        this.internalUserService.before({
             all: authorize.bind(this)
-        };
+        });
     }
 }
 

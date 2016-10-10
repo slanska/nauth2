@@ -49,8 +49,4 @@ process.on('unhandledRejection', (reason, p) =>
 
 app.set('query parser', 'extended');
 
-var port = process.env.PORT || 8800;
-app.listen(port, ()=>
-{
-    console.log(`Listening on ${port}`);
-});
+export = app;

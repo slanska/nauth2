@@ -51,7 +51,10 @@
     "wildcard-subdomains": "^1.0.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
     "faker": "^3.1.0",
+    "mocha": "^3.1.0",
     "nodemailer-wellknown": "^0.2.0",
     "pg": "^6.1.0",
     "sqlite3": "^3.1.4"

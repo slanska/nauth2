@@ -13,7 +13,10 @@ declare module "feathers"
 
     namespace f
     {
-        interface Service
+        /*
+         Configuration for API service
+         */
+        interface ServiceConfig
         {
             create?:(data, params, callback?:express.NextFunction)=>any;
             find?:(params, callback?)=>any;
@@ -22,10 +25,22 @@ declare module "feathers"
             patch?:(id, data, params, callback?)=>any;
             update?:(id, data, params, callback?)=>any;
             setup?:(app:Application)=>any;
-            before?:hooks.Hook;
-            after?:hooks.Hook;
 
-            on?:((callback)=>any) | ((eventName:string, callback)=>any);
+        }
+
+        /*
+         Service object
+         */
+        interface Service extends ServiceConfig
+        {
+            before(hooks:hooks.Hook):Service;
+            after(hooks:hooks.Hook):Service;
+
+            on(callback:Function):Service;
+            on(eventName:string, callback:Function):Service;
+            once(callback:Function):Service;
+            once(eventName:string, callback:Function):Service;
+            emit(eventName:string):Service;
         }
 
         /*
@@ -34,8 +49,9 @@ declare module "feathers"
         interface ApplicationCore
         {
             service(path:string):Service;
+            service(path:string, service:ServiceConfig):Service;
             services:{[servicePath:string]:Service};
-            use(path:string, service:Service):Application;
+            use(path:string, service:ServiceConfig):Application;
         }
 
         /*
@@ -76,7 +92,11 @@ declare module "feathers-hooks"
             /*
              - The service method parameters
              */
-            params:any,
+            params:{
+                provider:'rest'|'socket'|'primus',
+                query:any,
+                token:any
+            },
 
             /*
              - The request data (for create, update and patch)

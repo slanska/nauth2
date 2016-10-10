@@ -27,7 +27,7 @@ function verifyNewPassword(cfg?:Types.INAuth2Config, passwordField = 'password',
 
         if (!pwd.match(pwdx))
         // TODO Use phrases.json - WeakPassword
-            throw new errors.BadRequest('Weak password');
+            throw new errors.BadRequest('Weak or missing password');
     };
     return result;
 }

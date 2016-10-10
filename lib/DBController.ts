@@ -48,7 +48,7 @@ module NAuth2
             InternalUsers:feathers.Service;
         };
 
-        protected createUserService():feathers.Service
+        protected createUserService():feathers.ServiceConfig
         {
             return knexServiceFactory(
                 {
@@ -64,28 +64,28 @@ module NAuth2
          */
         protected createUserRegistrationService():feathers.Service
         {
-            var self = this;
-            this.app.use(this.Path.Register, this.createUserService());
-            var result = this.app.service(this.Path.Register);
-
-            // Assign hooks
-            result.before = {
+            this.Path.Register = `${this.cfg.basePath}/register`;
+            var result = this.app.service(this.Path.Register, this.createUserService());
+            result.before({
                 all: nhooks.supportedMethods('create'),
                 create: [
                     nhooks.verifyCaptcha('captcha'),
-                    nhooks.verifyNewPassword(self.cfg, 'password', 'confirmPassword'),
-                    hooks.remove('captcha', 'confirmPassword'),
-                    auth.hooks.hashPassword(self.authCfg)
+                    nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
+                    hooks.remove('captcha'),
+                    hooks.remove('confirmPassword'),
+                    auth.hooks.hashPassword(this.authCfg),
+                    nhooks.verifyEmail(),
+                    nhooks.verifyUniqueUserEmail(result)
                 ]
-            };
+            });
 
-            result.after = {
+            result.after({
                 create: [
                     // TODO send email conditionally
                     nhooks.sendEmail('registerComplete'),
                     nhooks.sendEmail('newUserNotification')
                 ]
-            };
+            });
 
             return result;
         }
@@ -123,12 +123,10 @@ module NAuth2
             this.Services = {} as any;
 
             // Users
-            this.Services.Users = this.createUserService();
-
-            this.app.use(this.Path.Users, this.Services.Users);
-            this.Services.Users.before = {
+            this.Services.Users = this.app.service(this.Path.Users, this.createUserService());
+            this.Services.Users.before({
                 // create: this.authorizeUsers
-            };
+            });
 
             // Roles
             this.Services.Roles = knexServiceFactory(
@@ -167,20 +165,7 @@ module NAuth2
             {
                 case Types.UserCreateMode.Auto:
                 case  Types.UserCreateMode.ByAdminOnly:
-                    this.Path.Register = `${cfg.basePath}/register`;
-                    this.app.use(this.Path.Register, {
-                        create: this.createUserRegistrationService.bind(this)
-                    });
-
-                    var svc = this.app.service(this.Path.Register);
-                    svc.before = {};
-                    svc.after = {};
-                    // .before({
-                    //     //create: check confirm password, check captcha, remove confirm password & captcha
-                    // })
-                    // .after({
-                    //     //create: send email - to user if selfComplete, to admin(s) if approveByAdmin
-                    // });
+                    this.createUserRegistrationService();
                     break;
             }
 
