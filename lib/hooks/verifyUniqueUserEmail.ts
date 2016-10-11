@@ -15,7 +15,15 @@ function verifyUniqueUserEmail(userService:feathers.Service, emailField = 'email
     var result = (p:hooks.HookParams)=>
     {
         var email = p.data[emailField];
-        // TODO
+        var qry = {[emailField] : email};
+        // qry[emailField] = email;
+        var result = userService.find({query: qry})
+            .then((r:feathers.FindResult)=>
+            {
+                if (r && r.data && r.data.length > 0)
+                    throw new errors.BadRequest('This email is already in use');
+            });
+        return result;
 
     };
     return result;

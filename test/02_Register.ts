@@ -12,6 +12,7 @@ import mocha = require('mocha');
 import * as Types from '../lib/Types';
 const app = require('../examples/feathers-app');
 var authentication = require('feathers-authentication/client');
+import faker = require('faker');
 
 var token;
 
@@ -75,7 +76,7 @@ it('fails: wrong captcha', (done) =>
             var result = req()
                 .post('/auth/register')
                 .send({
-                    email: 'sss@fff.com',
+                    email: faker.internet.userName() + '@mailinator.com',
                     password: '123Abcd!', confirmPassword: '123Abcd!',
                     captcha: {hash: captcha.hash, value: captcha.value}
                 }).end((err, res)=>

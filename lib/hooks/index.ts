@@ -5,16 +5,26 @@
 import supportedMethods = require('./supportMethods');
 import verifyCaptcha = require('./verifyCaptcha');
 import verifyNewPassword = require('./verifyNewPassword');
-import sendEmail = require('./sendEmail');
+import sendEmailToUser = require('./sendEmailToUser');
 import verifyUniqueUserEmail = require('./verifyUniqueUserEmail');
 import verifyEmail = require('./verifyEmail');
+import knexBeginTrn = require('./knexBeginTrn');
+import knexCommit = require('./knexCommit');
+import knexRollback = require('./knexRollback');
+import setTimestamps = require('./setTimestamps');
+import afterUserRegistration = require('./afterUserRegistration');
 
 export =
 {
     supportedMethods,
     verifyCaptcha,
     verifyNewPassword,
-    sendEmail,
+    sendEmailToUser,
     verifyUniqueUserEmail,
-    verifyEmail
+    verifyEmail,
+    setTimestamps,
+    knexBeginTrn,
+    knexCommit,
+    knexRollback,
+    afterUserRegistration
 }

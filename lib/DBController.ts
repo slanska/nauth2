@@ -75,21 +75,22 @@ module NAuth2
                     hooks.remove('confirmPassword'),
                     auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
-                    nhooks.verifyUniqueUserEmail(result)
+                    // nhooks.knexBeginTrn(this.db),
+                    nhooks.verifyUniqueUserEmail(this.app.service(this.Path.Users)),
+                    nhooks.setTimestamps()
                 ]
             });
 
             result.after({
                 create: [
+                    nhooks.afterUserRegistration(this.cfg)
+                    // nhooks.knexCommit(),
                     /*
-                    set default roles
-                    create log entry
+                     set default roles
+                     create log entry
 
-                    if domain register - add to domain, assign domain policy
+                     if domain register - add to domain, assign domain policy
                      */
-                    // TODO send email conditionally
-                    nhooks.sendEmail('registerComplete'),
-                    nhooks.sendEmail('newUserNotification')
                 ]
             });
 

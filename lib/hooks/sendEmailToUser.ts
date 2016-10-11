@@ -4,6 +4,7 @@
 
 /*
  Sends email using given template name and params.data as source of data for template
+ to the address specified by emailField attribute in data
  */
 
 import * as Types from '../Types';
@@ -12,7 +13,7 @@ import errors = require('feathers-errors');
 
 // TODO import Emailer
 
-function sendEmail(templateName:string)
+function sendEmail(templateName:string, emailField = 'email')
 {
     var result = (p:hooks.HookParams)=>
     {

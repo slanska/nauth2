@@ -5,9 +5,8 @@
 ///<reference path="../typings/tsd.d.ts"/>
 
 import * as knex from 'knex';
-import * as Nodemailer from 'nodemailer';
-import * as NodemailerSmtpTransport from 'nodemailer-smtp-transport';
-import * as express from 'express';
+import nodemailer = require( 'nodemailer');
+// import * as express from 'express';
 
 namespace Types
 {
@@ -119,9 +118,9 @@ namespace Types
         dbConfig:knex.Config;
 
         /*
-
+         this is what will be used to send emails
          */
-        emailConfig:NodemailerSmtpTransport.SmtpOptions;
+        emailTransport:nodemailer.Transporter;
 
         /*
          Regular expression for good password validation.
@@ -144,7 +143,7 @@ namespace Types
         passwordRules?:string|RegExp
     }
 
-     /*
+    /*
      Captcha information used to verify whether there is a human being on the other side of connection
      When returned from server, hash hash and imageBase64
      When sent back to server, should have original hash and value, entered by user

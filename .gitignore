@@ -9,8 +9,6 @@ lib/Consts.js
 lib/Consts.js.map
 lib/DBController.js
 lib/DBController.js.map
-lib/Emailer.js
-lib/Emailer.js.map
 lib/Router.js
 lib/Router.js.map
 lib/index.js
@@ -67,3 +65,13 @@ lib/Types.js.map
 /lib/hooks/verifyUniqueUserEmail.js
 /lib/hooks/verifyEmail.js
 /lib/hooks/verifyEmail.js.map
+/lib/hooks/setTimestamps.js
+/lib/hooks/setTimestamps.js.map
+/lib/hooks/knexRollback.js
+/lib/hooks/knexRollback.js.map
+/lib/hooks/knexCommit.js
+/lib/hooks/knexBeginTrn.js.map
+/lib/hooks/knexCommit.js.map
+/lib/hooks/knexBeginTrn.js
+/lib/KnexTransactionService.js.map
+/lib/KnexTransactionService.js

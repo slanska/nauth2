@@ -13,6 +13,14 @@ declare module "feathers"
 
     namespace f
     {
+        interface FindResult
+        {
+            data: any[];
+            limit:number;
+            skip:number;
+            total:number;
+        }
+
         /*
          Configuration for API service
          */
@@ -25,7 +33,6 @@ declare module "feathers"
             patch?:(id, data, params, callback?)=>any;
             update?:(id, data, params, callback?)=>any;
             setup?:(app:Application)=>any;
-
         }
 
         /*
@@ -93,7 +100,7 @@ declare module "feathers-hooks"
              - The service method parameters
              */
             params:{
-                provider:'rest'|'socket'|'primus',
+                provider:'rest'|'socketio'|'primus',
                 query:any,
                 token:any
             },
