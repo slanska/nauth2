@@ -75,3 +75,5 @@ lib/Types.js.map
 /lib/hooks/knexBeginTrn.js
 /lib/KnexTransactionService.js.map
 /lib/KnexTransactionService.js
+/lib/Emailer.js
+/lib/Emailer.js.map
