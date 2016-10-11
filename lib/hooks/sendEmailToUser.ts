@@ -8,16 +8,19 @@
  */
 
 import * as Types from '../Types';
+import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
+import Emailer = require('../Emailer');
 
-// TODO import Emailer
-
-function sendEmail(templateName:string, emailField = 'email')
+function sendEmail(app:feathers.Application, cfg:Types.INAuth2Config,
+                   templateName:string, emailField = 'email')
 {
+    var emailer = new Emailer(app, cfg);
     var result = (p:hooks.HookParams)=>
     {
-        // TODO Use nodemailer
+        // TODO get list of users
+        return emailer.send([], templateName, p);
     };
     return result;
 }
