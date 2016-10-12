@@ -37,8 +37,6 @@ lib/Types.js.map
 /examples/feathers-app.js
 /examples/config.js.map
 /examples/config.js
-/lib/UsersService.js
-/lib/UsersService.js.map
 /lib/hooks/index.js.map
 /lib/hooks/index.js
 /lib/RegisterService.js
@@ -77,3 +75,5 @@ lib/Types.js.map
 /lib/KnexTransactionService.js
 /lib/Emailer.js
 /lib/Emailer.js.map
+/lib/hooks/verifyFieldRegexp.js
+/lib/hooks/verifyFieldRegexp.js.map

@@ -45,6 +45,7 @@
     "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",
     "lodash": "^4.16.2",
+    "nodemailer": "^2.6.4",
     "shortid": "^2.2.6",
     "watch": "^1.0.1",
     "wildcard-subdomains": "^1.0.0"

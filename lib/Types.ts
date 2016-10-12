@@ -123,6 +123,13 @@ namespace Types
         emailTransport:nodemailer.Transporter;
 
         /*
+         If true, newly created domains will have their paths reversed from their names
+         I.e. name 'state.county.city' will be converted to path 'city.county.state'.
+         Default: false
+         */
+        reverseDomainPath?:boolean;
+
+        /*
          Regular expression for good password validation.
          Default rules:
          1) The password length must be greater than or equal to 8

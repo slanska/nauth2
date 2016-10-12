@@ -3,6 +3,7 @@
  */
 
 import * as Types from '../Types';
+import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 import sendEmailToUser = require('./sendEmailToUser');
@@ -10,7 +11,7 @@ import sendEmailToUser = require('./sendEmailToUser');
 /*
  Checks registration mode and depending on it, will send notification emails
  */
-function afterUserRegistration(cfg:Types.INAuth2Config)
+function afterUserRegistration(app:feathers.Application, cfg:Types.INAuth2Config)
 {
     /*
      registrationComplete
@@ -28,16 +29,17 @@ function afterUserRegistration(cfg:Types.INAuth2Config)
 
             case Types.UserCreateMode.SelfAndApproveByAdmin:
                 // Send email to user admin(s) to review request
+                // TODO
                 break;
 
             case Types.UserCreateMode.SelfAndConfirm:
                 // Send email to the user with confirmation link
-                sendEmailToUser('registerConfirm')(p);
+                sendEmailToUser(app, cfg, 'registerConfirm')(p);
                 break;
 
             case Types.UserCreateMode.SelfStart:
                 // Send Welcome email and update user status
-                sendEmailToUser('welcomeNewUser')(p);
+                sendEmailToUser(app, cfg, 'welcomeNewUser')(p);
                 break;
         }
        

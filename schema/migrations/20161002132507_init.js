@@ -6,23 +6,43 @@ exports.up = function (knex, Promise)
 {
     "use strict";
 
-    console.log('up');
-
     return knex.schema
         .createTable('NAuth2_Domains',
             function (tbl)
             {
-                console.log('Domains');
                 tbl.increments('domainId');
                 tbl.boolean('active').notNullable().defaultTo(true);
+
+                /*
+                 Hierarchical domain name, with optional multiple segments separated by dot.
+                 Segment may have the following characters: '0'-'9', 'A'-'Z', '_', '-'
+                 and start from alphanumeric character. Segment name is case insensitive, ie.
+                 MyDomain == MYDOMAIN == mydomain
+                 e.g. 'country.state.city'
+                 Segments define hierarchy and scope, i.e.
+                 */
                 tbl.string('name', 64).notNullable().unique();
+                
+                tbl.boolean('reversePath');
+
+                /*
+                If reversePath == true, path will be stored as reversed name.
+                E.g. for name 'canada.on.toronto' path would be set as 'toronto.on.canada'
+                 */
+                tbl.string('path', 64).notNullable().unique();
+
                 tbl.string('description', 200).nullable();
                 tbl.string('favIconLink', 200).nullable();
                 tbl.string('title', 64).nullable();
-                tbl.string('path', 64).notNullable().unique();
+
                 tbl.json('extData').nullable();
                 tbl.integer('userCreateMode').notNullable().defaultTo(0);
                 tbl.integer('changePwdEveryDays').defaultTo(0);
+
+                /*
+                 Non listed domains are not discoverable, i.e. excluded from search results
+                 */
+                tbl.boolean('listed').defaultTo(true);
 
                 tbl.timestamps();
             })
@@ -32,12 +52,11 @@ exports.up = function (knex, Promise)
                 tbl.increments('userID');
                 tbl.string('email').notNullable().unique();
                 tbl.string('password').notNullable();
-                // tbl.string('pwdSalt').notNullable();
                 tbl.string('prevPwdHash').nullable();
                 tbl.date('pwdExpireOn').nullable();
                 tbl.boolean('changePwdOnNextLogin').nullable();
                 tbl.boolean('suspended').notNullable().defaultTo(false);
-                tbl.string('nickName', 40).nullable();
+                tbl.string('nickName', 40).nullable().unique();
                 tbl.string('firstName', 40).nullable();
                 tbl.string('lastName', 40).nullable();
                 tbl.date('birthDate').nullable();
@@ -98,17 +117,17 @@ exports.up = function (knex, Promise)
                 /*
                  Can do everything on the database: create/remove domains/users/roles, grant/revoke any roles etc.
                  */
-                {name: 'SystemAdmin', title: 'System Admin', systemRole: true, domainSpecific:false},
+                {name: 'SystemAdmin', title: 'System Admin', systemRole: true, domainSpecific: false},
 
                 /*
                  Can create/remove users, grant/revoke roles, assign roles (except system roles). CANNOT manage domains/domain users and domain roles
                  */
-                {name: 'UserAdmin', title: 'User Admin', systemRole: true, domainSpecific:false},
+                {name: 'UserAdmin', title: 'User Admin', systemRole: true, domainSpecific: false},
 
                 /*
                  Can create/remove domains, grant/revoke domain roles, assign users to domains
                  */
-                {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true, domainSpecific:false},
+                {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true, domainSpecific: false},
 
                 /*
                  Can delete domain, manage users and roles within domain
