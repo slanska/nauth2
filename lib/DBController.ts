@@ -39,24 +39,49 @@ module NAuth2
             Log:feathers.Service;
             Domains:feathers.Service;
             DomainUsers:feathers.Service;
-
-            /*
-             Internally used service to operate on users. Not exposed via REST.
-             Consumed by other REST services (/users & /register) which add custom validation
-             and authorization on top of users service
-             */
-            InternalUsers:feathers.Service;
         };
 
-        protected createUserService():feathers.ServiceConfig
+        /*
+         Configures service for REST /auth/users
+         */
+        protected createUserService():feathers.Service
         {
-            return knexServiceFactory(
+            var svcCfg = knexServiceFactory(
                 {
                     Model: this.db,
                     name: DB.Tables.Users,
                     id: 'UserID',
                     paginate: {max: 200, "default": 50}
                 });
+            this.Services.Users = this.app.service(this.Path.Users, svcCfg);
+            this.Services.Users.before({
+                all: [
+                    auth.hooks.populateUser(this.authCfg),
+                    auth.hooks.restrictToAuthenticated(this.authCfg),
+                    auth.hooks.verifyToken(this.authCfg),
+                    nhooks.authorize('users', 'userID'),
+                ],
+                create: [
+                    auth.hooks.hashPassword(this.authCfg),
+                    nhooks.sanitizeData('users'),
+                    nhooks.setTimestamps()],
+                find: [],
+                get: [],
+                update: [
+                    nhooks.sanitizeData('users'),
+                    nhooks.setTimestamps()],
+                patch: [
+                    nhooks.sanitizeData('users'),
+                    nhooks.setTimestamps()],
+                remove: []
+
+            });
+            this.Services.Users.after({
+                all: [
+                    nhooks.sanitizeData('users')
+                ]
+            });
+            return this.Services.Users;
         }
 
         /*
@@ -75,7 +100,6 @@ module NAuth2
                     hooks.remove('confirmPassword'),
                     auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
-                    // nhooks.knexBeginTrn(this.db),
                     nhooks.verifyUniqueUserEmail(this.app.service(this.Path.Users)),
                     nhooks.setTimestamps()
                 ]
@@ -83,9 +107,10 @@ module NAuth2
 
             result.after({
                 create: [
-                    nhooks.afterUserRegistration(this.cfg)
+                    nhooks.afterUserRegistration(this.app, this.cfg)
                     // nhooks.knexCommit(),
                     /*
+                     TODO
                      set default roles
                      create log entry
 
@@ -97,13 +122,78 @@ module NAuth2
             return result;
         }
 
+        /*
+         Configures service for POST /auth/login
+         */
         protected createUserLoginService()
         {
-            return Promise.resolve('Obana!');
+            this.Path.Login = `${this.cfg.basePath}/login`;
+            var result = this.app.service(this.Path.Register, this.createUserService());
+            result.before({
+                all: nhooks.supportedMethods('create'),
+                create: [
+                    auth.hooks.associateCurrentUser(this.authCfg)
+                    // auth.hooks.hashPassword(this.authCfg),
+                ]
+            });
+
+            result.after({
+                create: [
+                    // nhooks.afterUserRegistration(this.app, this.cfg)
+                    // nhooks.knexCommit(),
+                    /*
+                     TODO
+                     set default roles
+                     create log entry
+
+                     if domain register - add to domain, assign domain policy
+                     */
+                ]
+            });
+
+            return result;
+        }
+
+        protected createRolesService()
+        {
+            this.Services.Roles = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: DB.Tables.Roles,
+                    id: 'RoleID',
+                    paginate: {max: 200, "default": 50}
+                });
+            this.app.use(this.Path.Roles, this.Services.Roles);
+        }
+
+        protected createUserRolesService()
+        {
+            this.Services.UserRoles = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: DB.Tables.UserRoles,
+                    id: ['UserID', 'RoleID'],
+                    paginate: {max: 200, "default": 50}
+                });
+            this.app.use(this.Path.UserRoles, this.Services.UserRoles);
+        }
+
+        protected createDomainsService()
+        {
+            this.Services.Domains = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: DB.Tables.Domains,
+                    id: 'DomainID',
+                    paginate: {max: 200, "default": 50}
+                });
+
+            this.app.use(this.Path.Domains, this.Services.Domains);
         }
 
         protected createDomainUserLoginService()
         {
+            //TODO
             return Promise.resolve('Obana!');
         }
 
@@ -112,6 +202,7 @@ module NAuth2
          */
         protected createDomainUserRegistrationService()
         {
+            //TODO
             return Promise.resolve('Obana!');
         }
 
@@ -130,43 +221,18 @@ module NAuth2
             this.Services = {} as any;
 
             // Users
-            this.Services.Users = this.app.service(this.Path.Users, this.createUserService());
-            this.Services.Users.before({
-                // create: this.authorizeUsers
-            });
+            this.createUserService();
 
             // Roles
-            this.Services.Roles = knexServiceFactory(
-                {
-                    Model: this.db,
-                    name: DB.Tables.Roles,
-                    id: 'RoleID',
-                    paginate: {max: 200, "default": 50}
-                });
-
-            this.app.use(this.Path.Roles, this.Services.Roles);
+            this.createRolesService();
 
             // UserRoles
-            this.Services.UserRoles = knexServiceFactory(
-                {
-                    Model: this.db,
-                    name: DB.Tables.UserRoles,
-                    id: ['UserID', 'RoleID'],
-                    paginate: {max: 200, "default": 50}
-                });
-
-            this.app.use(this.Path.UserRoles, this.Services.UserRoles);
+            this.createUserRolesService();
 
             // Log
-            this.Services.Log = knexServiceFactory(
-                {
-                    Model: this.db,
-                    name: DB.Tables.Log,
-                    id: 'LogID',
-                    paginate: {max: 200, "default": 50}
-                });
+            this.createLogService();
 
-            this.app.use(this.Path.Log, this.Services.Log);
+            // this.app.use(this.Path.Log, this.Services.Log);
 
             switch (cfg.userCreateMode)
             {
@@ -176,9 +242,7 @@ module NAuth2
                     break;
             }
 
-            this.app.use(this.Path.Login, {
-                create: this.createUserLoginService.bind(this)
-            });
+            this.createUserLoginService();
 
             if (cfg.subDomains)
             {
@@ -187,26 +251,10 @@ module NAuth2
                 this.Path.DomainLogin = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/login`;
 
                 // Domains
-                this.Services.Domains = knexServiceFactory(
-                    {
-                        Model: this.db,
-                        name: DB.Tables.Domains,
-                        id: 'DomainID',
-                        paginate: {max: 200, "default": 50}
-                    });
-
-                this.app.use(this.Path.Domains, this.Services.Domains);
+                this.createDomainsService();
 
                 // DomainUsers
-                this.Services.DomainUsers = knexServiceFactory(
-                    {
-                        Model: this.db,
-                        name: DB.Tables.DomainUsers,
-                        id: ['DomainID', 'UserID'],
-                        paginate: {max: 200, "default": 50}
-                    });
-
-                this.app.use(this.Path.DomainUsers, this.Services.DomainUsers);
+                this.createDomainUsersService();
 
                 this.app.use(this.Path.DomainLogin, {
                     create: this.createDomainUserLoginService.bind(this)
@@ -224,6 +272,36 @@ module NAuth2
                         break;
                 }
             }
+        }
+
+        /*
+
+         */
+        protected createDomainUsersService()
+        {
+            this.Services.DomainUsers = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: DB.Tables.DomainUsers,
+                    id: ['DomainID', 'UserID'],
+                    paginate: {max: 200, "default": 50}
+                });
+
+            this.app.use(this.Path.DomainUsers, this.Services.DomainUsers);
+        }
+
+        /*
+
+         */
+        private createLogService()
+        {
+            this.Services.Log = knexServiceFactory(
+                {
+                    Model: this.db,
+                    name: DB.Tables.Log,
+                    id: 'LogID',
+                    paginate: {max: 200, "default": 50}
+                });
         }
     }
 }

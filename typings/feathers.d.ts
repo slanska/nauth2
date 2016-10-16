@@ -395,6 +395,9 @@ declare module "feathers-authentication"
 
         export namespace hooks
         {
+            /*
+
+             */
             export function associateCurrentUser(cfg?:AuthConfig);
 
             /*
@@ -416,7 +419,7 @@ declare module "feathers-authentication"
             /*
              Checks if there is registered user
              */
-            export function restrictToAuthenticated();
+            export function restrictToAuthenticated(cfg?:AuthConfig);
 
             /*
              Checks if data.owner attribute (determined by cfg.ownerField) is id of current user

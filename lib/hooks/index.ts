@@ -16,6 +16,7 @@ import afterUserRegistration = require('./afterUserRegistration');
 import detectOwnUser = require('./detectOwnUser');
 import detectOwnDomain = require('./detectOwnDomain');
 import authorize = require('./authorize');
+import sanitizeData = require('./sanitizeData');
 
 export =
 {
@@ -32,5 +33,6 @@ export =
     afterUserRegistration,
     detectOwnUser,
     detectOwnDomain,
-    authorize
+    authorize,
+    sanitizeData
 }

@@ -9,11 +9,13 @@ var AccessControl = require('accesscontrol');
 import {methodMap, rules} from '../accessRules';
 
 /*
- BEFORE hook that authorizes request.
+ BEFORE (for create/update/patch operations) or AFTER (for get/find) hook
+ Applies filtering from accesscontrol.js to sanitize data based on granted access rules.
+ Pre-requisites: user must be authenticated and populated, token should be verified and parsed
  @param (string) resourceName - name of REST resource (users, roles etc.)
  @param (string) ownAttribute
  */
-function authorize(resourceName:string, ownAttribute:string)
+function sanitizeData(resourceName:string)
 {
     var result = function (p:hooks.HookParams)
     {
@@ -27,26 +29,20 @@ function authorize(resourceName:string, ownAttribute:string)
             resource: resourceName,
             action: action + ':any'
         });
-        if (!permission.granted && ownAttribute)
-        {
-            if (p.params['context'] && p.params['context'].hasOwnProperty(ownAttribute) && p.params['context'][ownAttribute])
-            {
-                permission = rules.permission({
-                    role: p.params.token.roles,
-                    resource: resourceName,
-                    action: action + ':own'
-                });
-                if (!permission.granted)
-                {
-                    throw new errors.MethodNotAllowed('Not authorized');
-                }
-            }
 
-            throw new errors.MethodNotAllowed('Not authorized');
+        if (!permission.granted)
+        {
+            permission = rules.permission({
+                role: p.params.token.roles,
+                resource: resourceName,
+                action: action + ':own'
+            });
         }
+
+        p.data = permission.filter(p.data);
     };
 
     return result;
 }
 
-export = authorize;
+export = sanitizeData;

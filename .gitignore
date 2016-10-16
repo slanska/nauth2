@@ -85,3 +85,7 @@ lib/Types.js.map
 /lib/hooks/detectOwnDomain.js.map
 /schema/initDB.js.map
 /schema/initDB.js
+/lib/hooks/sanitizeData.js
+/lib/hooks/sanitizeData.js.map
+/lib/accessRules.js.map
+/lib/accessRules.js
