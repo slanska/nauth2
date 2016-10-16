@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/slanska/nauth2#readme",
   "dependencies": {
+    "accesscontrol": "^1.0.0",
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.1",
     "cache-manager": "^2.1.2",
@@ -41,6 +42,7 @@
     "feathers-hooks": "^1.5.8",
     "feathers-knex": "^2.3.0",
     "feathers-rest": "^1.5.0",
+    "feathers-sendgrid": "^0.2.1",
     "httpstatus": "^1.0.0",
     "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",

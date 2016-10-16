@@ -11,6 +11,7 @@ import Promise = require('bluebird');
 import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');
+// import sendgrid = require('feathers-sendgrid');
 
 /*
  Helper class for composing emails for different users (based on their IDs)

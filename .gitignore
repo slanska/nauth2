@@ -77,3 +77,11 @@ lib/Types.js.map
 /lib/Emailer.js.map
 /lib/hooks/verifyFieldRegexp.js
 /lib/hooks/verifyFieldRegexp.js.map
+/lib/hooks/authorize.js
+/lib/hooks/authorize.js.map
+/lib/hooks/detectOwnDomain.js
+/lib/hooks/detectOwnUser.js.map
+/lib/hooks/detectOwnUser.js
+/lib/hooks/detectOwnDomain.js.map
+/schema/initDB.js.map
+/schema/initDB.js

@@ -13,6 +13,9 @@ import knexCommit = require('./knexCommit');
 import knexRollback = require('./knexRollback');
 import setTimestamps = require('./setTimestamps');
 import afterUserRegistration = require('./afterUserRegistration');
+import detectOwnUser = require('./detectOwnUser');
+import detectOwnDomain = require('./detectOwnDomain');
+import authorize = require('./authorize');
 
 export =
 {
@@ -26,5 +29,8 @@ export =
     knexBeginTrn,
     knexCommit,
     knexRollback,
-    afterUserRegistration
+    afterUserRegistration,
+    detectOwnUser,
+    detectOwnDomain,
+    authorize
 }

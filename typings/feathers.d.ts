@@ -15,7 +15,7 @@ declare module "feathers"
     {
         interface FindResult
         {
-            data: any[];
+            data:any[];
             limit:number;
             skip:number;
             total:number;
@@ -102,7 +102,8 @@ declare module "feathers-hooks"
             params:{
                 provider:'rest'|'socketio'|'primus',
                 query:any,
-                token:any
+                token:any,
+                [name:string]:any;
             },
 
             /*
@@ -521,7 +522,7 @@ declare module "feathers-errors"
 {
     interface Error
     {
-        new(message, data?)
+        new(message:string, data?:any)
     }
 
     namespace f
@@ -539,6 +540,15 @@ declare module "feathers-errors"
         var GeneralError:Error;
         var NotImplemented:Error;
         var Unavailable:Error;
+    }
+
+    export = f;
+}
+
+declare module "feathers-sendgrid"
+{
+    namespace f
+    {
     }
 
     export = f;

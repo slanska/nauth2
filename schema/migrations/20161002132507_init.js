@@ -22,12 +22,12 @@ exports.up = function (knex, Promise)
                  Segments define hierarchy and scope, i.e.
                  */
                 tbl.string('name', 64).notNullable().unique();
-                
+
                 tbl.boolean('reversePath');
 
                 /*
-                If reversePath == true, path will be stored as reversed name.
-                E.g. for name 'canada.on.toronto' path would be set as 'toronto.on.canada'
+                 If reversePath == true, path will be stored as reversed name.
+                 E.g. for name 'canada.on.toronto' path would be set as 'toronto.on.canada'
                  */
                 tbl.string('path', 64).notNullable().unique();
 
@@ -63,6 +63,7 @@ exports.up = function (knex, Promise)
                 tbl.string('gender', 1).nullable();
                 tbl.string('avatar', 200).nullable();
                 tbl.json('extData').nullable();
+                tbl.integer('maxCreatedDomains').defaultTo(0);
                 tbl.timestamps();
             })
         .createTable('NAuth2_Roles',
@@ -73,6 +74,10 @@ exports.up = function (knex, Promise)
                 tbl.string('name', 40).notNullable().unique();
                 tbl.string('title', 64).notNullable();
                 tbl.boolean('systemRole').notNullable().defaultTo(false);
+
+                /*
+                 TODO Confirm definition?
+                 */
                 tbl.boolean('domainSpecific').notNullable().defaultTo(false);
                 tbl.timestamps();
             })
@@ -137,7 +142,7 @@ exports.up = function (knex, Promise)
                 /*
                  Can manage users and roles within domain
                  */
-                {name: 'Domain User Admin', title: 'Domain User Admin', systemRole: true, domainSpecific: true}
+                {name: 'DomainUserAdmin', title: 'Domain User Admin', systemRole: true, domainSpecific: true}
             ]).into('NAuth2_Roles');
 
         });
