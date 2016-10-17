@@ -17,7 +17,7 @@ d.dbConfig.connection = {filename: path.join(__dirname, '../data/nauth2.db')}; /
 d.emailTransport = nodemailer.createTransport(nodemailerSendGrid(
     {
         auth: {
-            api_key: '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'
+            api_key: 'INSERT_YOUR_KEY_HERE'
         }
     }));
 
