@@ -185,6 +185,32 @@ function createTriggers(knex:Knex)
 
 function initData(knex:Knex)
 {
+    return knex.insert([
+        /*
+         Can do everything on the database: create/remove domains/users/roles, grant/revoke any roles etc.
+         */
+        {name: 'SystemAdmin', title: 'System Admin', systemRole: true, domainSpecific: false},
+
+        /*
+         Can create/remove users, grant/revoke roles, assign roles (except system roles). CANNOT manage domains/domain users and domain roles
+         */
+        {name: 'UserAdmin', title: 'User Admin', systemRole: true, domainSpecific: false},
+
+        /*
+         Can create/remove domains, grant/revoke domain roles, assign users to domains
+         */
+        {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true, domainSpecific: false},
+
+        /*
+         Can delete domain, manage users and roles within domain
+         */
+        {name: 'DomainAdmin', title: 'Domain Admin', systemRole: true, domainSpecific: true},
+
+        /*
+         Can manage users and roles within domain
+         */
+        {name: 'DomainUserAdmin', title: 'Domain User Admin', systemRole: true, domainSpecific: true}
+    ]).into('NAuth2_Roles');
 }
 
 createTables(knex)
@@ -198,7 +224,16 @@ createTables(knex)
     })
     .catch(err=>
     {
-        // TODO rollback changes
+        return knex.schema
+            .dropTableIfExists('NAuth2_UserRoles')
+            .dropTableIfExists('NAuth2_DomainUsers')
+            .dropTableIfExists('NAuth2_Domains')
+            .dropTableIfExists('NAuth2_Users')
+            .dropTableIfExists('NAuth2_Roles')
+            .dropTableIfExists('NAuth2_Log').then(()=>
+            {
+                throw err;
+            });
     });
 
 
