@@ -11,11 +11,120 @@ import Types = require('../lib/Types');
 import Knex = require('knex');
 import path = require('path');
 import fs = require('fs');
+import Promise = require('bluebird');
 
 var env = process.env.NODE_ENV || 'development';
 var config = require('../examples/config')[env] as Types.INAuth2Config;
+config.dbConfig.connection['multipleStatements'] = true;
 
 var knex = Knex(config.dbConfig);
+
+/*
+ Runs multi-statement script
+ */
+
+/*
+ Since Knex does natively support executing SQL-agnostic multi-statement raw script, here is the solution
+ */
+
+type ScriptRunner = (db, script:string, callback:Function)=>void;
+
+var scriptRunners:{[clientName:string]:ScriptRunner} = {
+    'sqlite3': (db, script:string, callback:Function)=>
+    {
+        db.exec(script, callback);
+    },
+    'pg': (db, script:string, callback:Function)=>
+    {
+        db.query(script, callback);
+    },
+    'mysql': (db, script:string, callback:Function)=>
+    {
+        db.query(script, callback);
+    }
+};
+
+function runSqlScript(script:string)
+{
+    return new Promise((resolve, reject)=>
+    {
+        knex.client.pool.acquire((error, db)=>
+        {
+            scriptRunners[config.dbConfig.client](db, script, (err, result)=>
+            {
+                if (err)
+                    reject(err);
+                resolve(knex.client.pool.release(db));
+            });
+        });
+    });
+}
+
+/*
+ Initializes SQLite specific database for better performance
+ */
+function preinitDB(knex:Knex):Promise<any>
+{
+    if (config.dbConfig.client === 'sqlite3')
+    {
+        console.info('Database configuration');
+
+        return runSqlScript(`PRAGMA page_size = 8192;
+            PRAGMA journal_mode = WAL;
+            PRAGMA foreign_keys = 1;
+            PRAGMA encoding = 'UTF-8';
+            PRAGMA synchronous = NORMAL;
+            PRAGMA recursive_triggers = 1;`);
+    }
+    return Promise.resolve(knex);
+}
+
+/*
+ SQL expressions to get current UTC timestamp
+ */
+const utc_ts =
+{
+
+    'sqlite3': 'julianday()',
+    'mysql': 'UTC_TIMESTAMP()',
+    'pg': "now() at time zone 'UTC'"
+};
+
+function addJsonColumn(tbl:Knex.TableBuilder, columnName:string)
+{
+    switch (config.dbConfig.client)
+    {
+        case 'sqlite3':
+            tbl.specificType(columnName, 'json1').nullable();
+            break;
+
+        case 'pg':
+            tbl.jsonb(columnName).nullable();
+            break;
+
+        default:
+            tbl.json(columnName).nullable();
+            break;
+    }
+}
+
+const json_cols =
+{
+    "sqlite3": "json1",
+    "mysql": "json",
+    "pg": "jsonb"
+};
+
+function addCreatedAt(tbl:Knex.TableBuilder)
+{
+    tbl.specificType(`created_at`, `datetime default (${utc_ts[config.dbConfig.client]})`);
+}
+
+function addTimestamps(tbl:Knex.TableBuilder)
+{
+    addCreatedAt(tbl);
+    tbl.dateTime(`updated_at`).nullable();
+}
 
 function createTables(knex:Knex)
 {
@@ -48,7 +157,7 @@ function createTables(knex:Knex)
                 tbl.string('favIconLink', 200).nullable();
                 tbl.string('title', 64).nullable();
 
-                tbl.json('extData').nullable();
+                addJsonColumn(tbl, 'extData');
                 tbl.integer('userCreateMode').notNullable().defaultTo(0);
                 tbl.integer('changePwdEveryDays').defaultTo(0);
 
@@ -57,12 +166,15 @@ function createTables(knex:Knex)
                  */
                 tbl.boolean('listed').defaultTo(true);
 
-                tbl.timestamps();
+                addTimestamps(tbl);
+
+                console.info('Domains table initialization');
+
             })
         .createTable('NAuth2_Users',
             function (tbl)
             {
-                tbl.increments('userID');
+                tbl.increments('userId');
                 tbl.string('email').notNullable().unique();
                 tbl.string('password').notNullable();
                 tbl.string('prevPwdHash').nullable();
@@ -75,14 +187,16 @@ function createTables(knex:Knex)
                 tbl.date('birthDate').nullable();
                 tbl.string('gender', 1).nullable();
                 tbl.string('avatar', 200).nullable();
-                tbl.json('extData').nullable();
+                addJsonColumn(tbl, 'extData');
                 tbl.integer('maxCreatedDomains').defaultTo(0);
-                tbl.timestamps();
+                addTimestamps(tbl);
+
+                console.info('Users table initialization');
             })
         .createTable('NAuth2_Roles',
             function (tbl)
             {
-                tbl.increments('roleID');
+                tbl.increments('roleId');
                 tbl.integer('domainID').nullable().references('domainId').inTable('NAuth2_Domains').index();
                 tbl.string('name', 40).notNullable().unique();
                 tbl.string('title', 64).notNullable();
@@ -92,74 +206,52 @@ function createTables(knex:Knex)
                  TODO Confirm definition?
                  */
                 tbl.boolean('domainSpecific').notNullable().defaultTo(false);
-                tbl.timestamps();
+                addTimestamps(tbl);
+
+                console.info('Roles table initialization');
             })
         .createTable('NAuth2_DomainUsers',
             function (tbl)
             {
                 tbl.integer('domainId').notNullable().references('domainId').inTable('NAuth2_Domains');
                 tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users').index();
-                tbl.timestamps();
+                addJsonColumn(tbl, 'extData');
+                addTimestamps(tbl);
                 tbl.primary(['domainId', 'userId'])
+
+                console.info('DomainUsers table initialization');
             })
         .createTable('NAuth2_UserRoles',
             function (tbl)
             {
                 tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users');
                 tbl.integer('roleId').notNullable().references('roleId').inTable('NAuth2_Roles').index();
-                tbl.timestamps();
+                addTimestamps(tbl);
                 tbl.primary(['userId', 'roleId']);
+
+                console.info('UserRoles table initialization');
             })
         .createTable('NAuth2_Log',
             function (tbl)
             {
                 tbl.bigIncrements('logID');
-                var col = tbl.dateTime('created_at').notNullable();
-                if (knex.client === 'sqlite')
-                    col.defaultTo(knex.raw("date('now')"));
-                else
-                    if (knex.client === 'postgres')
-                        col.defaultTo(knex.raw('now()'));
+
+                addCreatedAt(tbl);
                 tbl.binary('clientIpAddr').nullable();
                 tbl.integer('userId').nullable().references('userId').inTable('NAuth2_Users');
                 tbl.integer('roleId').nullable().references('roleId').inTable('NAuth2_Roles');
                 tbl.integer('domainId').nullable().references('domainId').inTable('NAuth2_Domains');
-                tbl.enu('op', ['createUser', 'updateUser', 'removeUser', 'createRole', 'updateRole', 'removeRole',
-                    'grantRole', 'revokeRole', 'createDomain', 'updateDomain', 'removeDomain',
-                    'addUserToDomain', 'removeUserFromFromDomain', 'userRegistered', 'userLoggedIn']).notNullable();
-            })
-        .then(function ()
-        {
-            // Init roles
-
-            return knex.insert([
-                /*
-                 Can do everything on the database: create/remove domains/users/roles, grant/revoke any roles etc.
-                 */
-                {name: 'SystemAdmin', title: 'System Admin', systemRole: true, domainSpecific: false},
+                addJsonColumn(tbl, 'extData');
 
                 /*
-                 Can create/remove users, grant/revoke roles, assign roles (except system roles). CANNOT manage domains/domain users and domain roles
+                 Standard operations. ':C' stands for create, ':U' - for update, ':D' - for delete
                  */
-                {name: 'UserAdmin', title: 'User Admin', systemRole: true, domainSpecific: false},
+                tbl.enu('op', ['User:C', 'User:U', 'User:D', 'Role:C', 'Role:U', 'Role:D',
+                    'UserRole:C', 'UserRole:D', 'Domain:C', 'Domain:U', 'Domain:D',
+                    'DomainUser:C', 'DomainUser:D', 'register', 'login']).notNullable();
 
-                /*
-                 Can create/remove domains, grant/revoke domain roles, assign users to domains
-                 */
-                {name: 'DomainSuperAdmin', title: 'Domain Super Admin', systemRole: true, domainSpecific: false},
-
-                /*
-                 Can delete domain, manage users and roles within domain
-                 */
-                {name: 'DomainAdmin', title: 'Domain Admin', systemRole: true, domainSpecific: true},
-
-                /*
-                 Can manage users and roles within domain
-                 */
-                {name: 'DomainUserAdmin', title: 'Domain User Admin', systemRole: true, domainSpecific: true}
-            ]).into('NAuth2_Roles');
-
-        });
+                console.info('Log table initialization');
+            });
 }
 
 /*
@@ -167,24 +259,27 @@ function createTables(knex:Knex)
  */
 function createTriggers(knex:Knex)
 {
-    if (['pg', 'sqlite3', 'mysql'].indexOf(knex.client.type) < 0)
-        throw new Error(`Triggers generation is not support for ${knex.client.type} database`);
+    if (['pg', 'sqlite3', 'mysql'].indexOf(config.dbConfig.client) < 0)
+        throw new Error(`Triggers generation is not support for ${config.dbConfig.client} database`);
 
-    var scriptPath = path.join(__dirname, `${knex.client.type === 'pg' ? 'pg' : 'sqlite&mysql'}_triggers.sql`);
+    console.info('Creating triggers');
+    var scriptPath = path.join(__dirname, `${config.dbConfig.client === 'pg' ? 'pg' : 'sqlite&mysql'}_triggers.sql`);
     var sql = fs.readFileSync(scriptPath, 'utf8');
 
-    if (knex.client.type === 'mysql')
+    if (config.dbConfig.client === 'mysql')
     {
         // Handling MySQL/MariaDB specific syntax
         sql = sql.replace('/*REFERENCING NEW ROW AS new*/', 'REFERENCING NEW ROW AS new');
         sql = sql.replace('/*REFERENCING OLD ROW AS old*/', 'REFERENCING OLD ROW AS old');
     }
+    sql = sql.replace("'/*now*/'", utc_ts[config.dbConfig.client]);
 
-    return knex.schema.raw(sql);
+    return runSqlScript(sql);
 }
 
 function initData(knex:Knex)
 {
+    console.info('Initializing data');
     return knex.insert([
         /*
          Can do everything on the database: create/remove domains/users/roles, grant/revoke any roles etc.
@@ -213,7 +308,11 @@ function initData(knex:Knex)
     ]).into('NAuth2_Roles');
 }
 
-createTables(knex)
+preinitDB(knex)
+    .then(()=>
+    {
+        return createTables(knex);
+    })
     .then(()=>
     {
         return createTriggers(knex);
@@ -222,22 +321,26 @@ createTables(knex)
     {
         return initData(knex);
     })
+    .then(()=>
+    {
+        console.info('Done!');
+        return knex.destroy();
+    })
     .catch(err=>
     {
-        return knex.schema
-            .dropTableIfExists('NAuth2_UserRoles')
-            .dropTableIfExists('NAuth2_DomainUsers')
-            .dropTableIfExists('NAuth2_Domains')
-            .dropTableIfExists('NAuth2_Users')
-            .dropTableIfExists('NAuth2_Roles')
-            .dropTableIfExists('NAuth2_Log').then(()=>
-            {
-                throw err;
-            });
+        knex.destroy();
+        console.error(`${err}. Rolling back`);
+        return Promise.all([
+            knex.schema.dropTableIfExists('NAuth2_UserRoles'),
+            knex.schema.dropTableIfExists('NAuth2_DomainUsers'),
+            knex.schema.dropTableIfExists('NAuth2_Domains'),
+            knex.schema.dropTableIfExists('NAuth2_Users'),
+            knex.schema.dropTableIfExists('NAuth2_Roles'),
+            knex.schema.dropTableIfExists('NAuth2_Log')
+        ]);
+    })
+    .finally(()=>
+    {
+        //knex.destroy();
+
     });
-
-
-
-
-
-

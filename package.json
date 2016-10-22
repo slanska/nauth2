@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "TypeScript": "tsc --watch",
     "postinstall": "tsc",
+    "initTestDB:SQLite": "node ./schema/initDB.js sqlite3",
+    "initTestDB:MariaDB": "node ./schema/initDB.js mysql",
+    "initTestDB:PostgreSQL": "node ./schema/initDB.js pg",
     "knex:migrate": "cd ./schema && knex migrate:latest --debug"
   },
   "repository": {

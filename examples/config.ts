@@ -8,6 +8,7 @@ import path = require('path');
 var knexConfig = require('../schema/knexfile');
 import nodemailer = require('nodemailer');
 var nodemailerSendGrid = require('nodemailer-sendgrid-transport');
+import fs = require('fs');
 
 var d = {} as Types.INAuth2Config;
 d.subDomains = {};
@@ -17,7 +18,7 @@ d.dbConfig.connection = {filename: path.join(__dirname, '../data/nauth2.db')}; /
 d.emailTransport = nodemailer.createTransport(nodemailerSendGrid(
     {
         auth: {
-            api_key: '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'
+            api_key: 'INSERT_YOUR_SEND_GRID_API_KEY_HERE'
         }
     }));
 
@@ -25,6 +26,19 @@ var s = {} as Types.INAuth2Config;
 
 var p = {} as Types.INAuth2Config;
 var m = {} as Types.INAuth2Config;
+
+var priv_cfg_stat = fs.statSync(path.join(__dirname, './private.config.js'));
+if (priv_cfg_stat.isFile())
+{
+    var priv_cfg = require('./private.config.js');
+    var emailTransport = nodemailer.createTransport(nodemailerSendGrid(
+        {
+            auth: {
+                api_key: priv_cfg.APIKey2
+            }
+        }));
+    d.emailTransport = s.emailTransport = p.emailTransport = m.emailTransport = emailTransport;
+}
 
 export = {
     development: d,

@@ -89,3 +89,10 @@ lib/Types.js.map
 /lib/hooks/sanitizeData.js.map
 /lib/accessRules.js.map
 /lib/accessRules.js
+/lib/hooks/verifyNewPassword.js.map
+/lib/hooks/verifyNewPassword.js
+/lib/hooks/supportMethods.js
+/lib/hooks/supportMethods.js.map
+/lib/hooks/sendEmailToUser.js.map
+/lib/hooks/sendEmailToUser.js
+/examples/private.config.js
