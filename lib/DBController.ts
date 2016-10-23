@@ -39,12 +39,14 @@ module NAuth2
             Log:feathers.Service;
             Domains:feathers.Service;
             DomainUsers:feathers.Service;
+            Register:feathers.Service;
+            Login:feathers.Service;
         };
 
         /*
-         Configures service for REST /auth/users
+         Create a new instance of users service, without hooks and other customization
          */
-        protected createUserService():feathers.Service
+        protected initUserService(path:string)
         {
             var svcCfg = knexServiceFactory(
                 {
@@ -53,13 +55,21 @@ module NAuth2
                     id: 'UserID',
                     paginate: {max: 200, "default": 50}
                 });
-            this.Services.Users = this.app.service(this.Path.Users, svcCfg);
+            return this.app.service(path, svcCfg);
+        }
+
+        /*
+         Configures service for REST /auth/users
+         */
+        protected createUserService():feathers.Service
+        {
+            this.Services.Users = this.initUserService(this.Path.Users);
             this.Services.Users.before({
                 all: [
                     auth.hooks.populateUser(this.authCfg),
                     auth.hooks.restrictToAuthenticated(this.authCfg),
                     auth.hooks.verifyToken(this.authCfg),
-                    nhooks.authorize('users', 'userID'),
+                    nhooks.authorize('users', 'userId'),
                 ],
                 create: [
                     auth.hooks.hashPassword(this.authCfg),
@@ -87,12 +97,11 @@ module NAuth2
         /*
          Configures service for POST /auth/register
          */
-        protected createUserRegistrationService():feathers.Service
+        protected createUserRegistrationService()
         {
             this.Path.Register = `${this.cfg.basePath}/register`;
-            var result = this.app.service(this.Path.Register, this.createUserService());
-            result.before({
-                all: nhooks.supportedMethods('create'),
+            this.Services.Register = this.initUserService(this.Path.Register);
+            this.Services.Register.before({
                 create: [
                     nhooks.verifyCaptcha('captcha'),
                     nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
@@ -100,12 +109,16 @@ module NAuth2
                     hooks.remove('confirmPassword'),
                     auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
-                    nhooks.verifyUniqueUserEmail(this.app.service(this.Path.Users)),
-                    nhooks.setTimestamps()
-                ]
+                    nhooks.verifyUniqueUserEmail()
+                ],
+                get: [hooks.disable('external')],
+                find: [hooks.disable('external')],
+                update: [hooks.disable('external')],
+                remove: [hooks.disable('external')],
+                patch: [hooks.disable('external')],
             });
 
-            result.after({
+            this.Services.Register.after({
                 create: [
                     nhooks.afterUserRegistration(this.app, this.cfg)
                     // nhooks.knexCommit(),
@@ -118,8 +131,6 @@ module NAuth2
                      */
                 ]
             });
-
-            return result;
         }
 
         /*
@@ -127,9 +138,9 @@ module NAuth2
          */
         protected createUserLoginService()
         {
-            this.Path.Login = `${this.cfg.basePath}/login`;
-            var result = this.app.service(this.Path.Register, this.createUserService());
-            result.before({
+            this.Path.Login = `/${this.cfg.basePath}/login`;
+            this.Services.Login = this.initUserService(this.Path.Login);
+            this.Services.Login.before({
                 all: nhooks.supportedMethods('create'),
                 create: [
                     auth.hooks.associateCurrentUser(this.authCfg)
@@ -137,7 +148,7 @@ module NAuth2
                 ]
             });
 
-            result.after({
+            this.Services.Login.after({
                 create: [
                     // nhooks.afterUserRegistration(this.app, this.cfg)
                     // nhooks.knexCommit(),
@@ -146,12 +157,10 @@ module NAuth2
                      set default roles
                      create log entry
 
-                     if domain register - add to domain, assign domain policy
+                     if domain login - add to domain, assign domain policy
                      */
                 ]
             });
-
-            return result;
         }
 
         protected createRolesService()
@@ -168,19 +177,19 @@ module NAuth2
 
         protected createUserRolesService()
         {
-            this.Services.UserRoles = knexServiceFactory(
+            var cfg = knexServiceFactory(
                 {
                     Model: this.db,
                     name: DB.Tables.UserRoles,
                     id: ['UserID', 'RoleID'],
                     paginate: {max: 200, "default": 50}
                 });
-            this.app.use(this.Path.UserRoles, this.Services.UserRoles);
+            this.Services.UserRoles = this.app.service(this.Path.UserRoles, cfg);
         }
 
         protected createDomainsService()
         {
-            this.Services.Domains = knexServiceFactory(
+            var cfg = knexServiceFactory(
                 {
                     Model: this.db,
                     name: DB.Tables.Domains,
@@ -188,7 +197,7 @@ module NAuth2
                     paginate: {max: 200, "default": 50}
                 });
 
-            this.app.use(this.Path.Domains, this.Services.Domains);
+            this.Services.Domains = this.app.service(this.Path.Domains, cfg);
         }
 
         protected createDomainUserLoginService()
@@ -236,8 +245,8 @@ module NAuth2
 
             switch (cfg.userCreateMode)
             {
-                case Types.UserCreateMode.Auto:
-                case  Types.UserCreateMode.ByAdminOnly:
+                case  Types.UserCreateMode.SelfAndApproveByAdmin:
+                case  Types.UserCreateMode.SelfStart:
                     this.createUserRegistrationService();
                     break;
             }

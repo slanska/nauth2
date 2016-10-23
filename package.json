@@ -39,6 +39,7 @@
     "cache-manager": "^2.1.2",
     "captchapng": "0.0.1",
     "cors": "^2.8.1",
+    "ect": "^0.5.9",
     "feathers": "^2.0.2",
     "feathers-authentication": "^0.7.11",
     "feathers-errors": "^2.4.0",

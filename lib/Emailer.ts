@@ -11,6 +11,7 @@ import Promise = require('bluebird');
 import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');
+
 // import sendgrid = require('feathers-sendgrid');
 
 /*
@@ -49,6 +50,7 @@ class Emailer
     send(emailOptions:nodemailer.SendMailOptions, templateName:string,
          params:hooks.HookParams, culture = 'en'):Promise<hooks.HookParams>
     {
+        //template7
         var self = this;
         var tmplPath = path.join(this.cfg.templatePath, culture, templateName);
         Emailer.readFileAsync(tmplPath)
