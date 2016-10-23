@@ -36,7 +36,9 @@ function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthC
                     reject(err);
                 else
                 {
-                    p.data['actionUrl'] = `${cfg.publicHostUrl}/confirmRegister?${token}`;
+                    // TODO http or https - temp
+                    
+                    p.data['actionUrl'] = `http://${cfg.publicHostUrl}/confirmRegister?${token}`;
                     p.data['actionTitle'] = 'Confirm Email Address'; // TODO Localize
                     resolve(p);
                 }

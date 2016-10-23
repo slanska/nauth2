@@ -25,7 +25,8 @@ export = (cfg:Types.INAuth2Config) =>
             done = true;
             if (_.isEmpty(cfg.publicHostUrl))
             {
-                cfg.publicHostUrl = req.headers['host'];
+                var prefix = req.secure ? 'https' : 'http';
+                cfg.publicHostUrl = `${prefix}://${req.headers['host']}`;
             }
 
             if (_.isEmpty(cfg.termsOfServiceUrl))
@@ -35,6 +36,7 @@ export = (cfg:Types.INAuth2Config) =>
 
             if (_.isEmpty(cfg.supportEmail))
             {
+
                 cfg.supportEmail = `${cfg.companyName} Support<support@nauth2.com>`;
             }
         }
