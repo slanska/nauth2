@@ -116,7 +116,8 @@ module NAuth2
                     hooks.remove('confirmPassword'),
                     auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
-                    nhooks.verifyUniqueUserEmail()
+                    nhooks.verifyUniqueUserEmail(),
+                    nhooks.jsonDataStringify()
                 ],
                 get: [hooks.disable('external')],
                 find: [hooks.disable('external')],
@@ -128,8 +129,10 @@ module NAuth2
             this.Services.RegisterUsers.after({
                 create: [
                     // TODO sets default roles
+                    hooks.pluck('email'),
                     nhooks.setRegisterConfirmActionUrl(this.cfg, this.authCfg),
                     nhooks.sendEmailToUser(this.app, this.cfg, 'welcomeAndConfirm',
+                        // TODO Localize
                         'Welcome to <%-companyName%>! Confirm your email')
                 ]
             });
@@ -222,7 +225,7 @@ module NAuth2
             this.db = knex(cfg.dbConfig);
 
             this.Path = {
-                Users: `${cfg.basePath}/users`,
+                Users: authCfg.userEndpoint,
                 Roles: `${cfg.basePath}/roles`,
                 UserRoles: `${cfg.basePath}/userroles`,
                 Log: `${cfg.basePath}/log`,

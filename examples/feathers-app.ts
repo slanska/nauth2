@@ -37,7 +37,8 @@ var app = feathers()
 app.use(errors({
     html: function (error, req, res, next)
     {
-        // render your error view with the error object
+        // TODO use ECT to render error view with the error object
+        res.render('error', error);
         res.json(error);
     }
 }));
@@ -47,6 +48,10 @@ process.on('unhandledRejection', (reason, p) =>
     console.log("Unhandled Rejection at: Promise ", p, " reason: ", reason);
 });
 
+/*
+ Use extended version of query parser, so that nested objects and other advanced features
+ will be available
+ */
 app.set('query parser', 'extended');
 
 export = app;

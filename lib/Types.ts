@@ -6,6 +6,7 @@
 
 import * as knex from 'knex';
 import nodemailer = require( 'nodemailer');
+import {strictEqual} from "assert";
 
 namespace Types
 {
@@ -193,6 +194,8 @@ namespace Types
         value?:string,
         imageBase64?:string
     }
+
+    export type TemplateFunction = (params:Object)=>string;
 }
 
 export = Types;

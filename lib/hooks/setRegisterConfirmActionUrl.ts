@@ -22,7 +22,7 @@ import Promise = require('bluebird');
 function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthConfig,
                                      emailFiield = 'email')
 {
-    var result = (p:hooks.HookParams)=>
+    var result = function (p:hooks.HookParams)
     {
         return new Promise((resolve, reject)=>
         {
@@ -37,6 +37,7 @@ function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthC
                 else
                 {
                     p.data['actionUrl'] = `${cfg.publicHostUrl}/confirmRegister?${token}`;
+                    p.data['actionTitle'] = 'Confirm Email Address'; // TODO Localize
                     resolve(p);
                 }
             });

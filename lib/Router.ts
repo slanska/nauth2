@@ -57,8 +57,13 @@ class Router
     constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
     {
         app.use(initRuntimeCfg(cfg));
-        
-        app.configure(authentication());
+
+        // this.AuthConfig.token = {expiresIn: '1d'} as any;
+        this.AuthConfig.idField = 'userId';
+        this.AuthConfig.userEndpoint = `/${cfg.basePath}/users`;
+        app.configure(authentication(this.AuthConfig));
+
+        app.use('/ui', feathers.static(path.join(__dirname, 'piblic')));
 
         this.cfg.basePath = this.cfg.basePath || '/auth';
         this.cfg.newMemberRoles = this.cfg.newMemberRoles || [];

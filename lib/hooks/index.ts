@@ -17,6 +17,7 @@ import detectOwnDomain = require('./detectOwnDomain');
 import authorize = require('./authorize');
 import sanitizeData = require('./sanitizeData');
 import setRegisterConfirmActionUrl = require('./setRegisterConfirmActionUrl');
+import {jsonDataParse, jsonDataStringify} from './jsonDataConvertor';
 
 export =
 {
@@ -34,5 +35,7 @@ export =
     detectOwnDomain,
     authorize,
     sanitizeData,
-    setRegisterConfirmActionUrl
+    setRegisterConfirmActionUrl,
+    jsonDataParse,
+    jsonDataStringify
 }

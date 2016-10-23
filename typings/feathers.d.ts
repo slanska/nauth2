@@ -13,6 +13,8 @@ declare module "feathers"
 
     namespace f
     {
+        function static(path:string):express.RequestHandler;
+
         interface FindResult
         {
             data:any[];

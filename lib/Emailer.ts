@@ -43,15 +43,16 @@ class Emailer
     }
 
     /*
-    Sends email using given template
+     Sends email using given template
 
      param @emailOptions:
      The following properties are required to be set by caller:
+     - subject
      - to
 
      The following properties will be set by this function:
      - html (result of rendering based on templateName and params.data. Path to template file is determined as
-        /<culture>/<templateName>.html)
+     /<culture>/<templateName>.html)
      - sender (from cfg)
      - from (from cfg)
 
@@ -69,16 +70,10 @@ class Emailer
         var dd = _.cloneDeep(params.data);
         dd.companyName = self.cfg.companyName;
         dd.templateName = templateName;
-        // dd.
+        dd.title = emailOptions.subject;
 
         return new Promise<any>((resolve, reject) =>
         {
-            var dd = {
-                confirmRegistrationUrl: '#', // auth/confirmRegister/<token>
-                title: 'Confirmation',
-                companyName: 'crudbit.com'
-            };
-
             /*
              actionTitle
              */
@@ -89,12 +84,12 @@ class Emailer
                     reject(err);
                 else
                 {
-                    emailOptions.subject = renderer.render(params.data);
+                    // emailOptions.subject = renderer.render(params.data);
                     emailOptions.html = html;
-                    // emailOptions.from = cfg.su
+
                     self.cfg.emailTransport.sendMail(emailOptions, (error:Error, info:nodemailer.SentMessageInfo)=>
                     {
-                        if (err)
+                        if (error)
                             reject(err);
                         else
                         {

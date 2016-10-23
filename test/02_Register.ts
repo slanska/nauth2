@@ -73,11 +73,13 @@ it('fails: wrong captcha', (done) =>
         .then(res=>
         {
             captcha = res.body as Types.ICaptcha;
+            var password = faker.internet.password(8, false, null, '@1zX');
             var result = req()
                 .post('/auth/register')
                 .send({
                     email: faker.internet.userName() + '@mailinator.com',
-                    password: '123Abcd!', confirmPassword: '123Abcd!',
+                    password: password, confirmPassword: password,
+                    extData: {_p: password},
                     captcha: {hash: captcha.hash, value: captcha.value}
                 }).end((err, res)=>
                 {

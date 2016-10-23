@@ -35,7 +35,7 @@ if (priv_cfg_stat.isFile())
     var emailTransport = nodemailer.createTransport(nodemailerSendGrid(
         {
             auth: {
-                api_key: priv_cfg.APIKey2
+                api_key: priv_cfg.APIKey
             }
         }));
     d.emailTransport = s.emailTransport = p.emailTransport = m.emailTransport = emailTransport;

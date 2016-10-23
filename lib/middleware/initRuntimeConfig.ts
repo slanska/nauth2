@@ -13,6 +13,7 @@ import _ = require('lodash');
 import express = require('express');
 import url = require('url');
 
+
 export = (cfg:Types.INAuth2Config) =>
 {
     var done = false;
@@ -32,12 +33,10 @@ export = (cfg:Types.INAuth2Config) =>
 // url.format()
             }
 
-            // if (_.isEmpty(cfg.))
-            // {
-            //
-            // }
-
-
+            if (_.isEmpty(cfg.supportEmail))
+            {
+                cfg.supportEmail = `${cfg.companyName} Support<support@nauth2.com>`;
+            }
         }
 
         next();
