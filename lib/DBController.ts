@@ -39,7 +39,16 @@ module NAuth2
             Log:feathers.Service;
             Domains:feathers.Service;
             DomainUsers:feathers.Service;
-            Register:feathers.Service;
+
+            /*
+             Similar to Users service, but intended for internal usage
+             Exposes only POST /register
+             */
+            RegisterUsers:feathers.Service;
+
+            /*
+             Exposes only POST /login
+             */
             Login:feathers.Service;
         };
 
@@ -73,16 +82,14 @@ module NAuth2
                 ],
                 create: [
                     auth.hooks.hashPassword(this.authCfg),
-                    nhooks.sanitizeData('users'),
-                    nhooks.setTimestamps()],
+                    nhooks.sanitizeData('users')
+                ],
                 find: [],
                 get: [],
                 update: [
-                    nhooks.sanitizeData('users'),
-                    nhooks.setTimestamps()],
+                    nhooks.sanitizeData('users')],
                 patch: [
-                    nhooks.sanitizeData('users'),
-                    nhooks.setTimestamps()],
+                    nhooks.sanitizeData('users')],
                 remove: []
 
             });
@@ -97,11 +104,11 @@ module NAuth2
         /*
          Configures service for POST /auth/register
          */
-        protected createUserRegistrationService()
+        protected createUserRegisterService()
         {
             this.Path.Register = `${this.cfg.basePath}/register`;
-            this.Services.Register = this.initUserService(this.Path.Register);
-            this.Services.Register.before({
+            this.Services.RegisterUsers = this.initUserService(this.Path.Register);
+            this.Services.RegisterUsers.before({
                 create: [
                     nhooks.verifyCaptcha('captcha'),
                     nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
@@ -118,17 +125,12 @@ module NAuth2
                 patch: [hooks.disable('external')],
             });
 
-            this.Services.Register.after({
+            this.Services.RegisterUsers.after({
                 create: [
-                    nhooks.afterUserRegistration(this.app, this.cfg)
-                    // nhooks.knexCommit(),
-                    /*
-                     TODO
-                     set default roles
-                     create log entry
-
-                     if domain register - add to domain, assign domain policy
-                     */
+                    // TODO sets default roles
+                    nhooks.setRegisterConfirmActionUrl(this.cfg, this.authCfg),
+                    nhooks.sendEmailToUser(this.app, this.cfg, 'welcomeAndConfirm',
+                        'Welcome to <%-companyName%>! Confirm your email')
                 ]
             });
         }
@@ -248,7 +250,7 @@ module NAuth2
                 case  Types.UserCreateMode.SelfAndApproveByAdmin:
                 case  Types.UserCreateMode.SelfAndConfirm:
                 case  Types.UserCreateMode.SelfStart:
-                    this.createUserRegistrationService();
+                    this.createUserRegisterService();
                     break;
             }
 

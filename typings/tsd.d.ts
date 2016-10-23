@@ -18,4 +18,5 @@
 /// <reference path="assertion-error/assertion-error.d.ts" />
 /// <reference path="chai-http/chai-http.d.ts" />
 /// <reference path="mocha/mocha.d.ts" />
+/// <reference path="jsonwebtoken/jsonwebtoken.d.ts" />
 

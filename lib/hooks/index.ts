@@ -11,12 +11,12 @@ import verifyEmail = require('./verifyEmail');
 import knexBeginTrn = require('./knexBeginTrn');
 import knexCommit = require('./knexCommit');
 import knexRollback = require('./knexRollback');
-import setTimestamps = require('./setTimestamps');
-import afterUserRegistration = require('./afterUserRegistration');
+// import afterUserRegistration = require('./afterUserRegistration');
 import detectOwnUser = require('./detectOwnUser');
 import detectOwnDomain = require('./detectOwnDomain');
 import authorize = require('./authorize');
 import sanitizeData = require('./sanitizeData');
+import setRegisterConfirmActionUrl = require('./setRegisterConfirmActionUrl');
 
 export =
 {
@@ -26,13 +26,13 @@ export =
     sendEmailToUser,
     verifyUniqueUserEmail,
     verifyEmail,
-    setTimestamps,
     knexBeginTrn,
     knexCommit,
     knexRollback,
-    afterUserRegistration,
+    // afterUserRegistration,
     detectOwnUser,
     detectOwnDomain,
     authorize,
-    sanitizeData
+    sanitizeData,
+    setRegisterConfirmActionUrl
 }

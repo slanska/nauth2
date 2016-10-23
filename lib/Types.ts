@@ -6,7 +6,6 @@
 
 import * as knex from 'knex';
 import nodemailer = require( 'nodemailer');
-// import * as express from 'express';
 
 namespace Types
 {
@@ -63,8 +62,9 @@ namespace Types
         basePath?:string;
 
         /*
-         (required) (default: a strong auto generated one) - Your secret used to sign JWT's.
+         Your secret used to sign JWT's.
          If this gets compromised you need to rotate it immediately!
+         (default: a strong auto generated one)
          */
         tokenSecret?:string,
 
@@ -109,6 +109,7 @@ namespace Types
 
         /*
          Path to email templates.
+         Default: /templates
          */
         templatePath?:string;
 
@@ -118,7 +119,7 @@ namespace Types
         dbConfig:knex.Config;
 
         /*
-         this is what will be used to send emails
+         configuration to send emails
          */
         emailTransport:nodemailer.Transporter;
 
@@ -147,7 +148,38 @@ namespace Types
 
          If password does not match rules, message 'WeakPassword' from templates/phrases.json will be sent back
          */
-        passwordRules?:string|RegExp
+        passwordRules?:string|RegExp,
+
+        /*
+         Your company name, to be included into emails etc.
+         By default: 'YOUR_COMPANY_NAME'
+         */
+        companyName?:string,
+
+        /*
+         Publicly available web address to be used for interaction with user
+         (via email and admin pages).
+         For example, upon registration user will receive welcomeAndConfirm message
+         with link to complete registration. This link will be composed as:
+         publicHostUrl + '/registerConfirm?' + registerToken
+
+         By default publicHostUrl = request.headers.host + '/' + basePath
+         */
+        publicHostUrl?:string;
+
+        /*
+         'from' email used to send all generated messages to the users
+         By default: '<%-companyName%> Support<support@publicHostUrl>'
+         (publicHostUrl will have website url portion only, e.g.
+         if publicHostUrl == 'www.example.com/auth', then email will have 'example.com' only)
+         */
+        supportEmail?:string;
+
+        /*
+         Link to end user's Terms of Service.
+         By default: link to /templates/<language>/termsOfService.html
+         */
+        termsOfServiceUrl?:string;
     }
 
     /*

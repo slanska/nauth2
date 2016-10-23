@@ -96,3 +96,7 @@ lib/Types.js.map
 /lib/hooks/sendEmailToUser.js.map
 /lib/hooks/sendEmailToUser.js
 /examples/private.config.js
+/lib/hooks/setRegisterConfirmToken.js.map
+/lib/hooks/setRegisterConfirmToken.js
+/lib/middleware/initRuntimeConfig.js
+/lib/middleware/initRuntimeConfig.js.map

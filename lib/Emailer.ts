@@ -10,7 +10,6 @@ import hooks = require('feathers-hooks');
 import Promise = require('bluebird');
 import _ = require('lodash');
 import path = require('path');
-import fs = require('fs');
 var ECT = require('ect');
 
 var renderer = ECT({
@@ -19,17 +18,16 @@ var renderer = ECT({
     ext: '.html'
 });
 
-// import sendgrid = require('feathers-sendgrid');
+renderer.renderAsync = Promise.promisify(renderer.render);
 
 /*
  Helper class for composing emails for different users (based on their IDs)
  and using different templates.
  Templates are stored as HTML files, without JavaScript.
- Templating is implemented using lodash template function (https://lodash.com/docs/4.16.4#template)
+ Templating is implemented using ECT template engine (https://github.com/baryshev/ect)
  Supported syntax:
- <%= user %> or ${ user } - to refer to param.data.user attribute
- <%- value %> - to escape HTML
- <% function() %> - to execute JavaScript code
+ <%= @user %>  - to refer to param.data.user attribute
+ <%- @value %> - to escape HTML
 
  Templates are running in sandbox, with standard JavaScript functions only (Math and Date)
  with addition of attachImage() function
@@ -37,34 +35,53 @@ var renderer = ECT({
  */
 class Emailer
 {
-    sendMailAsync:(options:nodemailer.SendMailOptions)=>Promise<hooks.HookParams>;
-
-    static readFileAsync = Promise.promisify(fs.readFile);
+    // sendMailAsync:(options:nodemailer.SendMailOptions)=>Promise<hooks.HookParams>;
 
     constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config)
     {
-        this.sendMailAsync = Promise.promisify<hooks.HookParams>(cfg.emailTransport.sendMail);
+        // this.sendMailAsync = Promise.promisify<hooks.HookParams>(cfg.emailTransport.sendMail);
     }
 
     /*
-     subject: parameter
-     from: site email address
-     html/text: from template + params.data
-     to
-     cc?
-     bcc?
+    Sends email using given template
+
+     param @emailOptions:
+     The following properties are required to be set by caller:
+     - to
+
+     The following properties will be set by this function:
+     - html (result of rendering based on templateName and params.data. Path to template file is determined as
+        /<culture>/<templateName>.html)
+     - sender (from cfg)
+     - from (from cfg)
+
+     The following properties are optional:
+     - cc
+     - bcc
+     - subject (if subject is set, it will be used as as is.
+     Otherwise, template with name /<culture>/<templateName>.subject.html)
+
      */
     send(emailOptions:nodemailer.SendMailOptions, templateName:string,
          params:hooks.HookParams, culture = 'en'):Promise<hooks.HookParams>
     {
         var self = this;
+        var dd = _.cloneDeep(params.data);
+        dd.companyName = self.cfg.companyName;
+        dd.templateName = templateName;
+        // dd.
+
         return new Promise<any>((resolve, reject) =>
         {
             var dd = {
-                confirmRegistrationUrl: '#',
+                confirmRegistrationUrl: '#', // auth/confirmRegister/<token>
                 title: 'Confirmation',
                 companyName: 'crudbit.com'
             };
+
+            /*
+             actionTitle
+             */
 
             renderer.render(`${culture}/${templateName}`, dd, (err, html)=>
             {
@@ -72,9 +89,18 @@ class Emailer
                     reject(err);
                 else
                 {
-                    resolve();
+                    emailOptions.subject = renderer.render(params.data);
                     emailOptions.html = html;
-                    self.sendMailAsync(emailOptions);
+                    // emailOptions.from = cfg.su
+                    self.cfg.emailTransport.sendMail(emailOptions, (error:Error, info:nodemailer.SentMessageInfo)=>
+                    {
+                        if (err)
+                            reject(err);
+                        else
+                        {
+                            resolve(params);
+                        }
+                    });
                 }
             });
 

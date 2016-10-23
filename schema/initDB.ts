@@ -187,6 +187,7 @@ function createTables(knex:Knex)
                 tbl.date('birthDate').nullable();
                 tbl.string('gender', 1).nullable();
                 tbl.string('avatar', 200).nullable();
+                tbl.string('culture', 10).nullable().defaultTo('en');
                 addJsonColumn(tbl, 'extData');
                 tbl.integer('maxCreatedDomains').defaultTo(0);
                 addTimestamps(tbl);

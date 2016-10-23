@@ -13,6 +13,7 @@ import * as Types from "./Types";
 import Emailer = require("./Emailer");
 import authentication = require('feathers-authentication');
 import Captcha = require('./Captcha');
+import initRuntimeCfg = require('./middleware/initRuntimeConfig');
 
 var config = require('./config');
 
@@ -48,26 +49,15 @@ var config = require('./config');
  */
 class Router
 {
-    // private isAuthenticated(req, res, next)
-    // {
-    //
-    // }
-    //
-    // private IsAdmin(req, res, next)
-    // {
-    // }
-    //
-    // private IsDomainAdmin(req, res, next)
-    // {
-    // }
-
     protected DBController:DBController;
-    protected Emailer: Emailer;
-    
+    protected Emailer:Emailer;
+
     public AuthConfig:authentication.AuthConfig = {} as authentication.AuthConfig;
 
     constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
     {
+        app.use(initRuntimeCfg(cfg));
+        
         app.configure(authentication());
 
         this.cfg.basePath = this.cfg.basePath || '/auth';
@@ -75,6 +65,7 @@ class Router
         this.cfg.userCreateMode = this.cfg.userCreateMode || Types.UserCreateMode.ByAdminOnly;
         this.cfg.templatePath = this.cfg.templatePath || path.join(__dirname, '../templates');
         this.cfg.passwordRules = new RegExp(this.cfg.passwordRules as any || '(?=^.{8,}$)(?=.*\\d)(?=.*[!@#$%^&*]+)(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$');
+        this.cfg.companyName = this.cfg.companyName || 'YOUR_COMPANY_NAME';
 
         if (this.cfg.subDomains)
         {
@@ -82,13 +73,6 @@ class Router
             // This will add new parameter to request - :subdomain
             this.app.use(wildcardSubdomains(cfg.subDomains));
         }
-
-        // Ensure that prerequisite modules are configured
-        // 1. Hooks
-
-        // 2. Rest
-
-        // 3. Authentication
 
         // Register services
         this.DBController = new DBController(this.app, this.cfg, this.AuthConfig);

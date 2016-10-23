@@ -81,7 +81,7 @@ it('fails: wrong captcha', (done) =>
                     captcha: {hash: captcha.hash, value: captcha.value}
                 }).end((err, res)=>
                 {
-                    console.log(err);
+                    // console.log(err);
                     done();
                 });
         });
