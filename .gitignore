@@ -102,3 +102,5 @@ lib/Types.js.map
 /lib/middleware/initRuntimeConfig.js.map
 /lib/hooks/jsonDataConvertor.js.map
 /lib/hooks/jsonDataConvertor.js
+/lib/hooks/setRegisterConfirmActionUrl.js.map
+/lib/hooks/setRegisterConfirmActionUrl.js
