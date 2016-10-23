@@ -11,6 +11,13 @@ import Promise = require('bluebird');
 import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');
+var ECT = require('ect');
+
+var renderer = ECT({
+    root: path.join(__dirname, '../templates'),
+    watch: true,
+    ext: '.html'
+});
 
 // import sendgrid = require('feathers-sendgrid');
 
@@ -50,46 +57,28 @@ class Emailer
     send(emailOptions:nodemailer.SendMailOptions, templateName:string,
          params:hooks.HookParams, culture = 'en'):Promise<hooks.HookParams>
     {
-        //template7
         var self = this;
-        var tmplPath = path.join(this.cfg.templatePath, culture, templateName);
-        Emailer.readFileAsync(tmplPath)
-            .then(ff=>
-            {
-                var tmplFunc = _.template(ff.toString('utf8'));
-                emailOptions.html = tmplFunc(params.data);
-                return emailOptions;
-            })
-            .then(opt=>
-            {
+        return new Promise<any>((resolve, reject) =>
+        {
+            var dd = {
+                confirmRegistrationUrl: '#',
+                title: 'Confirmation',
+                companyName: 'crudbit.com'
+            };
 
-            })
-            .catch(err=>
+            renderer.render(`${culture}/${templateName}`, dd, (err, html)=>
             {
-                //
+                if (err)
+                    reject(err);
+                else
+                {
+                    resolve();
+                    emailOptions.html = html;
+                    self.sendMailAsync(emailOptions);
+                }
             });
 
-        var result = Promise.all([
-            // Load template
-
-            // Populate with params
-
-            // Load images if needed
-
-            // Load users by their IDs
-        ])
-            .then(()=>
-            {
-                return self.sendMailAsync(emailOptions);
-            });
-
-        result
-            .then(info=>
-            {
-
-            });
-
-        return result;
+        });
     }
 }
 

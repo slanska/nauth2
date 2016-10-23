@@ -246,6 +246,7 @@ module NAuth2
             switch (cfg.userCreateMode)
             {
                 case  Types.UserCreateMode.SelfAndApproveByAdmin:
+                case  Types.UserCreateMode.SelfAndConfirm:
                 case  Types.UserCreateMode.SelfStart:
                     this.createUserRegistrationService();
                     break;
@@ -255,7 +256,7 @@ module NAuth2
 
             if (cfg.subDomains)
             {
-                this.Path.Domains = `${cfg.basePath}/domains`;
+                this.Path.Domains = `/${cfg.basePath}/domains`;
                 this.Path.DomainUsers = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/users`;
                 this.Path.DomainLogin = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/login`;
 
