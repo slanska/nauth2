@@ -14,6 +14,7 @@ import Emailer = require("./Emailer");
 import authentication = require('feathers-authentication');
 import Captcha = require('./Captcha');
 import initRuntimeCfg = require('./middleware/initRuntimeConfig');
+import _ = require('lodash');
 
 var config = require('./config');
 
@@ -61,6 +62,9 @@ class Router
         // this.AuthConfig.token = {expiresIn: '1d'} as any;
         this.AuthConfig.idField = 'userId';
         this.AuthConfig.userEndpoint = `/${cfg.basePath}/users`;
+        if (!_.isEmpty(cfg.tokenSecret))
+            this.AuthConfig.token = {secret: cfg.tokenSecret, expiresIn: cfg.tokenExpiresIn || '1d'};
+
         app.configure(authentication(this.AuthConfig));
 
         app.use('/ui', feathers.static(path.join(__dirname, 'piblic')));

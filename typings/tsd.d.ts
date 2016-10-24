@@ -19,4 +19,5 @@
 /// <reference path="chai-http/chai-http.d.ts" />
 /// <reference path="mocha/mocha.d.ts" />
 /// <reference path="jsonwebtoken/jsonwebtoken.d.ts" />
+/// <reference path="qs/qs.d.ts" />
 

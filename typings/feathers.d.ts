@@ -24,16 +24,26 @@ declare module "feathers"
         }
 
         /*
+
+         */
+        interface MethodParams
+        {
+            query?:any;
+            token?:any;
+            paginate?: {limit?:number, offset?:number};
+        }
+
+        /*
          Configuration for API service
          */
         interface ServiceConfig
         {
-            create?:(data, params, callback?:express.NextFunction)=>any;
-            find?:(params, callback?)=>any;
-            get?:(id, params, callback?)=>any;
-            remove?:(id, params, callback?)=>any;
-            patch?:(id, data, params, callback?)=>any;
-            update?:(id, data, params, callback?)=>any;
+            create?:(data, params:MethodParams, callback?:express.NextFunction)=>any;
+            find?:(params:MethodParams, callback?)=>any;
+            get?:(id, params:MethodParams, callback?)=>any;
+            remove?:(id, params:MethodParams, callback?)=>any;
+            patch?:(id, data, params:MethodParams, callback?)=>any;
+            update?:(id, data, params:MethodParams, callback?)=>any;
             setup?:(app:Application)=>any;
         }
 

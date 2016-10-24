@@ -70,6 +70,11 @@ namespace Types
         tokenSecret?:string,
 
         /*
+         Lifetime of token. By default, '1d'
+         */
+        tokenExpiresIn?:string;
+
+        /*
          Optional configuration for subdomains.
          Based on configuration: https://github.com/patmood/wildcard-subdomains
 

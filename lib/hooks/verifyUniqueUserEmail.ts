@@ -17,7 +17,7 @@ function verifyUniqueUserEmail(emailField = 'email')
         var self = this as feathers.Service;
         var email = p.data[emailField];
         var qry = {};
-        qry[emailField] = email;
+        qry['email'] = email;
         var result = self.find({query: qry})
             .then((r:feathers.FindResult)=>
             {

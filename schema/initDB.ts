@@ -180,7 +180,16 @@ function createTables(knex:Knex)
                 tbl.string('prevPwdHash').nullable();
                 tbl.date('pwdExpireOn').nullable();
                 tbl.boolean('changePwdOnNextLogin').nullable();
-                tbl.boolean('suspended').notNullable().defaultTo(false);
+
+                /*
+                Current status of user
+                Possible values:
+                'P' - pending approval or confirmation
+                'A' - active
+                'S' - suspended
+                'R' - removed (deactivated)
+                 */
+                tbl.string('status').notNullable().defaultTo('P');
                 tbl.string('nickName', 40).nullable().unique();
                 tbl.string('firstName', 40).nullable();
                 tbl.string('lastName', 40).nullable();
@@ -194,6 +203,12 @@ function createTables(knex:Knex)
 
                 console.info('Users table initialization');
             })
+        .createTable('NAuth2_UserNames', function (tbl)
+        {
+            tbl.string('userName').notNullable().primary();
+            tbl.integer('userId').notNullable().unique()
+                .references('userId').inTable('NAuth2_Users').onDelete('cascade').onUpdate('cascade');
+        })
         .createTable('NAuth2_Roles',
             function (tbl)
             {

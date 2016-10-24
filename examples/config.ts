@@ -13,6 +13,7 @@ import fs = require('fs');
 var d = {} as Types.INAuth2Config;
 d.subDomains = {};
 d.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
+d.tokenSecret = 'nYP6j0yzal90r5f9ZuS+h4cDyJaWX37xCAbJhGOPcfyfy4anJowENuu1xdp4iatHhxKNH4icxjZNiDeRliNRpw==';
 d.dbConfig = {};
 d.dbConfig.client = 'sqlite3';
 d.dbConfig.connection = {filename: path.join(__dirname, '../data/nauth2.db')}; // TODO

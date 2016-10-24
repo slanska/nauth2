@@ -9,6 +9,7 @@ import errors = require('feathers-errors');
 import auth = require('feathers-authentication');
 import jwt = require('jsonwebtoken');
 import Promise = require('bluebird');
+import Qs = require('qs');
 
 /*
  Generates temporary encrypted token for the given user's email
@@ -36,9 +37,8 @@ function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthC
                     reject(err);
                 else
                 {
-                    // TODO http or https - temp
-                    
-                    p.data['actionUrl'] = `http://${cfg.publicHostUrl}/confirmRegister?${token}`;
+                    var qry = Qs.stringify({t: token});
+                    p.data['actionUrl'] = `${cfg.publicHostUrl}${cfg.basePath}/confirmRegister?${qry}`;
                     p.data['actionTitle'] = 'Confirm Email Address'; // TODO Localize
                     resolve(p);
                 }

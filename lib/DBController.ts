@@ -11,6 +11,7 @@ import feathers = require("feathers");
 import nhooks = require('./hooks/index');
 import hooks = require('feathers-hooks');
 import auth  = require('feathers-authentication');
+import jwt = require('jsonwebtoken');
 
 module NAuth2
 {
@@ -138,12 +139,54 @@ module NAuth2
             });
         }
 
+        protected createRegisterConfirmService()
+        {
+            var self = this;
+            var path = `${self.cfg.basePath}/confirmRegister`;
+            var svc = self.app.service(path, {
+                find: (params:feathers.MethodParams)=>
+                {
+                    jwt.verify(params.query.t, self.authCfg.token.secret,
+                        (err, decoded)=>
+                        {
+                            if (err)
+                                return Promise.reject(err);
+
+                            // Update status of user to '(A)ctive'
+                            this.Services.RegisterUsers.find(
+                                {query: {email: decoded.email}, paginate: {limit: 1}})
+                                .then(users=>
+                                {
+                                    // Check if user is found
+
+                                    // Check if user is marked as suspended or deleted
+
+                                    // Finally, update its status
+                                    return this.Services.RegisterUsers.patch(users[0].userId,
+                                        {status: 'A'},
+                                        {});
+                                })
+                                .then(d=>
+                                {
+                                    // Return result or redirect
+                                })
+                                .catch(err=>
+                                {
+                                    throw err;
+                                });
+
+                        });
+                }
+            });
+            svc.before({find: []});
+        }
+
         /*
          Configures service for POST /auth/login
          */
         protected createUserLoginService()
         {
-            this.Path.Login = `/${this.cfg.basePath}/login`;
+            this.Path.Login = `${this.cfg.basePath}/login`;
             this.Services.Login = this.initUserService(this.Path.Login);
             this.Services.Login.before({
                 all: nhooks.supportedMethods('create'),
@@ -254,6 +297,7 @@ module NAuth2
                 case  Types.UserCreateMode.SelfAndConfirm:
                 case  Types.UserCreateMode.SelfStart:
                     this.createUserRegisterService();
+                    this.createRegisterConfirmService();
                     break;
             }
 
