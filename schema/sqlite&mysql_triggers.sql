@@ -34,6 +34,14 @@ begin
     insert into NAuth2_Log (userId, op) values (new.userId, 'User:C');
 end;
 
+create trigger if not exists NAuth2_Users_After_Insert_Name after insert on NAuth2_Users
+/*REFERENCING NEW ROW AS new*/
+for each row
+when new.userName is not null
+begin
+    insert into NAuth2_UserNames (userId, userName) values (new.userId, new.userName);
+end;
+
 create trigger if not exists NAuth2_Users_After_Update after update on NAuth2_Users
 /*REFERENCING NEW ROW AS new*/
 /*REFERENCING OLD ROW AS old*/
@@ -41,6 +49,16 @@ for each row
 begin
     update NAuth2_Users set updated_at = '/*now*/' where userId = new.userId;
     insert into NAuth2_Log (userId, op) values (new.userId, 'User:U');
+end;
+
+create trigger if not exists NAuth2_Users_After_Update_Name after update of userName on NAuth2_Users
+/*REFERENCING NEW ROW AS new*/
+/*REFERENCING OLD ROW AS old*/
+for each row
+when new.userName is not null or old.userName is not null
+begin
+    delete from NAuth2_UserNames where userId = old.userId;
+    insert into NAuth2_UserNames (userId, userName) values (new.userId, new.userName);
 end;
 
 create trigger if not exists NAuth2_Users_After_Delete after delete on NAuth2_Users

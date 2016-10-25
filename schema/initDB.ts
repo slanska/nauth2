@@ -12,6 +12,8 @@ import Knex = require('knex');
 import path = require('path');
 import fs = require('fs');
 import Promise = require('bluebird');
+import auth = require('feathers-authentication');
+import hooks = require('feathers-hooks');
 
 var env = process.env.NODE_ENV || 'development';
 var config = require('../examples/config')[env] as Types.INAuth2Config;
@@ -166,6 +168,22 @@ function createTables(knex:Knex)
                  */
                 tbl.boolean('listed').defaultTo(true);
 
+                // TODO Needed?
+                tbl.string('afterConfirmEmailEndpoint').nullable();
+                tbl.string('changePasswordEndpoint').nullable();
+                tbl.string('userProfileEndpoint').nullable();
+
+                tbl.string('homeEndpoint').nullable();
+
+                /*
+                 Status of domain:
+                 'A' - active
+                 'P' - pending
+                 'R' - removed (inactive)
+                 'S' - suspended
+                 */
+                tbl.string('status').notNullable().defaultTo('A');
+
                 addTimestamps(tbl);
 
                 console.info('Domains table initialization');
@@ -182,15 +200,15 @@ function createTables(knex:Knex)
                 tbl.boolean('changePwdOnNextLogin').nullable();
 
                 /*
-                Current status of user
-                Possible values:
-                'P' - pending approval or confirmation
-                'A' - active
-                'S' - suspended
-                'R' - removed (deactivated)
+                 Current status of user
+                 Possible values:
+                 'P' - pending approval or confirmation
+                 'A' - active
+                 'S' - suspended
+                 'R' - removed (deactivated)
                  */
                 tbl.string('status').notNullable().defaultTo('P');
-                tbl.string('nickName', 40).nullable().unique();
+                tbl.string('userName', 40).nullable().unique();
                 tbl.string('firstName', 40).nullable();
                 tbl.string('lastName', 40).nullable();
                 tbl.date('birthDate').nullable();
@@ -205,7 +223,7 @@ function createTables(knex:Knex)
             })
         .createTable('NAuth2_UserNames', function (tbl)
         {
-            tbl.string('userName').notNullable().primary();
+            tbl.string('userName', 40).notNullable().primary();
             tbl.integer('userId').notNullable().unique()
                 .references('userId').inTable('NAuth2_Users').onDelete('cascade').onUpdate('cascade');
         })
@@ -324,6 +342,33 @@ function initData(knex:Knex)
     ]).into('NAuth2_Roles');
 }
 
+function insertAdmin(knex:Knex)
+{
+    var pp = {} as hooks.HookParams;
+    pp.type = 'before';
+    pp.app = {} as any; // TODO
+    pp.data = {password: 'admin'};
+
+    return auth.hooks.hashPassword(pp)
+        .then(()=>
+        {
+            return knex.insert([{
+                email: '@',
+                changePasswordOnNextLogin: true,
+                userName: 'admin',
+                password: pp.data.password
+            }]).into('NAuth2_User');
+        }).then(d =>
+        {
+            return knex.insert([
+                {
+                    userId: 0, // TODO
+                    roleId: 0 // TODO
+                }
+            ]).into('NAuth2_UserRoles');
+        });
+}
+
 preinitDB(knex)
     .then(()=>
     {
@@ -336,6 +381,10 @@ preinitDB(knex)
     .then(()=>
     {
         return initData(knex);
+    })
+    .then(()=>
+    {
+        return insertAdmin(knex);
     })
     .then(()=>
     {
@@ -357,6 +406,5 @@ preinitDB(knex)
     })
     .finally(()=>
     {
-        //knex.destroy();
-
+        knex.destroy();
     });
