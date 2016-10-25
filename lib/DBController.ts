@@ -146,36 +146,42 @@ module NAuth2
             var svc = self.app.service(path, {
                 find: (params:feathers.MethodParams)=>
                 {
-                    jwt.verify(params.query.t, self.authCfg.token.secret,
-                        (err, decoded)=>
-                        {
-                            if (err)
-                                return Promise.reject(err);
+                    return new Promise((resolve, reject)=>
+                    {
+                        jwt.verify(params.query.t, self.authCfg.token.secret,
+                            (err, decoded)=>
+                            {
+                                if (err)
+                                    return Promise.reject(err);
 
-                            // Update status of user to '(A)ctive'
-                            this.Services.RegisterUsers.find(
-                                {query: {email: decoded.email}, paginate: {limit: 1}})
-                                .then(users=>
-                                {
-                                    // Check if user is found
+                                // Update status of user to '(A)ctive'
+                                return this.Services.RegisterUsers.find(
+                                    {query: {email: decoded.email}, paginate: {limit: 1}})
+                                    .then(users=>
+                                    {
+                                        // Check if user is found
 
-                                    // Check if user is marked as suspended or deleted
+                                        // Check if user is marked as suspended or deleted
 
-                                    // Finally, update its status
-                                    return this.Services.RegisterUsers.patch(users[0].userId,
-                                        {status: 'A'},
-                                        {});
-                                })
-                                .then(d=>
-                                {
-                                    // Return result or redirect
-                                })
-                                .catch(err=>
-                                {
-                                    throw err;
-                                });
+                                        // Finally, update its status
+                                        return this.Services.RegisterUsers.patch(users[0].userId,
+                                            {status: 'A'},
+                                            {});
+                                    })
+                                    .then(d=>
+                                    {
+                                        // Redirects or renders original page
+                                        resolve(d);
+                                        return d;
+                                    })
+                                    .catch(err=>
+                                    {
+                                        reject(err);
+                                    });
 
-                        });
+                            });
+
+                    });
                 }
             });
             svc.before({find: []});

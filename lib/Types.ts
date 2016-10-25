@@ -6,7 +6,6 @@
 
 import * as knex from 'knex';
 import nodemailer = require( 'nodemailer');
-import {strictEqual} from "assert";
 
 namespace Types
 {
@@ -161,6 +160,37 @@ namespace Types
          By default: 'YOUR_COMPANY_NAME'
          */
         companyName?:string,
+
+        /*
+         Company contact information. Used for rendering view and email footers
+         */
+        contactInfo?:{
+            addressLine1:string,
+            addressLine2?:string,
+            city:string,
+            provinceOrState:string,
+            postalCode:string,
+            country:string
+        },
+
+        /*
+         (optional) endpoints for email links
+         */
+
+        /*
+         Link to navigate after user clicked [Confirm my email] link in email
+         */
+        afterConfirmEmailEndpoint?:string,
+
+        /*
+         Link to navigate after user clicked [Change password] link in email
+         */
+        changePasswordEndpoint?:string,
+
+        /*
+         Base link to navigate for taking action for the given user
+         */
+        userProfileEndpoint?:string,
 
         /*
          Publicly available web address to be used for interaction with user

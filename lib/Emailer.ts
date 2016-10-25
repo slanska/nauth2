@@ -28,10 +28,6 @@ renderer.renderAsync = Promise.promisify(renderer.render);
  Supported syntax:
  <%= @user %>  - to refer to param.data.user attribute
  <%- @value %> - to escape HTML
-
- Templates are running in sandbox, with standard JavaScript functions only (Math and Date)
- with addition of attachImage() function
- Result of templating is sanitized to ensure that there is no JavaScript
  */
 class Emailer
 {
@@ -59,8 +55,7 @@ class Emailer
      The following properties are optional:
      - cc
      - bcc
-     - subject (if subject is set, it will be used as as is.
-     Otherwise, template with name /<culture>/<templateName>.subject.html)
+     Otherwise, template with name /<culture>/<templateName>.subject.html will be rendered)
 
      */
     send(emailOptions:nodemailer.SendMailOptions, templateName:string,
@@ -84,7 +79,6 @@ class Emailer
                     reject(err);
                 else
                 {
-                    // emailOptions.subject = renderer.render(params.data);
                     emailOptions.html = html;
 
                     self.cfg.emailTransport.sendMail(emailOptions, (error:Error, info:nodemailer.SentMessageInfo)=>
