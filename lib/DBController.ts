@@ -139,6 +139,15 @@ module NAuth2
             });
         }
 
+        /*
+
+         */
+        findUserByNameOrEmail(emailOrName:string):Promise<any>
+        {
+            var self = this;
+            return self.Services.RegisterUsers.find({});
+        }
+
         protected createRegisterConfirmService()
         {
             var self = this;
@@ -170,13 +179,12 @@ module NAuth2
                                     })
                                     .then(d=>
                                     {
-                                        // Redirects or renders original page
-                                        resolve(d);
-                                        return d;
+                                        // Redirects or renders default page
+                                        return resolve(d);
                                     })
                                     .catch(err=>
                                     {
-                                        reject(err);
+                                        return reject(err);
                                     });
 
                             });

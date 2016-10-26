@@ -50,3 +50,5 @@ Expects the following data attributes:
 
 The same as Action, plus:
 * **warning** placeholder
+
+#### Notification Template

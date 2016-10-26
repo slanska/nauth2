@@ -231,6 +231,29 @@ namespace Types
     }
 
     export type TemplateFunction = (params:Object)=>string;
+
+    /*
+
+     */
+    export interface IUserRecord
+    {
+        userId:number;
+        userName:string;
+        password:string;
+        email:string;
+        created_at:Date;
+        updated_at:Date;
+        // TODO TBC
+    }
+
+    /*
+    
+     */
+    export interface IDomainRecord
+    {
+        domainId: number;
+        // TODO TBC
+    }
 }
 
 export = Types;

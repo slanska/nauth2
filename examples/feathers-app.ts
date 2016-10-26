@@ -12,7 +12,7 @@ var errors = require('feathers-errors/handler');
 import nauth2 = require('../lib/index');
 var cors = require('cors');
 
-var config = require('./config')[process.env.NODE_ENV || 'development'];
+var config = require('./../config/config')[process.env.NODE_ENV || 'development'];
 
 var app = feathers()
 

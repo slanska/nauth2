@@ -16,7 +16,7 @@ import auth = require('feathers-authentication');
 import hooks = require('feathers-hooks');
 
 var env = process.env.NODE_ENV || 'development';
-var config = require('../examples/config')[env] as Types.INAuth2Config;
+var config = require('../config/config')[env] as Types.INAuth2Config;
 config.dbConfig.connection['multipleStatements'] = true;
 
 var knex = Knex(config.dbConfig);
@@ -251,7 +251,7 @@ function createTables(knex:Knex)
                 tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users').index();
                 addJsonColumn(tbl, 'extData');
                 addTimestamps(tbl);
-                tbl.primary(['domainId', 'userId'])
+                tbl.primary(['domainId', 'userId']);
 
                 console.info('DomainUsers table initialization');
             })

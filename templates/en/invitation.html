@@ -1,1 +1,18 @@
 <!--Sent when new user gets invited via email-->
+<% extend 'action' %>
+
+<% block 'top' : %>
+<h4>You are invited to become a member of <%= @companyName%>!</h4>
+<p><%= @inviterName% has invited you to join.></p>
+<p>To accept invitation please click link below. You will be redirected to our registration page to complete.</p>
+<p>If this email has been sent to you by mistake, please ignore it.</p>
+<% end %>
+
+<% block 'body' : %>
+<p>By clicking on the following link, you are confirming your email address and agreeing to <%- @companyName%>'s
+    <a href="<%- @termsOfServiceUrl%>">Terms of Service</a></p>
+<% end %>
+
+<% block 'bottom' : %>
+
+<% end %>
