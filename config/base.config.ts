@@ -36,7 +36,7 @@ var env_config = {
             connection: {filename: path.join(__dirname, '../data/nauth2.db')}
         }
     },
-    "test_sql": {
+    "test_sqlite3": {
         dbConfig: {
             client: 'sqlite3',
             connection: {filename: path.join(__dirname, '../data/nauth2.db')}
@@ -53,7 +53,9 @@ var env_config = {
             client: 'pg',
             connection: {filename: path.join(__dirname, '../data/nauth2.db')}
         }
-    }
+    },
+
+    "production": {}
 };
 
 var result_cfg = _.merge(common_cfg, env_config[process.env.NODE_ENV || 'development']);

@@ -161,7 +161,7 @@ module NAuth2
                             (err, decoded)=>
                             {
                                 if (err)
-                                    return Promise.reject(err);
+                                    return reject(err);
 
                                 // Update status of user to '(A)ctive'
                                 return this.Services.RegisterUsers.find(

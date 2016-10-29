@@ -9,8 +9,6 @@ lib/Consts.js
 lib/Consts.js.map
 lib/DBController.js
 lib/DBController.js.map
-lib/Router.js
-lib/Router.js.map
 lib/index.js
 lib/index.js.map
 node_modules/
@@ -33,10 +31,6 @@ typings/shortid/
 /lib/Types.js.map
 lib/Types.js
 lib/Types.js.map
-/examples/feathers-app.js.map
-/examples/feathers-app.js
-/examples/config.js.map
-/examples/config.js
 /lib/hooks/index.js.map
 /lib/hooks/index.js
 /lib/RegisterService.js
@@ -114,3 +108,9 @@ lib/Types.js.map
 /config/apiservice.config.js
 /config/base.config.js.map
 /config/base.config.js
+/apiservice.js
+/apiservice.js.map
+/index.js
+/index.js.map
+/config/index.js.map
+/config/index.js

@@ -193,6 +193,15 @@ namespace Types
         userProfileEndpoint?:string,
 
         /*
+         Runtime mode for NAuth2.
+         In apiservice mode *Endpoint values above are mandatory
+         In website mode simple integrated SPA application will be used (see /public for content)
+         *Endpoint links are optional. If not set, integrated endpoints will be used
+         Default value: 'website'
+         */
+        run_mode:'apiservice'|'website',
+
+        /*
          Publicly available web address to be used for interaction with user
          (via email and admin pages).
          For example, upon registration user will receive welcomeAndConfirm message
@@ -216,6 +225,12 @@ namespace Types
          By default: link to /templates/<language>/termsOfService.html
          */
         termsOfServiceUrl?:string;
+
+        /*
+         true if running in development/debug mode (process.env.ENV === 'development').
+         Default: false
+         */
+        debug?:boolean;
     }
 
     /*
@@ -247,11 +262,11 @@ namespace Types
     }
 
     /*
-    
+
      */
     export interface IDomainRecord
     {
-        domainId: number;
+        domainId:number;
         // TODO TBC
     }
 }

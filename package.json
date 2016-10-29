@@ -2,7 +2,7 @@
   "name": "nauth2",
   "version": "0.0.1",
   "description": "Node.js server library for handling authentication and authorization in multi-tenant, multi-domain environment",
-  "main": "testapp",
+  "main": "lib/index",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "TypeScript": "tsc --watch",
