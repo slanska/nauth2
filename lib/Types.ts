@@ -6,6 +6,7 @@
 
 import * as knex from 'knex';
 import nodemailer = require( 'nodemailer');
+import authentication = require('feathers-authentication');
 
 namespace Types
 {
@@ -245,6 +246,9 @@ namespace Types
         imageBase64?:string
     }
 
+    /*
+     Function to be used as template builder (e.g. for dynamic email subject texts)
+     */
     export type TemplateFunction = (params:Object)=>string;
 
     /*
@@ -253,7 +257,7 @@ namespace Types
     export interface IUserRecord
     {
         userId:number;
-        userName:string;
+        name:string;
         password:string;
         email:string;
         created_at:Date;
@@ -268,6 +272,12 @@ namespace Types
     {
         domainId:number;
         // TODO TBC
+    }
+
+    export interface INAuth2Controller
+    {
+        AuthConfig:authentication.AuthConfig;
+        cfg:Types.INAuth2Config;
     }
 }
 

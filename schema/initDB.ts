@@ -12,12 +12,23 @@ import Knex = require('knex');
 import path = require('path');
 import fs = require('fs');
 import Promise = require('bluebird');
-import auth = require('feathers-authentication');
+import authentication = require('feathers-authentication');
 import hooks = require('feathers-hooks');
+import feathers = require('feathers');
 
 var env = process.env.NODE_ENV || 'development';
-var config = require('../config/config')[env] as Types.INAuth2Config;
-config.dbConfig.connection['multipleStatements'] = true;
+import config = require('../config/index');
+
+import initRuntimeConfig = require('../lib/middleware/initRuntimeConfig');
+
+var dummyController = {} as Types.INAuth2Controller;
+dummyController.cfg = config;
+dummyController.AuthConfig = {} as authentication.AuthConfig;
+initRuntimeConfig(dummyController);
+
+var dummyApp = feathers();
+dummyApp.configure(hooks());
+dummyApp.configure(authentication(dummyController.AuthConfig));
 
 var knex = Knex(config.dbConfig);
 
@@ -197,7 +208,6 @@ function createTables(knex:Knex)
                 tbl.string('password').notNullable();
                 tbl.string('prevPwdHash').nullable();
                 tbl.date('pwdExpireOn').nullable();
-                tbl.boolean('changePwdOnNextLogin').nullable();
 
                 /*
                  Current status of user
@@ -217,6 +227,7 @@ function createTables(knex:Knex)
                 tbl.string('culture', 10).nullable().defaultTo('en');
                 addJsonColumn(tbl, 'extData');
                 tbl.integer('maxCreatedDomains').defaultTo(0);
+                tbl.boolean('changePasswordOnNextLogin').defaultTo(false);
                 addTimestamps(tbl);
 
                 console.info('Users table initialization');
@@ -346,10 +357,14 @@ function insertAdmin(knex:Knex)
 {
     var pp = {} as hooks.HookParams;
     pp.type = 'before';
-    pp.app = {} as any; // TODO
+    pp.app = dummyApp;
     pp.data = {password: 'admin'};
 
-    return auth.hooks.hashPassword(pp)
+    var adminId;
+    var roleId;
+
+    var hashed = authentication.hooks.hashPassword()(pp);
+    return hashed
         .then(()=>
         {
             return knex.insert([{
@@ -357,15 +372,25 @@ function insertAdmin(knex:Knex)
                 changePasswordOnNextLogin: true,
                 userName: 'admin',
                 password: pp.data.password
-            }]).into('NAuth2_User');
+            }]).into('NAuth2_Users');
         }).then(d =>
         {
+            return knex.select('userId').from('NAuth2_Users').where({userName: 'admin'});
+        })
+        .then(users=>
+        {
+            adminId = users[0].userId;
+            return knex.select('roleId').from('NAuth2_Roles').where({
+                name: 'SystemAdmin'
+            });
+        }).then((roles)=>
+        {
+            roleId = roles[0].roleId;
             return knex.insert([
                 {
-                    userId: 0, // TODO
-                    roleId: 0 // TODO
-                }
-            ]).into('NAuth2_UserRoles');
+                    userId: adminId,
+                    roleId: roleId
+                }]).into('NAuth2_UserRoles');
         });
 }
 
@@ -399,6 +424,7 @@ preinitDB(knex)
             knex.schema.dropTableIfExists('NAuth2_UserRoles'),
             knex.schema.dropTableIfExists('NAuth2_DomainUsers'),
             knex.schema.dropTableIfExists('NAuth2_Domains'),
+            knex.schema.dropTableIfExists('NAuth2_UserNames'),
             knex.schema.dropTableIfExists('NAuth2_Users'),
             knex.schema.dropTableIfExists('NAuth2_Roles'),
             knex.schema.dropTableIfExists('NAuth2_Log')

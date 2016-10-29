@@ -14,30 +14,39 @@ import express = require('express');
 import url = require('url');
 
 
-export = (cfg:Types.INAuth2Config) =>
+export = (controller: Types.INAuth2Controller) =>
 {
     var done = false;
+
+    /*
+    Init authentication configuration
+     */
+    // this.AuthConfig.token = {expiresIn: '1d'} as any;
+    controller.AuthConfig.idField = 'userId';
+    controller.AuthConfig.userEndpoint = `/${controller.cfg.basePath}/users`;
+    if (!_.isEmpty(controller.cfg.tokenSecret))
+        controller.AuthConfig.token = {secret: controller.cfg.tokenSecret, expiresIn: controller.cfg.tokenExpiresIn || '1d'};
 
     var result = (req:express.Request, res:express.Response, next)=>
     {
         if (!done)
         {
             done = true;
-            if (_.isEmpty(cfg.publicHostUrl))
+            if (_.isEmpty(controller.cfg.publicHostUrl))
             {
                 var prefix = req.secure ? 'https' : 'http';
-                cfg.publicHostUrl = `${prefix}://${req.headers['host']}`;
+                controller.cfg.publicHostUrl = `${prefix}://${req.headers['host']}`;
             }
 
-            if (_.isEmpty(cfg.termsOfServiceUrl))
+            if (_.isEmpty(controller.cfg.termsOfServiceUrl))
             {
 // url.format()
             }
 
-            if (_.isEmpty(cfg.supportEmail))
+            if (_.isEmpty(controller.cfg.supportEmail))
             {
 
-                cfg.supportEmail = `${cfg.companyName} Support<support@nauth2.com>`;
+                controller.cfg.supportEmail = `${controller.cfg.companyName} Support<support@nauth2.com>`;
             }
         }
 

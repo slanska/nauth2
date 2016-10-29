@@ -28,8 +28,8 @@ var app = AppFactory(config);
 
 if (useCluster)
 {
-    console.log('App Launching in cluster mode on port: ' + process.env.PORT);
-    console.log('Workers count: ' + numCPUs);
+    console.log(`App Launching in cluster mode on port: ${port}`);
+    console.log(`Workers count: ${numCPUs}`);
 }
 
 /*

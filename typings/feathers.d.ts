@@ -231,6 +231,9 @@ declare module "feathers-hooks"
          */
         function lowerCase(...fields:string[]);
     }
+
+    function f();
+    
     export = f;
 }
 

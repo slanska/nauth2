@@ -356,7 +356,7 @@ module NAuth2
                 {
                     Model: this.db,
                     name: DB.Tables.DomainUsers,
-                    id: ['DomainID', 'UserID'],
+                    id: ['domainId', 'userId'],
                     paginate: {max: 200, "default": 50}
                 });
 

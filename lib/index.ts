@@ -46,38 +46,27 @@ import _ = require('lodash');
 /*
 
  */
-class Controller
+class Controller implements Types.INAuth2Controller
 {
-    protected DBController:DBController;
-    protected Emailer:Emailer;
+    public DBController:DBController;
+    public Emailer:Emailer;
+
+    public Paths:{};
+
+    public Services:{};
 
     public AuthConfig:authentication.AuthConfig = {} as authentication.AuthConfig;
 
-    constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
+    constructor(protected app:feathers.Application, public cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
     {
-        app.use(initRuntimeCfg(cfg));
-
-        // this.AuthConfig.token = {expiresIn: '1d'} as any;
-        this.AuthConfig.idField = 'userId';
-        this.AuthConfig.userEndpoint = `/${cfg.basePath}/users`;
-        if (!_.isEmpty(cfg.tokenSecret))
-            this.AuthConfig.token = {secret: cfg.tokenSecret, expiresIn: cfg.tokenExpiresIn || '1d'};
+        app.use(initRuntimeCfg(this));
 
         app.configure(authentication(this.AuthConfig));
 
-        app.use('/ui', feathers.static(path.join(__dirname, 'piblic')));
-
-        this.cfg.basePath = this.cfg.basePath || '/auth';
-        this.cfg.newMemberRoles = this.cfg.newMemberRoles || [];
-        this.cfg.userCreateMode = this.cfg.userCreateMode || Types.UserCreateMode.ByAdminOnly;
-        this.cfg.templatePath = this.cfg.templatePath || path.join(__dirname, '../templates');
-        this.cfg.passwordRules = new RegExp(this.cfg.passwordRules as any || '(?=^.{8,}$)(?=.*\\d)(?=.*[!@#$%^&*]+)(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$');
-        this.cfg.companyName = this.cfg.companyName || 'YOUR_COMPANY_NAME';
+        app.use('/ui', feathers.static(path.join(__dirname, 'public')));
 
         if (this.cfg.subDomains)
         {
-            this.cfg.subDomains.namespace = this.cfg.subDomains.namespace || '_sub';
-            // This will add new parameter to request - :subdomain
             this.app.use(wildcardSubdomains(cfg.subDomains));
         }
 
@@ -92,7 +81,7 @@ class Controller
 
 export = (app:feathers.Application, cfg:Types.INAuth2Config)=>
 {
-    return function()
+    return function ()
     {
         return new Controller(app, cfg);
     }
