@@ -10,9 +10,12 @@ import chaiHttp = require('chai-http');
 import assert = require('assert');
 import mocha = require('mocha');
 import * as Types from '../lib/Types';
-const app = require('../examples/feathers-app');
+const AppFactory = require('../appFactory');
 var authentication = require('feathers-authentication/client');
 import faker = require('faker');
+var config = require('../config');
+config.debug = true;
+var app = AppFactory(config);
 
 var token;
 
@@ -83,8 +86,7 @@ it('fails: wrong captcha', (done) =>
                     captcha: {hash: captcha.hash, value: captcha.value}
                 }).end((err, res)=>
                 {
-                    // console.log(err);
-                    done();
+                    done(err);
                 });
         });
 });

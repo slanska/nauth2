@@ -190,7 +190,7 @@ function createTables(knex:Knex)
                  Status of domain:
                  'A' - active
                  'P' - pending
-                 'R' - removed (inactive)
+                 'D' - deleted (inactive)
                  'S' - suspended
                  */
                 tbl.string('status').notNullable().defaultTo('A');
@@ -215,7 +215,7 @@ function createTables(knex:Knex)
                  'P' - pending approval or confirmation
                  'A' - active
                  'S' - suspended
-                 'R' - removed (deactivated)
+                 'D' - deleted (deactivated)
                  */
                 tbl.string('status').notNullable().defaultTo('P');
                 tbl.string('userName', 40).nullable().unique();
@@ -371,7 +371,8 @@ function insertAdmin(knex:Knex)
                 email: '@',
                 changePasswordOnNextLogin: true,
                 userName: 'admin',
-                password: pp.data.password
+                password: pp.data.password,
+                status: 'A' // Active
             }]).into('NAuth2_Users');
         }).then(d =>
         {
