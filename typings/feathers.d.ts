@@ -30,7 +30,7 @@ declare module "feathers"
         {
             query?:any;
             token?:any;
-            paginate?: {limit?:number, offset?:number};
+            paginate?:{limit?:number, offset?:number};
         }
 
         /*
@@ -77,6 +77,37 @@ declare module "feathers"
          United express' and feathers' application
          */
         type Application = ApplicationCore & express.Application
+
+        /*
+         Standard structure of response body
+         */
+        interface ResponseBody
+        {
+            /*
+             Status class description. E.g. "Not implemented"
+             */
+            "name":string,
+
+            /*
+             Specific message
+             */
+            "message":string,
+
+            /*
+             HTTP status code
+             */
+            "code":number,
+
+            /*
+             Status class name. E.g. "not-implemented"
+             */
+            "className":string,
+
+            /*
+             Optional hash of errors
+             */
+            "errors"?:Object
+        }
     }
 
     function f():f.Application;
@@ -233,7 +264,7 @@ declare module "feathers-hooks"
     }
 
     function f();
-    
+
     export = f;
 }
 

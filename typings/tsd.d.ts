@@ -20,4 +20,6 @@
 /// <reference path="mocha/mocha.d.ts" />
 /// <reference path="jsonwebtoken/jsonwebtoken.d.ts" />
 /// <reference path="qs/qs.d.ts" />
+/// <reference path="http-status/http-status.d.ts" />
+
 

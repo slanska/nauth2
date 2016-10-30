@@ -21,7 +21,7 @@ import cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 
 var port = process.env.PORT || 8800;
-var useCluster = process.env.CLUSTER || false;
+var useCluster = !!process.env.CLUSTER || false;
 var config = require(`./config`);
 
 var app = AppFactory(config);
@@ -30,21 +30,20 @@ if (useCluster)
 {
     console.log(`App Launching in cluster mode on port: ${port}`);
     console.log(`Workers count: ${numCPUs}`);
+    /*
+     Set handlers on cluster events
+     */
+    cluster.on('fork', function (worker)
+    {
+        console.log("Start worker: %s online", worker.process.pid || "");
+    });
+    cluster.on('exit', function (worker, code, signal)
+    {
+        console.log('Worker: %s died', worker.process.pid || "");
+    });
 }
 
-/*
- Set handlers on cluster events
- */
-cluster.on('fork', function (worker)
-{
-    console.log("Start worker: %s online", worker.process.pid || "");
-});
-cluster.on('exit', function (worker, code, signal)
-{
-    console.log('Worker: %s died', worker.process.pid || "");
-});
-
-if (cluster.isMaster)
+if (cluster.isMaster && useCluster)
 {
     // Fork workers.
     for (var i = 0; i < numCPUs; i++)

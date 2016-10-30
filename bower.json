@@ -1,0 +1,34 @@
+{
+  "name": "nauth2",
+  "description": "Node.js server library for handling authentication and authorization in multi-tenant, multi-domain environment",
+  "main": "lib/index",
+  "authors": [
+    "slanska"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "authorization",
+    "authentication",
+    "multi-tenant",
+    "node.js",
+    "express.js",
+    "user",
+    "management",
+    "sub-domains"
+  ],
+  "homepage": "https://github.com/slanska/nauth2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "./public/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "vue": "^2.0.3",
+    "Framework7-Vue": "https://github.com/nolimits4web/Framework7-Vue.git",
+    "Framework7": "framework7#^1.4.2",
+    "feathers-client": "^1.6.2"
+  }
+}

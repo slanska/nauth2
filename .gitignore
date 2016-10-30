@@ -114,3 +114,7 @@ lib/Types.js.map
 /index.js.map
 /config/index.js.map
 /config/index.js
+/public/app/userController.js
+/public/app/userController.js.map
+/public/app/adminController.js
+/public/app/adminController.js.map

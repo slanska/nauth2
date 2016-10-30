@@ -33,7 +33,7 @@ function sendEmailToUser(app:feathers.Application, cfg:Types.INAuth2Config,
         }
         else
         {
-            subject = (subject as Types.TemplateFunction)(p.data);
+            emailOptions.subject = (subject as Types.TemplateFunction)(p.data);
         }
 
         return emailer.send(emailOptions, templateName, p);

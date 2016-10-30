@@ -12,6 +12,9 @@ import nhooks = require('./hooks/index');
 import hooks = require('feathers-hooks');
 import auth  = require('feathers-authentication');
 import jwt = require('jsonwebtoken');
+import errors = require('feathers-errors');
+import HTTPStatus = require('http-status');
+import _ = require('lodash');
 
 module NAuth2
 {
@@ -134,18 +137,34 @@ module NAuth2
                     nhooks.setRegisterConfirmActionUrl(this.cfg, this.authCfg),
                     nhooks.sendEmailToUser(this.app, this.cfg, 'welcomeAndConfirm',
                         // TODO Localize
-                        'Welcome to <%-companyName%>! Confirm your email')
+                        _.template('Welcome to <%-companyName%>! Confirm your email')),
+
+                    (p:hooks.HookParams)=>
+                    {
+                        p.result = {} as feathers.ResponseBody;
+                        p.result.name = 'Success';
+                        p.result.className = 'success';
+                        p.result.code = HTTPStatus.OK;
+                        p.result.message = 'Registration successful. Check your email';
+                    }
                 ]
             });
         }
 
         /*
-
+         Finds user by his/her email or name. Returns promise
          */
-        findUserByNameOrEmail(emailOrName:string):Promise<any>
+        findUserByNameOrEmail(emailOrName:string):Promise<Types.IUserRecord[]>
         {
             var self = this;
-            return self.Services.RegisterUsers.find({});
+            return self.Services.RegisterUsers.find({query: {$or: [{email: emailOrName}, {userName: emailOrName}]}})
+                .then(users=>
+                {
+                    if (!users || !users.data || users.data.length !== 1)
+                        return null;
+
+                    return users.data[0];
+                });
         }
 
         protected createRegisterConfirmService()
@@ -169,8 +188,12 @@ module NAuth2
                                     .then(users=>
                                     {
                                         // Check if user is found
-
                                         // Check if user is marked as suspended or deleted
+                                        if (!users || users.length !== 1 || users[0].status === 'D' || users[0].status === 'S')
+                                        {
+                                            // TODO Translate
+                                            reject(new errors.NotFound('User not found or suspended'));
+                                        }
 
                                         // Finally, update its status
                                         return this.Services.RegisterUsers.patch(users[0].userId,
@@ -180,7 +203,20 @@ module NAuth2
                                     .then(d=>
                                     {
                                         // Redirects or renders default page
-                                        return resolve(d);
+                                        if (self.cfg.run_mode === 'website')
+                                        {
+
+                                        }
+                                        else
+                                        {
+
+                                        }
+                                        var result = {} as feathers.ResponseBody;
+                                        result.name = 'Success';
+                                        result.className = 'success';
+                                        result.code = HTTPStatus.OK;
+                                        result.message = 'Registration successful. Check your email';
+                                        return resolve(result);
                                     })
                                     .catch(err=>
                                     {
@@ -200,11 +236,21 @@ module NAuth2
          */
         protected createUserLoginService()
         {
+            var self = this;
             this.Path.Login = `${this.cfg.basePath}/login`;
             this.Services.Login = this.initUserService(this.Path.Login);
             this.Services.Login.before({
                 all: nhooks.supportedMethods('create'),
                 create: [
+                    (p:hooks.HookParams) =>
+                    {
+                        return self.findUserByNameOrEmail(p.data.email)
+                            .then(user=>
+                            {
+
+                            });
+                    },
+
                     auth.hooks.associateCurrentUser(this.authCfg)
                     // auth.hooks.hashPassword(this.authCfg),
                 ]
@@ -212,12 +258,16 @@ module NAuth2
 
             this.Services.Login.after({
                 create: [
-                    // nhooks.afterUserRegistration(this.app, this.cfg)
-                    // nhooks.knexCommit(),
+                    // nhooks.afterUserLogin(this.app, this.cfg)
                     /*
                      TODO
+                     check if user active
+
                      set default roles
                      create log entry
+
+                     get access token
+                     get refresh token
 
                      if domain login - add to domain, assign domain policy
                      */
