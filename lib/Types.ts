@@ -70,9 +70,20 @@ namespace Types
         tokenSecret?:string,
 
         /*
-         Lifetime of token. By default, '1d'
+         Lifetime of access token. By default: '1d'
          */
         tokenExpiresIn?:string;
+
+        /*
+         Lifetime of refresh token. By default: '15 days'
+         */
+        refreshTokenExpiresIn?:string;
+
+        /*
+        Lifetime of token sent after user registration.
+        Default: '1 day'
+         */
+        confirmTokenExpiresIn?:string;
 
         /*
          Optional configuration for subdomains.
@@ -232,6 +243,8 @@ namespace Types
          Default: false
          */
         debug?:boolean;
+
+
     }
 
     /*
@@ -262,6 +275,16 @@ namespace Types
         email:string;
         created_at:Date;
         updated_at:Date;
+        firstName?:string;
+        lastName?:string;
+        extData?:Object;
+        status?:'A'|'P'|'D'|'S';
+        birthData?:Date;
+        gender?:string;
+        avatar?:string;
+        culture?:string;
+        maxCreatedDomains?:number;
+        changePasswordOnNextLogin?:boolean;
         // TODO TBC
     }
 

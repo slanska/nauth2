@@ -86,27 +86,27 @@ declare module "feathers"
             /*
              Status class description. E.g. "Not implemented"
              */
-            "name":string,
+            name:string,
 
             /*
              Specific message
              */
-            "message":string,
+            message:string,
 
             /*
              HTTP status code
              */
-            "code":number,
+            code:number,
 
             /*
              Status class name. E.g. "not-implemented"
              */
-            "className":string,
+            className:string,
 
             /*
              Optional hash of errors
              */
-            "errors"?:Object
+            errors?:Object
         }
     }
 

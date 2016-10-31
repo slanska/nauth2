@@ -29,7 +29,7 @@ function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthC
         {
             var payload = {email: p.data[emailFiield]};
             var signOptions = {} as jwt.SignOptions;
-            signOptions.expiresIn = '24h';
+            signOptions.expiresIn = cfg.confirmTokenExpiresIn;
             signOptions.subject = 'confirm_registration';
             jwt.sign(payload, authCfg.token.secret, signOptions, (err, token)=>
             {

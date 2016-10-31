@@ -14,21 +14,34 @@ import express = require('express');
 import url = require('url');
 
 
-export = (controller: Types.INAuth2Controller) =>
+export = (controller:Types.INAuth2Controller) =>
 {
     var done = false;
 
     /*
-    Init authentication configuration
+     Init authentication configuration
      */
     // this.AuthConfig.token = {expiresIn: '1d'} as any;
     controller.AuthConfig.idField = 'userId';
     controller.AuthConfig.userEndpoint = `/${controller.cfg.basePath}/users`;
     if (!_.isEmpty(controller.cfg.tokenSecret))
-        controller.AuthConfig.token = {secret: controller.cfg.tokenSecret, expiresIn: controller.cfg.tokenExpiresIn || '1d'};
+        controller.AuthConfig.token = {
+            secret: controller.cfg.tokenSecret,
+            expiresIn: controller.cfg.tokenExpiresIn || '1d'
+        };
 
     var result = (req:express.Request, res:express.Response, next)=>
     {
+        // Executed on every request
+
+        // TODO Determine if this is AJAX or normal call
+        if (req.xhr || req.headers["x-requested-with"] === 'XMLHttpRequest'
+            || req.headers['accept'].indexOf('json') > -1)
+        {
+            //ajax request
+        }
+
+        //Executed only once
         if (!done)
         {
             done = true;
@@ -40,7 +53,7 @@ export = (controller: Types.INAuth2Controller) =>
 
             if (_.isEmpty(controller.cfg.termsOfServiceUrl))
             {
-// url.format()
+                // url.format()
             }
 
             if (_.isEmpty(controller.cfg.supportEmail))

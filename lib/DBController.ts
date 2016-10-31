@@ -15,6 +15,7 @@ import jwt = require('jsonwebtoken');
 import errors = require('feathers-errors');
 import HTTPStatus = require('http-status');
 import _ = require('lodash');
+import Qs = require('qs');
 
 module NAuth2
 {
@@ -215,6 +216,8 @@ module NAuth2
                                         result.name = 'Success';
                                         result.className = 'success';
                                         result.code = HTTPStatus.OK;
+
+                                        // TODO Send confirmation email, if applicable
                                         result.message = 'Registration successful. Check your email';
                                         return resolve(result);
                                     })
@@ -231,33 +234,54 @@ module NAuth2
             svc.before({find: []});
         }
 
+        private verifyUserOnLogin()
+        {
+            // TODO
+        }
+
+        static invalidLoginError()
+        {
+            return new errors.GeneralError('Invalid email, user name or password, suspended or deleted account');
+        }
+
         /*
          Configures service for POST /auth/login
          */
         protected createUserLoginService()
         {
             var self = this;
-            this.Path.Login = `${this.cfg.basePath}/login`;
-            this.Services.Login = this.initUserService(this.Path.Login);
-            this.Services.Login.before({
-                all: nhooks.supportedMethods('create'),
+            self.Path.Login = `${self.cfg.basePath}/login`;
+            self.Services.Login = self.app.service(self.Path.Login, new LoginService(self.cfg, self.authCfg));
+
+            self.Services.Login.before({
                 create: [
+                    // Hash password
+                    auth.hooks.hashPassword(this.authCfg),
+
+                    // Preserve password hash in params
+                    // nhooks.copyDataToResult('password'),
+
+                    // Find user by email or login
                     (p:hooks.HookParams) =>
                     {
-                        return self.findUserByNameOrEmail(p.data.email)
-                            .then(user=>
-                            {
-
-                            });
+                        var result = self.findUserByNameOrEmail(p.data.email);
+                        result.then(user=>
+                        {
+                            if (!user)
+                                throw DBController.invalidLoginError();
+                            p.result = user;
+                            return p;
+                        });
+                        return result;
                     },
 
-                    auth.hooks.associateCurrentUser(this.authCfg)
-                    // auth.hooks.hashPassword(this.authCfg),
+                    nhooks.jsonDataParse('extData')
                 ]
             });
 
-            this.Services.Login.after({
+            self.Services.Login.after({
                 create: [
+
                     // nhooks.afterUserLogin(this.app, this.cfg)
                     /*
                      TODO
@@ -327,7 +351,9 @@ module NAuth2
             return Promise.resolve('Obana!');
         }
 
-        constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config, protected authCfg:auth.AuthConfig)
+        constructor(protected app:feathers.Application,
+                    protected cfg:Types.INAuth2Config,
+                    protected authCfg:auth.AuthConfig)
         {
             this.db = knex(cfg.dbConfig);
 
@@ -425,6 +451,82 @@ module NAuth2
                     id: 'LogID',
                     paginate: {max: 200, "default": 50}
                 });
+        }
+    }
+
+    /*
+     Internal service for user login
+     */
+    class LoginService
+    {
+        constructor(protected cfg:Types.INAuth2Config, protected authCfg:auth.AuthConfig)
+        {
+        }
+
+        create(data, params:feathers.MethodParams)
+        {
+            var self = this;
+            return new Promise((resolve, reject) =>
+            {
+                var p:any = params;
+                if (p.data)
+                {
+                    var u = p.data as Types.IUserRecord;
+                    if (u.password !== p.result.password)
+                    {
+                        return reject(DBController.invalidLoginError());
+                    }
+
+                    if (u.changePasswordOnNextLogin)
+                    {
+                        // Redirect or return warning
+                    }
+
+                    switch (u.status)
+                    {
+                        case 'A':
+                            // generate tokens
+
+                            /*
+                             TODO Payload includes:
+                             userId
+                             all assigned general roles (not domain specific)
+                             top 10 assigned domains and all their roles (if applicable)
+                             */
+                            var payload = {};
+                            var signOptions = {} as jwt.SignOptions;
+                            signOptions.expiresIn = self.cfg.tokenExpiresIn;
+                            signOptions.subject = 'signin';
+                            jwt.sign(payload, self.authCfg.token.secret, signOptions, (err, token)=>
+                            {
+                                if (err)
+                                    return reject(err);
+
+                                // TODO refreshToken
+                                var qry = Qs.stringify({token: token, refreshToken: ''});
+                                resolve(p);
+                            });
+
+                            break;
+
+                        case 'S':
+                        case 'D':
+                            // suspended or deleted - return error
+                            return reject(DBController.invalidLoginError());
+
+
+                        case 'P':
+                            // Registration is not yet confirmed - resend email
+                            return resolve({});
+                    }
+
+                    var result = {} as any; //feathers.ResponseBody;
+// result.
+                    result.token = {};
+                    result.refreshToken = {};
+                    return resolve(result);
+                }
+            });
         }
     }
 }

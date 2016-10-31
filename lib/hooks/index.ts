@@ -15,6 +15,7 @@ import authorize = require('./authorize');
 import sanitizeData = require('./sanitizeData');
 import setRegisterConfirmActionUrl = require('./setRegisterConfirmActionUrl');
 import {jsonDataParse, jsonDataStringify} from './jsonDataConvertor';
+import copyDataToResult = require('./copyDataToResult');
 
 export =
 {
@@ -31,5 +32,6 @@ export =
     sanitizeData,
     setRegisterConfirmActionUrl,
     jsonDataParse,
-    jsonDataStringify
+    jsonDataStringify,
+    copyDataToResult
 }
