@@ -158,14 +158,16 @@ module NAuth2
         findUserByNameOrEmail(emailOrName:string):Promise<Types.IUserRecord[]>
         {
             var self = this;
-            return self.Services.RegisterUsers.find({query: {$or: [{email: emailOrName}, {userName: emailOrName}]}})
-                .then(users=>
-                {
-                    if (!users || !users.data || users.data.length !== 1)
-                        return null;
+            var result = self.Services.RegisterUsers.find({query: {$or: [{email: emailOrName}, {userName: emailOrName}]}});
+            result.then(users=>
+            {
+                if (!users || !users.data || users.data.length !== 1)
+                    return null;
 
-                    return users.data[0];
-                });
+                return users.data[0];
+            });
+
+            return result;
         }
 
         protected createRegisterConfirmService()
@@ -262,17 +264,23 @@ module NAuth2
                     // nhooks.copyDataToResult('password'),
 
                     // Find user by email or login
-                    (p:hooks.HookParams) =>
+                    function (p:hooks.HookParams)
                     {
-                        var result = self.findUserByNameOrEmail(p.data.email);
-                        result.then(user=>
+                        return new Promise((resolve, reject)=>
                         {
-                            if (!user)
-                                throw DBController.invalidLoginError();
-                            p.result = user;
-                            return p;
+                            self.findUserByNameOrEmail(p.data.email)
+                                .then(user=>
+                                {
+                                    if (!user)
+                                        throw DBController.invalidLoginError();
+                                    p.result = user;
+                                    return resolve();
+                                })
+                                .catch(err=>
+                                {
+                                    return reject(err);
+                                });
                         });
-                        return result;
                     },
 
                     nhooks.jsonDataParse('extData')
@@ -504,7 +512,7 @@ module NAuth2
 
                                 // TODO refreshToken
                                 var qry = Qs.stringify({token: token, refreshToken: ''});
-                                resolve(p);
+                                return resolve(p);
                             });
 
                             break;

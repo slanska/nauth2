@@ -23,7 +23,7 @@ export = (config:Types.INAuth2Config) =>
     // Enable REST services
     app.configure(rest())
 
-    // Hooks MUST be configured before authentication
+    // Hooks, cors and body parser MUST be configured before authentication
         .configure(hooks())
 
         .use(cors())
