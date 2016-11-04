@@ -16,6 +16,7 @@ import errors = require('feathers-errors');
 import HTTPStatus = require('http-status');
 import _ = require('lodash');
 import Qs = require('qs');
+import {hashPasswordAsync} from './hooks/passwordHelpers';
 
 module NAuth2
 {
@@ -119,7 +120,9 @@ module NAuth2
                     nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
                     hooks.remove('captcha'),
                     hooks.remove('confirmPassword'),
-                    auth.hooks.hashPassword(this.authCfg),
+                    nhooks.setPasswordSalt(),
+                    nhooks.hashPassword(),
+                    // TODO auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
                     nhooks.verifyUniqueUserEmail(),
                     nhooks.jsonDataStringify()
@@ -155,19 +158,20 @@ module NAuth2
         /*
          Finds user by his/her email or name. Returns promise
          */
-        findUserByNameOrEmail(emailOrName:string):Promise<Types.IUserRecord[]>
+        findUserByNameOrEmail(emailOrName:string):Promise<Types.IUserRecord>
         {
             var self = this;
-            var result = self.Services.RegisterUsers.find({query: {$or: [{email: emailOrName}, {userName: emailOrName}]}});
-            result.then(users=>
+            return new Promise((resolve, reject)=>
             {
-                if (!users || !users.data || users.data.length !== 1)
-                    return null;
+                self.db('NAuth2_Users').where({email: emailOrName}).orWhere({userName: emailOrName})
+                    .then(users=>
+                    {
+                        if (!users || users.length !== 1)
+                            return resolve(null);
 
-                return users.data[0];
-            });
-
-            return result;
+                        return resolve(users[0]);
+                    });
+            }) as any;
         }
 
         protected createRegisterConfirmService()
@@ -253,39 +257,7 @@ module NAuth2
         {
             var self = this;
             self.Path.Login = `${self.cfg.basePath}/login`;
-            self.Services.Login = self.app.service(self.Path.Login, new LoginService(self.cfg, self.authCfg));
-
-            self.Services.Login.before({
-                create: [
-                    // Hash password
-                    auth.hooks.hashPassword(this.authCfg),
-
-                    // Preserve password hash in params
-                    // nhooks.copyDataToResult('password'),
-
-                    // Find user by email or login
-                    function (p:hooks.HookParams)
-                    {
-                        return new Promise((resolve, reject)=>
-                        {
-                            self.findUserByNameOrEmail(p.data.email)
-                                .then(user=>
-                                {
-                                    if (!user)
-                                        throw DBController.invalidLoginError();
-                                    p.result = user;
-                                    return resolve();
-                                })
-                                .catch(err=>
-                                {
-                                    return reject(err);
-                                });
-                        });
-                    },
-
-                    nhooks.jsonDataParse('extData')
-                ]
-            });
+            self.Services.Login = self.app.service(self.Path.Login, new LoginService(self));
 
             self.Services.Login.after({
                 create: [
@@ -359,9 +331,9 @@ module NAuth2
             return Promise.resolve('Obana!');
         }
 
-        constructor(protected app:feathers.Application,
-                    protected cfg:Types.INAuth2Config,
-                    protected authCfg:auth.AuthConfig)
+        constructor(public app:feathers.Application,
+                    public cfg:Types.INAuth2Config,
+                    public authCfg:auth.AuthConfig)
         {
             this.db = knex(cfg.dbConfig);
 
@@ -467,8 +439,15 @@ module NAuth2
      */
     class LoginService
     {
-        constructor(protected cfg:Types.INAuth2Config, protected authCfg:auth.AuthConfig)
+        constructor(protected DBController:DBController)
         {
+        }
+
+        protected app:feathers.Application;
+
+        setup(app:feathers.Application)
+        {
+            this.app = app;
         }
 
         create(data, params:feathers.MethodParams)
@@ -476,64 +455,81 @@ module NAuth2
             var self = this;
             return new Promise((resolve, reject) =>
             {
-                var p:any = params;
-                if (p.data)
-                {
-                    var u = p.data as Types.IUserRecord;
-                    if (u.password !== p.result.password)
+                var user:Types.IUserRecord = null;
+                // Load user by email or name
+                self.DBController.findUserByNameOrEmail(data.email)
+                    .then(user=>
                     {
-                        return reject(DBController.invalidLoginError());
-                    }
-
-                    if (u.changePasswordOnNextLogin)
+                        if (!user)
+                            throw DBController.invalidLoginError();
+                        return user;
+                    })
+                    .then((uu:Types.IUserRecord)=>
                     {
-                        // Redirect or return warning
-                    }
+                        user = uu;
+                        // Check if account exists and active
 
-                    switch (u.status)
+                        // Hash password using salt
+                        return hashPasswordAsync(data.password, user.pwdSalt);
+                    })
+                    .then(newPwd=>
                     {
-                        case 'A':
-                            // generate tokens
-
-                            /*
-                             TODO Payload includes:
-                             userId
-                             all assigned general roles (not domain specific)
-                             top 10 assigned domains and all their roles (if applicable)
-                             */
-                            var payload = {};
-                            var signOptions = {} as jwt.SignOptions;
-                            signOptions.expiresIn = self.cfg.tokenExpiresIn;
-                            signOptions.subject = 'signin';
-                            jwt.sign(payload, self.authCfg.token.secret, signOptions, (err, token)=>
-                            {
-                                if (err)
-                                    return reject(err);
-
-                                // TODO refreshToken
-                                var qry = Qs.stringify({token: token, refreshToken: ''});
-                                return resolve(p);
-                            });
-
-                            break;
-
-                        case 'S':
-                        case 'D':
-                            // suspended or deleted - return error
+                        // Verify password
+                        if (user.password !== newPwd)
+                        {
                             return reject(DBController.invalidLoginError());
+                        }
+
+                        if (user.changePasswordOnNextLogin)
+                        {
+                            // Redirect or return warning
+                        }
+
+                        switch (user.status)
+                        {
+                            case 'A':
+                                // load roles
+
+                                // load top 10 domains (if applicable)
+
+                                // generate tokens
+
+                                /*
+                                 TODO Payload includes:
+                                 userId
+                                 all assigned general roles (not domain specific)
+                                 top 10 assigned domains and all their roles (if applicable)
+                                 */
+                                var payload = {id: user.userId, roles: [], domains: []};
+                                var signOptions = {} as jwt.SignOptions;
+                                signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
+                                signOptions.subject = 'signin';
+                                jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token)=>
+                                {
+                                    if (err)
+                                        return reject(err);
+
+                                    return resolve({token: token, refreshToken: ''});
+                                });
+
+                                break;
+
+                            case 'S':
+                            case 'D':
+                                // suspended or deleted - return error
+                                return reject(DBController.invalidLoginError());
 
 
-                        case 'P':
-                            // Registration is not yet confirmed - resend email
-                            return resolve({});
-                    }
+                            case 'P':
+                                // TODO Registration is not yet confirmed - resend email
+                                return resolve({});
+                        }
 
-                    var result = {} as any; //feathers.ResponseBody;
-// result.
-                    result.token = {};
-                    result.refreshToken = {};
-                    return resolve(result);
-                }
+                    })
+                    .catch(err=>
+                    {
+                        return reject(err);
+                    });
             });
         }
     }

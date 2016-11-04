@@ -15,6 +15,7 @@ import Promise = require('bluebird');
 import authentication = require('feathers-authentication');
 import hooks = require('feathers-hooks');
 import feathers = require('feathers');
+import {hashPasswordAsync, generatePasswordSalt} from '../lib/hooks/passwordHelpers';
 
 var env = process.env.NODE_ENV || 'development';
 import config = require('../config/index');
@@ -97,7 +98,6 @@ function preinitDB(knex:Knex):Promise<any>
  */
 const utc_ts =
 {
-
     'sqlite3': 'julianday()',
     'mysql': 'UTC_TIMESTAMP()',
     'pg': "now() at time zone 'UTC'"
@@ -206,8 +206,15 @@ function createTables(knex:Knex)
                 tbl.increments('userId');
                 tbl.string('email').notNullable().unique();
                 tbl.string('password').notNullable();
+
+                /*
+                 Comma separated list of previously used passwords
+                 Configurable number of last used passwords,
+                 to prevent re-using the same password, for better protection
+                 */
                 tbl.string('prevPwdHash').nullable();
                 tbl.date('pwdExpireOn').nullable();
+                tbl.string('pwdSalt').notNullable();
 
                 /*
                  Current status of user
@@ -363,15 +370,17 @@ function insertAdmin(knex:Knex)
     var adminId;
     var roleId;
 
-    var hashed = authentication.hooks.hashPassword()(pp);
+    var salt = generatePasswordSalt();
+    var hashed = hashPasswordAsync('admin', salt);
     return hashed
-        .then(()=>
+        .then(pwdHash=>
         {
             return knex.insert([{
                 email: '@',
                 changePasswordOnNextLogin: true,
                 userName: 'admin',
-                password: pp.data.password,
+                pwdSalt: salt,
+                password: pwdHash,
                 status: 'A' // Active
             }]).into('NAuth2_Users');
         }).then(d =>

@@ -120,3 +120,5 @@ lib/Types.js.map
 /public/app/adminController.js.map
 /lib/hooks/copyDataToResult.js
 /lib/hooks/copyDataToResult.js.map
+/lib/hooks/setPasswordSalt.js.map
+/lib/hooks/setPasswordSalt.js

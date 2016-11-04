@@ -285,6 +285,7 @@ namespace Types
         culture?:string;
         maxCreatedDomains?:number;
         changePasswordOnNextLogin?:boolean;
+        pwdSalt:string;
         // TODO TBC
     }
 

@@ -16,6 +16,7 @@ import sanitizeData = require('./sanitizeData');
 import setRegisterConfirmActionUrl = require('./setRegisterConfirmActionUrl');
 import {jsonDataParse, jsonDataStringify} from './jsonDataConvertor';
 import copyDataToResult = require('./copyDataToResult');
+import {setPasswordSalt, hashPassword} from './passwordHelpers';
 
 export =
 {
@@ -33,5 +34,7 @@ export =
     setRegisterConfirmActionUrl,
     jsonDataParse,
     jsonDataStringify,
-    copyDataToResult
+    copyDataToResult,
+    setPasswordSalt,
+    hashPassword
 }
