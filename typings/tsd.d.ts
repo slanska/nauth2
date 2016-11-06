@@ -21,5 +21,6 @@
 /// <reference path="jsonwebtoken/jsonwebtoken.d.ts" />
 /// <reference path="qs/qs.d.ts" />
 /// <reference path="http-status/http-status.d.ts" />
+/// <reference path="bcryptjs/bcryptjs.d.ts" />
 
 

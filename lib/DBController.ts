@@ -16,7 +16,7 @@ import errors = require('feathers-errors');
 import HTTPStatus = require('http-status');
 import _ = require('lodash');
 import Qs = require('qs');
-import {hashPasswordAsync} from './hooks/passwordHelpers';
+import bcrypt = require('bcryptjs');
 
 module NAuth2
 {
@@ -120,9 +120,7 @@ module NAuth2
                     nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
                     hooks.remove('captcha'),
                     hooks.remove('confirmPassword'),
-                    nhooks.setPasswordSalt(),
-                    nhooks.hashPassword(),
-                    // TODO auth.hooks.hashPassword(this.authCfg),
+                    auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
                     nhooks.verifyUniqueUserEmail(),
                     nhooks.jsonDataStringify()
@@ -467,15 +465,11 @@ module NAuth2
                     .then((uu:Types.IUserRecord)=>
                     {
                         user = uu;
-                        // Check if account exists and active
-
-                        // Hash password using salt
-                        return hashPasswordAsync(data.password, user.pwdSalt);
                     })
-                    .then(newPwd=>
+                    .then(()=>
                     {
                         // Verify password
-                        if (user.password !== newPwd)
+                        if (!bcrypt.compareSync(data.password, user.password))
                         {
                             return reject(DBController.invalidLoginError());
                         }

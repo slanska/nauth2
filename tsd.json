@@ -76,6 +76,9 @@
     },
     "http-status/http-status.d.ts": {
       "commit": "44be13ae844ec0721109542d5902e41438d72855"
+    },
+    "bcryptjs/bcryptjs.d.ts": {
+      "commit": "df827a4d96dc999b3ecf113da6afbb49b2c9f0a2"
     }
   }
 }

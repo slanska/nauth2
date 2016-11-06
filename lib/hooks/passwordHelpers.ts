@@ -11,11 +11,36 @@ import * as Types from '../Types';
 import hooks = require("feathers-hooks");
 import Promise = require('bluebird');
 
-const pbkdf2Async = Promise.promisify(crypto.pbkdf2);
-
-export function generatePasswordSalt()
+/**
+ * generates random string of characters i.e salt
+ * @function
+ * @param {number} length - Length of the random string.
+ * Source: https://code.ciphertrick.com/2016/01/18/salt-hash-passwords-using-nodejs-crypto/
+ */
+export function generatePasswordSalt(length:number = 32)
 {
-    return crypto.randomBytes(32).toString('base64');
+    return crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex') /** convert to hexadecimal format */
+        .slice(0, length);
+    /** return required number of characters */
+}
+
+/**
+ * hash password with sha512.
+ * @function
+ * @param {string} password - List of required fields.
+ * @param {string} salt - Data to be validated.
+ */
+export function getPasswordHash(password:string, salt:string)
+{
+    var hash = crypto.createHmac('sha512', salt);
+    /** Hashing algorithm sha512 */
+    hash.update(password);
+    var value = hash.digest('hex');
+    return {
+        salt: salt,
+        passwordHash: value
+    };
 }
 
 /*
@@ -25,22 +50,11 @@ export function setPasswordSalt(saltField = 'pwdSalt')
 {
     var result = (p:hooks.HookParams)=>
     {
-        p.data[saltField] = generatePasswordSalt();
+        p.data[saltField] = generatePasswordSalt(32);
     };
     return result;
 }
 
-/*
- Hashes password using given salt
- */
-export function hashPasswordAsync(password:string, salt:string):Promise<string>
-{
-    return pbkdf2Async(password, salt, 256, 32, 'sha256')
-        .then(bb=>
-    {
-        return bb.toString('base64');
-    });
-}
 
 /*
  Converts open password to its hash using given salt field
@@ -49,10 +63,7 @@ export function hashPassword(passwordField = 'password', saltField = 'pwdSalt')
 {
     const result = (p:hooks.HookParams)=>
     {
-        return hashPasswordAsync(p.data[passwordField], p.data[saltField]).then(hash=>
-        {
-            p.data[passwordField] = hash;
-        });
+        p.data[passwordField] = getPasswordHash(p.data[passwordField], p.data[saltField]);
     };
 
     return result;

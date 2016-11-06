@@ -5,7 +5,6 @@
 ///<reference path="../typings/tsd.d.ts"/>
 
 import chai = require('chai');
-// import {should, expect} from 'chai';
 import chaiHttp = require('chai-http');
 import assert = require('assert');
 import mocha = require('mocha');
@@ -16,8 +15,6 @@ import faker = require('faker');
 var config = require('../config');
 config.debug = true;
 var app = AppFactory(config);
-
-var token;
 
 chai.use(chaiHttp);
 var should = chai.should();
@@ -59,21 +56,21 @@ describe('menu service', () =>
         });
 
     });
-});
+
 
 //teardown after tests
-after((done) =>
-{
-    //delete contents of menu in mongodb
-    done();
+    after((done) =>
+    {
+        //delete contents of menu in mongodb
+        done();
 
-});
+    });
 
-it('fails: wrong captcha', (done) =>
-{
-    var captcha:Types.ICaptcha;
-    req().get('/auth/captcha')
-        .then(res=>
+    it('fails: wrong captcha', (done) =>
+    {
+        var captcha:Types.ICaptcha;
+        var result = req().get('/auth/captcha');
+        result.then(res=>
         {
             captcha = res.body as Types.ICaptcha;
             var password = faker.internet.password(8, false, null, '@1zX');
@@ -89,56 +86,58 @@ it('fails: wrong captcha', (done) =>
                     done(err);
                 });
         });
-});
+    });
 
-it('fails: weak password', (done) =>
-{
-    // assert.ok(app.service('menus'));
-    done();
-});
+    it('fails: weak password', (done) =>
+    {
+        // assert.ok(app.service('menus'));
+        done();
+    });
 
-it('fails: password and confirm password mismatch', (done) =>
-{
-    // assert.ok(app.service('menus'));
-    done();
-});
+    it('fails: password and confirm password mismatch', (done) =>
+    {
+        // assert.ok(app.service('menus'));
+        done();
+    });
 
-it('fails: email already used', (done) =>
-{
-    // assert.ok(app.service('menus'));
-    done();
-});
+    it('fails: email already used', (done) =>
+    {
+        // assert.ok(app.service('menus'));
+        done();
+    });
 
-/*
- TODO other cases:
- templates on different languages
- redirect
- */
+    /*
+     TODO other cases:
+     templates on different languages
+     redirect
+     */
 
-it('should post the menuitem data', function (done)
-{
-    done();
-    //setup a request
-    // chai.request(app)
-    // //request to /store
-    //     .post('/menus')
-    //     .set('Accept', 'application/json')
-    //     .set('Authorization', 'Bearer '.concat(token))
-    //     //attach data to request
-    //     .send({
-    //         name: 'shrimp fettuccine',
-    //         price: 12.99,
-    //         categories: 'dinner, pasta'
-    //     })
-    //     //when finished do the following
-    //     .end((err, res) =>
-    //     {
-    //         res.body.should.have.property('name');
-    //         res.body.name.should.equal('shrimp fettuccine');
-    //         res.body.should.have.property('price');
-    //         res.body.price.should.equal(12.99);
-    //         res.body.categories.should.be.an('array')
-    //             .to.include.members(['dinner, pasta']);
-    //         done();
-    //     });
+    it('should post the menuitem data', function (done)
+    {
+        done();
+        //setup a request
+        // chai.request(app)
+        // //request to /store
+        //     .post('/menus')
+        //     .set('Accept', 'application/json')
+        //     .set('Authorization', 'Bearer '.concat(token))
+        //     //attach data to request
+        //     .send({
+        //         name: 'shrimp fettuccine',
+        //         price: 12.99,
+        //         categories: 'dinner, pasta'
+        //     })
+        //     //when finished do the following
+        //     .end((err, res) =>
+        //     {
+        //         res.body.should.have.property('name');
+        //         res.body.name.should.equal('shrimp fettuccine');
+        //         res.body.should.have.property('price');
+        //         res.body.price.should.equal(12.99);
+        //         res.body.categories.should.be.an('array')
+        //             .to.include.members(['dinner, pasta']);
+        //         done();
+        //     });
+    });
+
 });

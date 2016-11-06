@@ -5,6 +5,16 @@
 /*
  Creates nauth2 tables, indexes, triggers.
  Populates initial data
+
+ Delete existing tables:
+ drop table if exists NAuth2_Users;
+ drop table if exists NAuth2_UserNames;
+ drop table if exists NAuth2_Roles;
+ drop table if exists NAuth2_UserRoles;
+ drop table if exists NAuth2_Domains;
+ drop table if exists NAuth2_DomainUsers;
+ drop table if exists NAuth2_Log;
+ drop table if exists NAuth2_RefreshTokens;
  */
 
 import Types = require('../lib/Types');
@@ -15,7 +25,8 @@ import Promise = require('bluebird');
 import authentication = require('feathers-authentication');
 import hooks = require('feathers-hooks');
 import feathers = require('feathers');
-import {hashPasswordAsync, generatePasswordSalt} from '../lib/hooks/passwordHelpers';
+// import {getPasswordHash, generatePasswordSalt} from '../lib/hooks/passwordHelpers';
+import bcrypt = require('bcryptjs');
 
 var env = process.env.NODE_ENV || 'development';
 import config = require('../config/index');
@@ -203,7 +214,7 @@ function createTables(knex:Knex)
         .createTable('NAuth2_Users',
             function (tbl)
             {
-                tbl.increments('userId');
+                tbl.bigIncrements('userId');
                 tbl.string('email').notNullable().unique();
                 tbl.string('password').notNullable();
 
@@ -214,7 +225,6 @@ function createTables(knex:Knex)
                  */
                 tbl.string('prevPwdHash').nullable();
                 tbl.date('pwdExpireOn').nullable();
-                tbl.string('pwdSalt').notNullable();
 
                 /*
                  Current status of user
@@ -242,14 +252,41 @@ function createTables(knex:Knex)
         .createTable('NAuth2_UserNames', function (tbl)
         {
             tbl.string('userName', 40).notNullable().primary();
-            tbl.integer('userId').notNullable().unique()
+            tbl.bigInteger('userId').notNullable().unique()
                 .references('userId').inTable('NAuth2_Users').onDelete('cascade').onUpdate('cascade');
+        })
+        .createTable('NAuth2_RefreshTokens', tbl=>
+        {
+            tbl.uuid('tokenUuid').notNullable().primary();
+
+            tbl.bigInteger('userId').notNullable().index().references('userId').inTable('NAuth2_Users');
+
+            /*
+             Complete user agent information
+             */
+            addJsonColumn(tbl, 'userAgent');
+            tbl.string('ipAddress').notNullable();
+            tbl.dateTime('validUntil').notNullable();
+
+            /*
+             A - Active/granted
+             D - deleted/revoked
+             */
+            tbl.string('state', 1).notNullable().defaultTo('A');
+
+            /*
+             Hashed subset of user-agent information, to verify that refresh token is used from the same context as it was
+             originally created
+             */
+            tbl.string('signatureHash').notNullable();
+            addTimestamps(tbl);
+
         })
         .createTable('NAuth2_Roles',
             function (tbl)
             {
-                tbl.increments('roleId');
-                tbl.integer('domainID').nullable().references('domainId').inTable('NAuth2_Domains').index();
+                tbl.bigIncrements('roleId');
+                tbl.bigInteger('domainID').nullable().references('domainId').inTable('NAuth2_Domains').index();
                 tbl.string('name', 40).notNullable().unique();
                 tbl.string('title', 64).notNullable();
                 tbl.boolean('systemRole').notNullable().defaultTo(false);
@@ -265,8 +302,8 @@ function createTables(knex:Knex)
         .createTable('NAuth2_DomainUsers',
             function (tbl)
             {
-                tbl.integer('domainId').notNullable().references('domainId').inTable('NAuth2_Domains');
-                tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users').index();
+                tbl.bigInteger('domainId').notNullable().references('domainId').inTable('NAuth2_Domains');
+                tbl.bigInteger('userId').notNullable().references('userId').inTable('NAuth2_Users').index();
                 addJsonColumn(tbl, 'extData');
                 addTimestamps(tbl);
                 tbl.primary(['domainId', 'userId']);
@@ -276,8 +313,8 @@ function createTables(knex:Knex)
         .createTable('NAuth2_UserRoles',
             function (tbl)
             {
-                tbl.integer('userId').notNullable().references('userId').inTable('NAuth2_Users');
-                tbl.integer('roleId').notNullable().references('roleId').inTable('NAuth2_Roles').index();
+                tbl.bigInteger('userId').notNullable().references('userId').inTable('NAuth2_Users');
+                tbl.bigInteger('roleId').notNullable().references('roleId').inTable('NAuth2_Roles').index();
                 addTimestamps(tbl);
                 tbl.primary(['userId', 'roleId']);
 
@@ -290,9 +327,9 @@ function createTables(knex:Knex)
 
                 addCreatedAt(tbl);
                 tbl.binary('clientIpAddr').nullable();
-                tbl.integer('userId').nullable().references('userId').inTable('NAuth2_Users');
-                tbl.integer('roleId').nullable().references('roleId').inTable('NAuth2_Roles');
-                tbl.integer('domainId').nullable().references('domainId').inTable('NAuth2_Domains');
+                tbl.bigInteger('userId').nullable().references('userId').inTable('NAuth2_Users');
+                tbl.bigInteger('roleId').nullable().references('roleId').inTable('NAuth2_Roles');
+                tbl.bigInteger('domainId').nullable().references('domainId').inTable('NAuth2_Domains');
                 addJsonColumn(tbl, 'extData');
 
                 /*
@@ -370,30 +407,23 @@ function insertAdmin(knex:Knex)
     var adminId;
     var roleId;
 
-    var salt = generatePasswordSalt();
-    var hashed = hashPasswordAsync('admin', salt);
-    return hashed
-        .then(pwdHash=>
-        {
-            return knex.insert([{
-                email: '@',
-                changePasswordOnNextLogin: true,
-                userName: 'admin',
-                pwdSalt: salt,
-                password: pwdHash,
-                status: 'A' // Active
-            }]).into('NAuth2_Users');
-        }).then(d =>
-        {
-            return knex.select('userId').from('NAuth2_Users').where({userName: 'admin'});
-        })
+    var pwd = bcrypt.hashSync('admin');
+    return knex.insert([{
+        email: '@',
+        changePasswordOnNextLogin: true,
+        userName: 'admin',
+        password: pwd,
+        status: 'A' // Active
+    }]).into('NAuth2_Users')
         .then(users=>
         {
-            adminId = users[0].userId;
-            return knex.select('roleId').from('NAuth2_Roles').where({
+            adminId = users[0];
+            var result = knex.select('roleId').from('NAuth2_Roles').where({
                 name: 'SystemAdmin'
             });
-        }).then((roles)=>
+            return result;
+        })
+        .then((roles)=>
         {
             roleId = roles[0].roleId;
             return knex.insert([

@@ -34,6 +34,7 @@
   "homepage": "https://github.com/slanska/nauth2#readme",
   "dependencies": {
     "accesscontrol": "^1.0.0",
+    "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.1",
     "cache-manager": "^2.1.2",
