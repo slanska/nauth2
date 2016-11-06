@@ -4,6 +4,7 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
+global.Promise = require('bluebird');
 import chai = require('chai');
 import chaiHttp = require('chai-http');
 import assert = require('assert');
@@ -69,23 +70,27 @@ describe('menu service', () =>
     it('fails: wrong captcha', (done) =>
     {
         var captcha:Types.ICaptcha;
-        var result = req().get('/auth/captcha');
-        result.then(res=>
-        {
-            captcha = res.body as Types.ICaptcha;
-            var password = faker.internet.password(8, false, null, '@1zX');
-            var result = req()
-                .post('/auth/register')
-                .send({
-                    email: faker.internet.userName() + '@mailinator.com',
-                    password: password, confirmPassword: password,
-                    extData: {_p: password},
-                    captcha: {hash: captcha.hash, value: captcha.value}
-                }).end((err, res)=>
-                {
-                    done(err);
-                });
-        });
+        var result = req().get('/auth/captcha')
+            .then((res)=>
+            {
+                captcha = res.body as Types.ICaptcha;
+                var password = faker.internet.password(8, false, null, '@1zX');
+                var result = req()
+                    .post('/auth/register')
+                    .send({
+                        email: faker.internet.userName() + '@mailinator.com',
+                        password: password, confirmPassword: password,
+                        extData: {_p: password},
+                        captcha: {hash: captcha.hash, value: captcha.value}
+                    }).end((err, res)=>
+                    {
+                        done(err);
+                    });
+            }).catch(err=>
+            {
+                // throw err;
+                done(err);
+            });
     });
 
     it('fails: weak password', (done) =>

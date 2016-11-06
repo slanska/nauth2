@@ -36,7 +36,7 @@ export = (controller:Types.INAuth2Controller) =>
 
         // TODO Determine if this is AJAX or normal call
         if (req.xhr || req.headers["x-requested-with"] === 'XMLHttpRequest'
-            || req.headers['accept'].indexOf('json') > -1)
+            || (req.headers['accept'] && req.headers['accept'].indexOf('json') > -1))
         {
             //ajax request
         }
