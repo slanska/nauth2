@@ -84,7 +84,6 @@ module NAuth2
             this.Services.Users.before({
                 all: [
                     auth.hooks.verifyToken(this.authCfg),
-                    // auth.hooks.populateUser(this.authCfg),
                     this.populateUserHook(),
                     auth.hooks.restrictToAuthenticated(this.authCfg),
                     nhooks.authorize('users', 'userId'),

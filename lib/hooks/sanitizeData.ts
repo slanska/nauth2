@@ -46,7 +46,9 @@ function sanitizeData(resourceName:string)
         }
         else
         {
-            p.result.data = permission.filter(p.result.data);
+            if (p.result.data)
+                p.result.data = permission.filter(p.result.data);
+            else p.result = permission.filter(p.result);
         }
     };
 
