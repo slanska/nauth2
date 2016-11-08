@@ -25,7 +25,6 @@ import Promise = require('bluebird');
 import authentication = require('feathers-authentication');
 import hooks = require('feathers-hooks');
 import feathers = require('feathers');
-// import {getPasswordHash, generatePasswordSalt} from '../lib/hooks/passwordHelpers';
 import bcrypt = require('bcryptjs');
 
 var env = process.env.NODE_ENV || 'development';
@@ -132,13 +131,6 @@ function addJsonColumn(tbl:Knex.TableBuilder, columnName:string)
     }
 }
 
-const json_cols =
-{
-    "sqlite3": "json1",
-    "mysql": "json",
-    "pg": "jsonb"
-};
-
 function addCreatedAt(tbl:Knex.TableBuilder)
 {
     tbl.specificType(`created_at`, `datetime default (${utc_ts[config.dbConfig.client]})`);
@@ -231,7 +223,7 @@ function createTables(knex:Knex)
                  Possible values:
                  'P' - pending approval or confirmation
                  'A' - active
-                 'S' - suspended
+                 'S' - suspended (locked)
                  'D' - deleted (deactivated)
                  */
                 tbl.string('status').notNullable().defaultTo('P');
@@ -304,6 +296,15 @@ function createTables(knex:Knex)
             {
                 tbl.bigInteger('domainId').notNullable().references('domainId').inTable('NAuth2_Domains');
                 tbl.bigInteger('userId').notNullable().references('userId').inTable('NAuth2_Users').index();
+                /*
+                 Current status of user for the given domain
+                 Possible values:
+                 'P' - pending approval or confirmation
+                 'A' - active
+                 'S' - suspended (locked)
+                 'D' - deleted (deactivated)
+                 */
+                tbl.string('status').notNullable().defaultTo('P');
                 addJsonColumn(tbl, 'extData');
                 addTimestamps(tbl);
                 tbl.primary(['domainId', 'userId']);
@@ -315,8 +316,10 @@ function createTables(knex:Knex)
             {
                 tbl.bigInteger('userId').notNullable().references('userId').inTable('NAuth2_Users');
                 tbl.bigInteger('roleId').notNullable().references('roleId').inTable('NAuth2_Roles').index();
+                // tbl.bigInteger('domainId').notNullable().references('domainId').inTable('NAuth2_Domains');
+
                 addTimestamps(tbl);
-                tbl.primary(['userId', 'roleId']);
+                tbl.primary(['userId', 'roleId']); // TODO domainId
 
                 console.info('UserRoles table initialization');
             })
@@ -325,6 +328,9 @@ function createTables(knex:Knex)
             {
                 tbl.bigIncrements('logID');
 
+                /*
+                 TODO oldData json, newData json - update triggers to build JSON
+                 */
                 addCreatedAt(tbl);
                 tbl.binary('clientIpAddr').nullable();
                 tbl.bigInteger('userId').nullable().references('userId').inTable('NAuth2_Users');

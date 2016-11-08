@@ -14,6 +14,7 @@ namespace Types
      Modes for user registration
 
      */
+    import DateTimeFormat = Intl.DateTimeFormat;
     export enum UserCreateMode {
         /*
          For domains 'Auto' mode means that system wide setting will be used. For system level setting, 'Auto' is treated as 'ByAdminOnly'
@@ -80,8 +81,8 @@ namespace Types
         refreshTokenExpiresIn?:string;
 
         /*
-        Lifetime of token sent after user registration.
-        Default: '1 day'
+         Lifetime of token sent after user registration.
+         Default: '1 day'
          */
         confirmTokenExpiresIn?:string;
 
@@ -114,6 +115,7 @@ namespace Types
 
         /*
          Roles assigned to a new member upon creation/registration
+         Array of role names
          Default: none
          */
         newMemberRoles?:string[];
@@ -302,6 +304,22 @@ namespace Types
     {
         AuthConfig:authentication.AuthConfig;
         cfg:Types.INAuth2Config;
+    }
+
+    /*
+     NAuth2_RefreshTokens record
+     */
+    export interface IRefreshTokenRecord
+    {
+        tokenUuid:string;
+        userId:number;
+        userAgent:Object;
+        ipAddress:string;
+        validUntil:Date;
+        state:string;
+        signatureHash:string;
+        created_at:Date;
+        updated_at:Date;
     }
 }
 

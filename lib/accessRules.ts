@@ -15,13 +15,13 @@ export var ruleList = [
         role: ["systemAdmin", "systemUserAdmin"],
         resource: "users",
         action: "create:any",
-        attributes: ['*', '!password', '!prevPwd']
+        attributes: ['*', '!password', '!prevPwdHash']
     },
     {
         role: ["systemAdmin", "systemUserAdmin"],
         resource: "users",
         action: "read:any",
-        attributes: ['*', '!password', '!prevPwd']
+        attributes: ['*', '!password', '!prevPwdHash']
     },
     {
         role: ["systemAdmin", "systemUserAdmin"],
@@ -34,21 +34,21 @@ export var ruleList = [
     // create and delete are not allowed
     {
         role: "member", resource: "users", action: "update:own",
-        attributes: ['*', '!prevPwd', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
+        attributes: ['*', '!prevPwdHash', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
             '!updated_at', '!maxCreatedDomains']
     },
     {
         role: "member",
         resource: "users",
         action: "read:own",
-        attributes: ['*', '!prevPwd', '!password', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
+        attributes: ['*', '!prevPwdHash', '!password', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
             '!updated_at', '!maxCreatedDomains']
     },
 
     // POST /register TODO Needed?
     {
         role: "guest", resource: "users", action: "create:any",
-        attributes: ['*', '!prevPwd', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
+        attributes: ['*', '!prevPwdHash', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
             '!updated_at', '!maxCreatedDomains']
     },
 

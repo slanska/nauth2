@@ -5,8 +5,8 @@
 import * as Types from '../Types';
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
-var AccessControl = require('accesscontrol');
 import {methodMap, rules} from '../accessRules';
+var Notation = require('notation');
 
 /*
  BEFORE (for create/update/patch operations) or AFTER (for get/find) hook
@@ -25,7 +25,7 @@ function sanitizeData(resourceName:string)
             throw new errors.NotImplemented(`${p.method} is not supported by authorization hook`);
 
         var permission = rules.permission({
-            role: p.params.token.roles,
+            role: ['systemAdmin'], // TODO p.params.token.roles,
             resource: resourceName,
             action: action + ':any'
         });
@@ -39,7 +39,15 @@ function sanitizeData(resourceName:string)
             });
         }
 
-        p.data = permission.filter(p.data);
+
+        if (p.type === 'before')
+        {
+            p.data = permission.filter(p.data);
+        }
+        else
+        {
+            p.result.data = permission.filter(p.result.data);
+        }
     };
 
     return result;

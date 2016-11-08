@@ -15,7 +15,7 @@
       "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
     },
     "node/node.d.ts": {
-      "commit": "3cc599268d2dabe3c3ee194e92965ee87440e9c3"
+      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
     },
     "mime/mime.d.ts": {
       "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
@@ -79,6 +79,21 @@
     },
     "bcryptjs/bcryptjs.d.ts": {
       "commit": "df827a4d96dc999b3ecf113da6afbb49b2c9f0a2"
+    },
+    "uuid/UUID.d.ts": {
+      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
+    },
+    "node-uuid/node-uuid.d.ts": {
+      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
+    },
+    "node-uuid/node-uuid-base.d.ts": {
+      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
+    },
+    "node-uuid/node-uuid-cjs.d.ts": {
+      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
+    },
+    "object-hash/object-hash.d.ts": {
+      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
     }
   }
 }

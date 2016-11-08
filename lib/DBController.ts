@@ -17,12 +17,14 @@ import HTTPStatus = require('http-status');
 import _ = require('lodash');
 import Qs = require('qs');
 import bcrypt = require('bcryptjs');
+var uuid = require('uuid');
+import objectHash = require('object-hash');
 
 module NAuth2
 {
     export class DBController
     {
-        protected db:knex;
+        public db:knex;
 
         Path:{
             Users:string,
@@ -81,9 +83,10 @@ module NAuth2
             this.Services.Users = this.initUserService(this.Path.Users);
             this.Services.Users.before({
                 all: [
-                    auth.hooks.populateUser(this.authCfg),
-                    auth.hooks.restrictToAuthenticated(this.authCfg),
                     auth.hooks.verifyToken(this.authCfg),
+                    // auth.hooks.populateUser(this.authCfg),
+                    this.populateUserHook(),
+                    auth.hooks.restrictToAuthenticated(this.authCfg),
                     nhooks.authorize('users', 'userId'),
                 ],
                 create: [
@@ -105,6 +108,27 @@ module NAuth2
                 ]
             });
             return this.Services.Users;
+        }
+
+        /*
+
+         */
+        private setRolesToNewUser()
+        {
+            var self = this;
+
+            var result = (p:hooks.HookParams)=>
+            {
+                return self.db.table('NAuth2_Roles').where({'name': {$in: self.cfg.newMemberRoles || []}})
+                    .then(rr =>
+                    {
+                        var roles = _.map(rr, 'roleId');
+                        return self.db.table('NAuth2_UserRoles')
+                            .insert({userId: p.result.userId, roles: roles});
+                    });
+
+            };
+            return result;
         }
 
         /*
@@ -134,7 +158,7 @@ module NAuth2
 
             this.Services.RegisterUsers.after({
                 create: [
-                    // TODO sets default roles
+                    this.setRolesToNewUser(),
                     hooks.pluck('email'),
                     nhooks.setRegisterConfirmActionUrl(this.cfg, this.authCfg),
                     nhooks.sendEmailToUser(this.app, this.cfg, 'welcomeAndConfirm',
@@ -151,6 +175,41 @@ module NAuth2
                     }
                 ]
             });
+        }
+
+        /*
+         Populates user data based on data.userId field
+         */
+        populateUserHook()
+        {
+            var self = this;
+
+            var result = (p:hooks.HookParams)=>
+            {
+                return self.db.table('NAuth2_Users').select('*').where({userId: p.params['payload'].userId})
+                    .then(users=>
+                    {
+                        if (!users || users.length === 0)
+                            throw new errors.GeneralError(`User ${p.data.userId} not found`);
+
+                        p.params['user'] = users[0];
+                    });
+            };
+            return result;
+        }
+
+        /*
+         Creates entry for refresh token
+         */
+        createRefreshToken(userId:number, userAgent:Object):Promise<Types.IRefreshTokenRecord>
+        {
+            var self = this;
+            var it = {} as Types.IRefreshTokenRecord;
+            it.tokenUuid = uuid.v4();
+            it.userAgent = userAgent;
+            it.userId = userId;
+            it.signatureHash = objectHash(userAgent, {});
+            return self.db.table('NAuth2_RefreshTokens').insert(it);
         }
 
         /*
@@ -482,31 +541,41 @@ module NAuth2
                         switch (user.status)
                         {
                             case 'A':
-                                // load roles
-
-                                // load top 10 domains (if applicable)
-
-                                // generate tokens
-
                                 /*
                                  TODO Payload includes:
                                  userId
                                  all assigned general roles (not domain specific)
                                  top 10 assigned domains and all their roles (if applicable)
                                  */
-                                var payload = {id: user.userId, roles: [], domains: []};
-                                var signOptions = {} as jwt.SignOptions;
-                                signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
-                                signOptions.subject = 'signin';
-                                jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token)=>
-                                {
-                                    if (err)
-                                        return reject(err);
+                                var payload = {userId: user.userId, roles: [], domains: []};
 
-                                    return resolve({token: token, refreshToken: ''});
-                                });
+                                // load roles
+                                return self.DBController.db.select('roleId').from('NAuth2_UserRoles').where({userId: user.userId})
+                                    .then(rr =>
+                                    {
+                                        payload.roles = _.map(rr, 'roleId');
 
-                                break;
+                                        // load top 10 domains (if applicable)
+                                        return self.DBController.db.table('NAuth2_DomainUsers')
+                                            .where({userId: user.userId})
+                                            .limit(10); // TODO Use config for limit? How about orderBy
+                                    })
+                                    .then(dd =>
+                                    {
+                                        payload.domains = _.map(dd, 'domainId');
+
+                                        // generate tokens
+                                        var signOptions = {} as jwt.SignOptions;
+                                        signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
+                                        signOptions.subject = 'signin';
+                                        jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token)=>
+                                        {
+                                            if (err)
+                                                return reject(err);
+
+                                            return resolve({token: token, refreshToken: ''});
+                                        });
+                                    });
 
                             case 'S':
                             case 'D':

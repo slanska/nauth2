@@ -5,7 +5,6 @@
 import * as Types from '../Types';
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
-var AccessControl = require('accesscontrol');
 import {methodMap, rules} from '../accessRules';
 
 /*
@@ -22,8 +21,9 @@ function authorize(resourceName:string, ownAttribute:string)
         if (!action)
             throw new errors.NotImplemented(`${p.method} is not supported by authorization hook`);
 
+        var roles = ['systemAdmin'];
         var permission = rules.permission({
-            role: p.params.token.roles,
+            role: roles, //p.params['payload'].roles,
             resource: resourceName,
             action: action + ':any'
         });
@@ -32,7 +32,7 @@ function authorize(resourceName:string, ownAttribute:string)
             if (p.params['context'] && p.params['context'].hasOwnProperty(ownAttribute) && p.params['context'][ownAttribute])
             {
                 permission = rules.permission({
-                    role: p.params.token.roles,
+                    role: p.params['payload'].roles,
                     resource: resourceName,
                     action: action + ':own'
                 });
