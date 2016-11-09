@@ -108,8 +108,6 @@ lib/Types.js.map
 /config/apiservice.config.js
 /config/base.config.js.map
 /config/base.config.js
-/apiservice.js
-/apiservice.js.map
 /index.js
 /index.js.map
 /config/index.js.map
@@ -120,5 +118,14 @@ lib/Types.js.map
 /public/app/adminController.js.map
 /lib/hooks/copyDataToResult.js
 /lib/hooks/copyDataToResult.js.map
-/lib/hooks/setPasswordSalt.js.map
-/lib/hooks/setPasswordSalt.js
+/test/03_Login.js
+/test/03_Login.js.map
+/test/benchmark/
+/test/benchmark/many_databases.js
+/test/benchmark/many_databases.js.map
+/test/helper.js
+/test/helper.js.map
+/test/05_DomainManagement.js
+/test/04_UserManagement.js
+/test/04_UserManagement.js.map
+/test/05_DomainManagement.js.map

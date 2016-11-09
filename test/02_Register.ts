@@ -111,6 +111,26 @@ describe('menu service', () =>
         done();
     });
 
+    it('user self-registered', (done)=>
+    {
+        done();
+    });
+
+    it('1000 users self-registered and confirmed', (done)=>
+    {
+        done();
+    });
+
+    it('user registered and pending approval', (done)=>
+    {
+        done();
+    });
+
+    it('user created by admin', (done)=>
+    {
+        done();
+    });
+
     /*
      TODO other cases:
      templates on different languages
