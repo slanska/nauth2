@@ -4,5 +4,13 @@
 
 ///<reference path="../../typings/browser.d.ts"/>
 
+/*
+ User activities
+ - login
+ - register
+ - change password
+ - reset password request
+ 
+ */
 var F7Vue = require('framework7-vue');
 import _ = require('lodash');

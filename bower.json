@@ -29,6 +29,7 @@
     "vue": "^2.0.3",
     "Framework7-Vue": "https://github.com/nolimits4web/Framework7-Vue.git",
     "Framework7": "framework7#^1.4.2",
-    "feathers-client": "^1.6.2"
+    "feathers-client": "^1.6.2",
+    "lodash": "^4.16.6"
   }
 }

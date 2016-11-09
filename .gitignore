@@ -129,3 +129,11 @@ lib/Types.js.map
 /test/04_UserManagement.js
 /test/04_UserManagement.js.map
 /test/05_DomainManagement.js.map
+/appFactory.js.map
+/appFactory.js
+/lib/hooks/passwordHelpers.js.map
+/lib/hooks/passwordHelpers.js
+/test/06_Misc.js.map
+/test/06_Misc.js
+/test/07_AccessRules.js.map
+/test/07_AccessRules.js
