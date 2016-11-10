@@ -6,39 +6,42 @@ import * as Types from './Types';
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 var AccessControl = require('accesscontrol');
+import Promise = require('bluebird');
+import Knex = require('knex');
+import _ = require('lodash');
 
 export var ruleList = [
     /*
      Users tables
      */
     {
-        role: ["systemAdmin", "systemUserAdmin"],
+        role: ["SystemAdmin", "UserAdmin"],
         resource: "users",
         action: "create:any",
         attributes: ['*', '!password', '!prevPwdHash']
     },
     {
-        role: ["systemAdmin", "systemUserAdmin"],
+        role: ["SystemAdmin", "UserAdmin"],
         resource: "users",
         action: "read:any",
         attributes: ['*', '!password', '!prevPwdHash']
     },
     {
-        role: ["systemAdmin", "systemUserAdmin"],
+        role: ["SystemAdmin", "UserAdmin"],
         resource: "users",
         action: "update:any",
         attributes: ['*', '!created_at']
     },
-    {role: ["systemAdmin", "systemUserAdmin"], resource: "users", action: "delete:any"},
+    {role: ["SystemAdmin", "UserAdmin"], resource: "users", action: "delete:any"},
 
     // create and delete are not allowed
     {
-        role: "member", resource: "users", action: "update:own",
+        role: "Member", resource: "users", action: "update:own",
         attributes: ['*', '!prevPwdHash', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
             '!updated_at', '!maxCreatedDomains']
     },
     {
-        role: "member",
+        role: "Member",
         resource: "users",
         action: "read:own",
         attributes: ['*', '!prevPwdHash', '!password', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
@@ -47,7 +50,7 @@ export var ruleList = [
 
     // POST /register TODO Needed?
     {
-        role: "guest", resource: "users", action: "create:any",
+        role: "Guest", resource: "users", action: "create:any",
         attributes: ['*', '!prevPwdHash', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
             '!updated_at', '!maxCreatedDomains']
     },
@@ -56,82 +59,122 @@ export var ruleList = [
      Domains
      */
     {
-        role: "member", resource: "domains", action: "create:own", attributes: ['*']
+        role: "Member", resource: "domains", action: "create:own", attributes: ['*']
     },
 
-    {role: "domainAdmin", resource: "domains", action: "read:own", attributes: ['*']},
-    {role: "domainAdmin", resource: "domains", action: "update:own", attributes: ['*']},
-    {role: "domainAdmin", resource: "domains", action: "delete:own"},
+    {role: "DomainAdmin", resource: "domains", action: "read:own", attributes: ['*']},
+    {role: "DomainAdmin", resource: "domains", action: "update:own", attributes: ['*']},
+    {role: "DomainAdmin", resource: "domains", action: "delete:own"},
 
-    {role: ["systemAdmin", "domainSuperAdmin"], resource: "domains", action: "create:any", attributes: ['*']},
-    {role: ["systemAdmin", "domainSuperAdmin"], resource: "domains", action: "read:any", attributes: ['*']},
-    {role: ["systemAdmin", "domainSuperAdmin"], resource: "domains", action: "update:any", attributes: ['*']},
-    {role: ["systemAdmin", "domainSuperAdmin"], resource: "domains", action: "delete:any"},
+    {role: ["SystemAdmin", "domainSuperAdmin"], resource: "domains", action: "create:any", attributes: ['*']},
+    {role: ["SystemAdmin", "domainSuperAdmin"], resource: "domains", action: "read:any", attributes: ['*']},
+    {role: ["SystemAdmin", "domainSuperAdmin"], resource: "domains", action: "update:any", attributes: ['*']},
+    {role: ["SystemAdmin", "domainSuperAdmin"], resource: "domains", action: "delete:any"},
 
     /*
      Roles - can be managed by system admin or domainAdmin (for domain roles) only
      */
-    {role: "systemAdmin", resource: "roles", action: "create:any", attributes: ['*', '!created_at', '!updated_at']},
-    {role: "systemAdmin", resource: "roles", action: "read:any", attributes: ['*']},
-    {role: "systemAdmin", resource: "roles", action: "update:any", attributes: ['*', '!created_at', '!updated_at']},
-    {role: "systemAdmin", resource: "roles", action: "delete:any"},
+    {role: "SystemAdmin", resource: "roles", action: "create:any", attributes: ['*', '!created_at', '!updated_at']},
+    {role: "SystemAdmin", resource: "roles", action: "read:any", attributes: ['*']},
+    {role: "SystemAdmin", resource: "roles", action: "update:any", attributes: ['*', '!created_at', '!updated_at']},
+    {role: "SystemAdmin", resource: "roles", action: "delete:any"},
 
     /*
      UserRoles
      */
     {
-        role: ["systemAdmin", "systemUserAdmin"],
+        role: ["SystemAdmin", "UserAdmin"],
         resource: "userRoles",
         action: "create:any",
         attributes: ['*', '!created_at', '!updated_at']
     },
     {
-        role: ["systemAdmin", "systemUserAdmin"],
+        role: ["SystemAdmin", "UserAdmin"],
         resource: "userRoles",
         action: "read:any",
         attributes: ['*', '!created_at', '!updated_at']
     },
     {
-        role: ["systemAdmin", "systemUserAdmin"],
+        role: ["SystemAdmin", "UserAdmin"],
         resource: "userRoles",
         action: "update:any",
         attributes: ['*', '!created_at', '!updated_at']
     },
-    {role: ["systemAdmin", "systemUserAdmin"], resource: "userRoles", action: "delete:any"},
+    {role: ["SystemAdmin", "UserAdmin"], resource: "userRoles", action: "delete:any"},
 
     /*
      DomainUsers
      */
     {
-        role: "domainUserAdmin",
+        role: "DomainUserAdmin",
         resource: "domains",
         action: "create:own",
         attributes: ['*', '!created_at', '!updated_at']
     },
-    {role: "domainUserAdmin", resource: "domains", action: "read:own", attributes: ['*', '!created_at', '!updated_at']},
+    {role: "DomainUserAdmin", resource: "domains", action: "read:own", attributes: ['*', '!created_at', '!updated_at']},
     {
-        role: "domainUserAdmin",
+        role: "DomainUserAdmin",
         resource: "domains",
         action: "update:own",
         attributes: ['*', '!created_at', '!updated_at']
     },
-    {role: "domainUserAdmin", resource: "domains", action: "delete:own"},
+    {role: "DomainUserAdmin", resource: "domains", action: "delete:own"},
 
-    {role: "systemAdmin", resource: "domains", action: "create:any", attributes: ['*', '!created_at', '!updated_at']},
-    {role: "systemAdmin", resource: "domains", action: "read:any", attributes: ['*', '!created_at', '!updated_at']},
-    {role: "systemAdmin", resource: "domains", action: "update:any", attributes: ['*', '!created_at', '!updated_at']},
-    {role: "systemAdmin", resource: "domains", action: "delete:any"},
+    {role: "SystemAdmin", resource: "domains", action: "create:any", attributes: ['*', '!created_at', '!updated_at']},
+    {role: "SystemAdmin", resource: "domains", action: "read:any", attributes: ['*', '!created_at', '!updated_at']},
+    {role: "SystemAdmin", resource: "domains", action: "update:any", attributes: ['*', '!created_at', '!updated_at']},
+    {role: "SystemAdmin", resource: "domains", action: "delete:any"},
 
     /*
      Log
      */
-    {role: "systemAdmin", resource: "log", action: "read:any", attributes: ['*']}
+    {role: "SystemAdmin", resource: "log", action: "read:any", attributes: ['*']}
 ];
 
 /*
  Initialization of access rules
  */
-export const rules = new AccessControl(ruleList);
+var _rules = void 0;
+
+/*
+ Called once, on first request, to replace access rules' role names into role IDs
+ */
+export function getRules(db:Knex):Promise<any>
+{
+    if (_rules)
+        return Promise.resolve(_rules);
+
+    return db.table('NAuth2_Roles')
+        .then(roles=>
+        {
+            var roleIDs = {};
+            _.forEach(roles, (rr)=>
+            {
+                roleIDs[rr.name] = rr.roleId;
+            });
+            _.forEach(ruleList, (it)=>
+            {
+                if (_.isArray(it.role))
+                {
+                    it.role = _.map(it.role, (rn:string)=>
+                    {
+                        let rid = roleIDs[rn];
+                        if (rid)
+                            return String(rid);
+                        return rn;
+                    });
+                }
+                else
+                {
+                    let rid = it.role as string;
+                    if (rid)
+                        it.role = String(roleIDs[rid]);
+                }
+            });
+            _rules = new AccessControl(ruleList);
+            return _rules;
+        });
+}
 
 /*
  Mapping between feathers.js method names and CRUD operation names expected by accesscontrol

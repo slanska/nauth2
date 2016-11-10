@@ -5,8 +5,11 @@
 import * as Types from '../Types';
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
-import {methodMap, rules} from '../accessRules';
-var Notation = require('notation');
+import {methodMap, getRules} from '../accessRules';
+var AccessControl = require('accesscontrol');
+import Knex = require('knex');
+import Promise = require('bluebird');
+import _ = require('lodash');
 
 /*
  BEFORE (for create/update/patch operations) or AFTER (for get/find) hook
@@ -15,41 +18,44 @@ var Notation = require('notation');
  @param (string) resourceName - name of REST resource (users, roles etc.)
  @param (string) ownAttribute
  */
-function sanitizeData(resourceName:string)
+function sanitizeData(db:Knex, resourceName:string)
 {
     var result = function (p:hooks.HookParams)
     {
-        var action = methodMap[p.method];
+        return getRules(db)
+            .then(rules=>
+            {
+                var action = methodMap[p.method];
 
-        if (!action)
-            throw new errors.NotImplemented(`${p.method} is not supported by authorization hook`);
+                if (!action)
+                    throw new errors.NotImplemented(`${p.method} is not supported by authorization hook`);
 
-        var permission = rules.permission({
-            role: ['systemAdmin'], // TODO p.params.token.roles,
-            resource: resourceName,
-            action: action + ':any'
-        });
+                var permission = rules.permission({
+                    role: p.params['payload'].roles,
+                    resource: resourceName,
+                    action: action + ':any'
+                });
 
-        if (!permission.granted)
-        {
-            permission = rules.permission({
-                role: p.params.token.roles,
-                resource: resourceName,
-                action: action + ':own'
-            });
-        }
+                if (!permission.granted)
+                {
+                    permission = rules.permission({
+                        role: p.params['payload'].roles,
+                        resource: resourceName,
+                        action: action + ':own'
+                    });
+                }
 
-
-        if (p.type === 'before')
-        {
-            p.data = permission.filter(p.data);
-        }
-        else
-        {
-            if (p.result.data)
-                p.result.data = permission.filter(p.result.data);
-            else p.result = permission.filter(p.result);
-        }
+                if (p.type === 'before')
+                {
+                    p.data = permission.filter(p.data);
+                }
+                else
+                {
+                    if (p.result.data)
+                        p.result.data = permission.filter(p.result.data);
+                    else p.result = permission.filter(p.result);
+                }
+            }) as any;
     };
 
     return result;

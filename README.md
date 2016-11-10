@@ -5,10 +5,10 @@
   
 ### What its name stands for?
   
-Node.js AUTHentication/AUTHorization (double 'auth')
+Node.js + Authentication + Authorization -> N+Auth+Auth -> NAuth2
 
 ### What does it do?
-NAuth2 is a library, not a framework. It runs as a package on top of Express.js
+NAuth2 is a library, not a framework. It runs as a package on top of Express.js/feathers.js
 application or service and needs to be activated (see example below). 
 It implements set of REST API for full stack of user management.
 It provides simple, basic and flexible options for configuring different aspects
@@ -20,7 +20,7 @@ and at the same time, to provide all its features out of box with minimum effort
 * Library to be used in [feathers.js](https://github.com/feathersjs/feathers)-based 
 applications as a middleware for general purpose user management
 * Light alternative to [Stormpath](https://stormpath.com), [Forgerock](https://www.forgerock.com)
-or [Loopback](http://loopback.io/doc/en/lb2/Authentication-authorization-and-permissions.html)   
+or [Loopback Authorization](http://loopback.io/doc/en/lb2/Authentication-authorization-and-permissions.html)   
 * REST API for user registration, login, forgot password, change password and other typical 
 tasks related to user management
 * Stores all user information in a relational database (PostgreSQL, MySQL/MariaDB, Sqlite3, Oracle), 
@@ -28,7 +28,7 @@ hosted by you (uses [Knex](http://knexjs.org) for database access)
 * Email notification for registration completion, forgotten passwords etc. 
 (uses [nodemailer](https://nodemailer.com) for email sending), using customizable HTML templates
 * Implements concept of domains. Every user can be associated with number of
-domains and have separately defined rules for accesing them. 
+domains and have separately defined rules for accessing them (see details [here](#domains)). 
 * Captcha support (generate image and code to be used on client)
 * Written in TypeScript
 
@@ -46,7 +46,6 @@ expected that domain is specified in REST URL, like _website.address/**domain**_
 or _**domain**.website.address_. Domain determines context of request being processed. 
 A user may have different roles assigned depending on domain. NAuth2 provides 
 concise way to deal with multi-domain model. 
-
 
 ### How to use
 
@@ -189,16 +188,25 @@ Adds a new user
 
 #### POST /fakedata
 
+### User Registration
+
+Following user registration mode are supported:
+* Auto (same as By Admin Only) - only admin or user admin can create a new user. User will be immediately activated. This is default mode.
+* Self confirm. Guests can register themselves. New user account is in pending state until user activated it by clicking link in confirmation email
+* Self and approve. Guests can register, but they have to be approved by admin or user admin (who will receive notification email with link to proceed)
+* Self and start. Guests can register and become active users immediately, no confirmation via email is required.
+
 ### Email templates
 
-NAuth2 uses templates to generate emails. Here is the list of templates needed for 
+NAuth2 uses [ECT.js](http://ectjs.com) template engine to generate emails. 
+Here is the list of templates needed for 
 different stages of flow:
-* Complete registration
-* Registration done
-* Forgot password
+* Confirm email
+* Registration completed
+* Password reset requested
 * Password changed
 * Invitation
-* Password will expire
+* Password will expire in N days
 
 ### Internals. Database structure
 NAuth2 stores user data in the relational database. The following tables
@@ -211,7 +219,7 @@ are used:
 #### NAuth2_DomainUsers
 #### NAuth2_UserRoles
 #### NAuth2_Log
-#### NAuth2_Config
+#### NAuth2_RefreshTokens
 
 ### Internals. Caching
 For the sake of performance NAuth2 keeps most frequently used information in the cache.
@@ -223,3 +231,23 @@ may need to be deployed (for example, Redis or Aerospike)
 ### Developer mode
 When running in developer mode NAuth2 enables feature to generate fake users,
 for load tests
+
+### Dependencies
+
+Many thanks to the wonderful tools and libraries used in this project:
+feathers.js
+Express.js
+lodash
+knex
+nodemailer
+ect.js
+Framework7
+vue.js
+mocha & chai
+captchapng
+accesscontrol
+jsonwebtoken
+object-hash
+bcryptjs
+wildcard-subdomains
+

@@ -86,24 +86,24 @@ module NAuth2
                     auth.hooks.verifyToken(this.authCfg),
                     this.populateUserHook(),
                     auth.hooks.restrictToAuthenticated(this.authCfg),
-                    nhooks.authorize('users', 'userId'),
+                    nhooks.authorize(this.db, 'users', 'userId'),
                 ],
                 create: [
                     auth.hooks.hashPassword(this.authCfg),
-                    nhooks.sanitizeData('users')
+                    nhooks.sanitizeData(this.db, 'users')
                 ],
                 find: [],
                 get: [],
                 update: [
-                    nhooks.sanitizeData('users')],
+                    nhooks.sanitizeData(this.db,'users')],
                 patch: [
-                    nhooks.sanitizeData('users')],
+                    nhooks.sanitizeData(this.db, 'users')],
                 remove: []
 
             });
             this.Services.Users.after({
                 all: [
-                    nhooks.sanitizeData('users')
+                    nhooks.sanitizeData(this.db, 'users')
                 ]
             });
             return this.Services.Users;
