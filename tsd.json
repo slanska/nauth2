@@ -94,6 +94,12 @@
     },
     "object-hash/object-hash.d.ts": {
       "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
+    },
+    "casperjs/casperjs.d.ts": {
+      "commit": "f5ab2df94e1aabf0fc6d783ad01c4c4671760627"
+    },
+    "phantomjs/phantomjs.d.ts": {
+      "commit": "f5ab2df94e1aabf0fc6d783ad01c4c4671760627"
     }
   }
 }

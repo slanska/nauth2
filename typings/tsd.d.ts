@@ -23,5 +23,7 @@
 /// <reference path="http-status/http-status.d.ts" />
 /// <reference path="bcryptjs/bcryptjs.d.ts" />
 /// <reference path="object-hash/object-hash.d.ts" />
+// / <reference path="casperjs/casperjs.d.ts" />
+// / <reference path="phantomjs/phantomjs.d.ts" />
 
 

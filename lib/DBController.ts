@@ -95,7 +95,7 @@ module NAuth2
                 find: [],
                 get: [],
                 update: [
-                    nhooks.sanitizeData(this.db,'users')],
+                    nhooks.sanitizeData(this.db, 'users')],
                 patch: [
                     nhooks.sanitizeData(this.db, 'users')],
                 remove: []
@@ -121,9 +121,16 @@ module NAuth2
                 return self.db.table('NAuth2_Roles').where({'name': {$in: self.cfg.newMemberRoles || []}})
                     .then(rr =>
                     {
-                        var roles = _.map(rr, 'roleId');
+                        var roles = _.map(rr, (r:any)=>
+                        {
+                            return {userId: p.result.userId, roleId: r.roleId};
+                        });
+
+                        if (roles.length === 0)
+                            return Promise.resolve();
+
                         return self.db.table('NAuth2_UserRoles')
-                            .insert({userId: p.result.userId, roles: roles});
+                            .insert(roles);
                     });
 
             };
@@ -159,6 +166,8 @@ module NAuth2
                 create: [
                     this.setRolesToNewUser(),
                     hooks.pluck('email'),
+
+                    // TODO afterUserRegister
                     nhooks.setRegisterConfirmActionUrl(this.cfg, this.authCfg),
                     nhooks.sendEmailToUser(this.app, this.cfg, 'welcomeAndConfirm',
                         // TODO Localize

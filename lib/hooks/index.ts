@@ -8,7 +8,7 @@ import verifyNewPassword = require('./verifyNewPassword');
 import sendEmailToUser = require('./sendEmailToUser');
 import verifyUniqueUserEmail = require('./verifyUniqueUserEmail');
 import verifyEmail = require('./verifyEmail');
-// import afterUserRegistration = require('./afterUserRegistration');
+import afterUserRegistration = require('./afterUserRegistration');
 import detectOwnUser = require('./detectOwnUser');
 import detectOwnDomain = require('./detectOwnDomain');
 import authorize = require('./authorize');
@@ -26,7 +26,7 @@ export =
     sendEmailToUser,
     verifyUniqueUserEmail,
     verifyEmail,
-    // afterUserRegistration,
+    afterUserRegistration,
     detectOwnUser,
     detectOwnDomain,
     authorize,

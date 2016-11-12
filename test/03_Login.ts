@@ -4,11 +4,54 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
+import {TestHelper} from './helper';
+
+function loadUsers(env:TestHelper)
+{
+    return env.req.get('/auth/users')
+        .end(err, users=>
+        {
+        });
+}
+
+var adminPassword = 'admin';
+
+function loginAsAdmin(env:TestHelper)
+{
+    return env.req.get('/auth/login').send({email: 'admin', password: adminPassword}).end(()=>
+    {
+
+    });
+}
+
+function changePassword(env:TestHelper, email:string, password:string, newPassword:string, confirmPassword:string)
+{
+    return env.req
+        .post('/auth/changePassword')
+        .send({
+            email,
+            password,
+            newPassword,
+            confirmPassword
+        })
+        .end;
+}
+
+
 describe('Login', ()=>
 {
     it('admin first login', (done)=>
     {
-        done();
+        var env = new TestHelper();
+        env.start()
+            .then(()=>loginAsAdmin(env))
+            .then(res=>
+            {
+                // Expected: need to change password
+                adminPassword = env.generatePassword();
+                return changePassword(env, 'admin', 'admin', adminPassword, adminPassword);
+            })
+            .then(done);
     });
 
     it('admin login', (done)=>
@@ -101,8 +144,6 @@ describe('Login', ()=>
 
         done();
     });
-
-
 
 
 });

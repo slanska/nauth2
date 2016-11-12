@@ -31,7 +31,7 @@ function afterUserRegistration(knex:Knex, cfg:Types.INAuth2Config, emailField = 
         {
             case Types.UserCreateMode.Auto:
             case Types.UserCreateMode.ByAdminOnly:
-                // Cannot be here. Just ignore
+                // Not supposed to be here. Just ignore
 
                 break;
 
