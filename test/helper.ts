@@ -16,6 +16,7 @@ import Faker = require('faker');
 import feathers = require('feathers');
 import config = require('../config/index');
 import Promise = require('bluebird');
+import {exec} from 'child_process';
 
 // import Casper = require('casperjs');
 
@@ -92,6 +93,24 @@ export class TestHelper
     generatePassword()
     {
         return this.faker.internet.password(8, false, null, '@1zX');
+    }
+
+    /*
+     Executes casper.js test.
+     Returns promise
+     */
+    runCasper()
+    {
+        return new Promise((resolve, reject)=>
+        {
+            exec('casperjs', (err, stdout, stderr)=>
+            {
+                if (err)
+                    return reject(err);
+
+                resolve(stdout);
+            });
+        });
     }
 }
 

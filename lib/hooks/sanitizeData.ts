@@ -6,7 +6,6 @@ import * as Types from '../Types';
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 import {methodMap, getRules} from '../accessRules';
-var AccessControl = require('accesscontrol');
 import Knex = require('knex');
 import Promise = require('bluebird');
 import _ = require('lodash');

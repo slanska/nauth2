@@ -35,4 +35,14 @@ describe('Login', ()=>
     {
         done();
     });
+
+    it('list public domains', (done)=>
+    {
+        done();
+    });
+
+    it('register user via domain', (done)=>
+    {
+        done();
+    });
 });

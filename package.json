@@ -69,6 +69,10 @@
     "nodemailer-wellknown": "^0.2.0",
     "pg": "^6.1.0",
     "phantomjs": "^2.1.7",
-    "sqlite3": "^3.1.4"
+    "sqlite3": "^3.1.4",
+    "ts-loader": "^1.2.0",
+    "webdriverio": "^4.4.0",
+    "webpack": "^1.13.3",
+    "webpack-typescript": "^0.5.6"
   }
 }

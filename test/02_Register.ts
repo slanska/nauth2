@@ -36,6 +36,7 @@ describe('register', () =>
     it('fails: wrong captcha', (done) =>
     {
         var env = new TestHelper();
+
         env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
         env.start()
             .then(()=>

@@ -4,11 +4,7 @@
     "experimentalDecorators": true,
     "target": "es5",
     "module": "commonjs",
-    "sourceMap": true
-  },
-  "exclude": [
-          "node_modules",
-          "public",
-          "typings"
-        ]
+    "sourceMap": true,
+     "noEmit": false
+  }
 }

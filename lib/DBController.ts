@@ -138,6 +138,20 @@ module NAuth2
         }
 
         /*
+         Sets status for new user as 'A'(Active), if user create mode is SelfStart
+         */
+        private setNewUserStatusHook()
+        {
+            var self = this;
+            var result = (p:hooks.HookParams)=>
+            {
+                if (self.cfg.userCreateMode === Types.UserCreateMode.SelfStart)
+                    p.data.status = 'A';
+            };
+            return result;
+        }
+
+        /*
          Configures service for POST /auth/register
          */
         protected createUserRegisterService()
@@ -153,6 +167,7 @@ module NAuth2
                     auth.hooks.hashPassword(this.authCfg),
                     nhooks.verifyEmail(),
                     nhooks.verifyUniqueUserEmail(),
+                    this.setNewUserStatusHook(),
                     nhooks.jsonDataStringify()
                 ],
                 get: [hooks.disable('external')],

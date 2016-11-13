@@ -246,7 +246,25 @@ namespace Types
          */
         debug?:boolean;
 
+        /*
+         UI settings for embedded website
+         */
+        ui?:{
+            /*
+             default: auto
+             */
+            skin?:'auto' | 'ios' | 'material',
 
+            /*
+             default: white
+             */
+            theme?:'white' | 'dark',
+
+            /*
+             default: blue
+             */
+            color?:string
+        }
     }
 
     /*
