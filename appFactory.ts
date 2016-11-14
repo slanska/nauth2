@@ -15,6 +15,7 @@ var bodyParser = require('body-parser');
 var errors = require('feathers-errors/handler');
 import nauth2 = require('./lib/index');
 var cors = require('cors');
+var ECT = require('ect');
 
 export = (config:Types.INAuth2Config) =>
 {
@@ -35,6 +36,10 @@ export = (config:Types.INAuth2Config) =>
         .use(bodyParser.urlencoded({extended: true}))
 
         .configure(nauth2(app, config));
+
+    var ectRenderer = ECT({ watch: true, root: __dirname + '/public', ext : '.html' });
+    app.set('view engine', 'ect');
+    app.engine('ect', ectRenderer.render);
 
     // Just like Express your error middleware needs to be
     // set up last in your middleware chain.

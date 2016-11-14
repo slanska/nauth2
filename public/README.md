@@ -6,9 +6,11 @@ otherwise uses material design.
 
 Uses the following libraries:
 * [Framework7](www.framework7.io) - for UI, web site and mobile friendly
-* [Vue.js](vuejs.org) - for re-usable components and data binding
+* [Vue.js](vuejs.org) - for custom re-usable components and data binding
 * [lodash](lodash.com) - general purpose utilities
 * [Feathers JS Client](feathersjs.com) - to communicate with feathers JS backend
+
+Packs sources into few bundles, via webpack.
 
 #### Pages
 * layout.html - master page with all dependencies and general page layout. Used

@@ -2,98 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!--different meta for desktop/mobile?-->
     <meta name="viewport" content="width=device-width">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <title><%= @ApplicationName%></title>
-
-    <!--<link rel="stylesheet" href="framework7/framework7.material.css">-->
-    <!--<link rel="stylesheet" href="framework7/framework7.material.colors.css">-->
-    <!--<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.css">-->
-    <!--<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.css">-->
 </head>
 <body>
-<!--<div id="app">-->
-<!--<f7-statusbar></f7-statusbar>-->
-<!--<f7-panel left reveal layout="dark" theme="pink">-->
-<!--<f7-view navbar-fixed>-->
-<!--<f7-pages>-->
-<!--<f7-page>-->
-<!--<f7-navbar title="Left Panel"></f7-navbar>-->
-<!--<f7-list>-->
-<!--<f7-list-item link="/cards/" title="Cards"></f7-list-item>-->
-<!--<f7-list-item link="/lists/" title="Lists"></f7-list-item>-->
-<!--</f7-list>-->
-<!--</f7-page>-->
-<!--</f7-pages>-->
-<!--</f7-view>-->
-<!--</f7-panel>-->
-
-<!--<f7-panel right cover>-->
-<!--<p>Panel right content</p>-->
-<!--</f7-panel>-->
-
-<!--<f7-views navbar-through>-->
-<!--&lt;!&ndash;TODO dynamic-navbar depending on device&ndash;&gt;-->
-<!--<f7-view main url="/" :dynamic-navbar="true">-->
-<!--<f7-pages>-->
-<!--<f7-page toolbar-fixed>-->
-<!--<f7-toolbar>-->
-<!--<f7-link>Left</f7-link>-->
-<!--<f7-link>Right</f7-link>-->
-<!--</f7-toolbar>-->
-<!--</f7-page>-->
-<!--</f7-pages>-->
-
-<!--</f7-view>-->
-<!--</f7-views>-->
-
-<!--&lt;!&ndash; Login Screen &ndash;&gt;-->
-<!--<f7-login-screen id="demo-login-screen">-->
-<!--<f7-view>-->
-<!--<f7-pages>-->
-<!--<f7-page login-screen>-->
-<!--<f7-login-screen-title>My App</f7-login-screen-title>-->
-<!--<f7-list form>-->
-<!--<f7-list-item>-->
-<!--<f7-label>Username</f7-label>-->
-<!--<f7-input name="username" placeholder="Username"></f7-input>-->
-<!--</f7-list-item>-->
-<!--<f7-list-item>-->
-<!--<f7-label>Password</f7-label>-->
-<!--<f7-input name="password" type="password" placeholder="Password"></f7-input>-->
-<!--</f7-list-item>-->
-<!--</f7-list>-->
-<!--<f7-list>-->
-<!--<f7-list-button title="Sign In" close-login-screen></f7-list-button>-->
-<!--<f7-list-label>-->
-<!--<p>Click Sign In to close Login Screen</p>-->
-<!--</f7-list-label>-->
-<!--</f7-list>-->
-<!--</f7-page>-->
-<!--</f7-pages>-->
-<!--</f7-view>-->
-<!--</f7-login-screen>-->
-<!--</div>-->
-<!--<script src="bower_components/Framework7/dist/js/framework7.js"></script>-->
-<!--<script src="bower_components/Framework7-Vue/dist/framework7-vue.min.js"></script>-->
-<!--&lt;!&ndash;<script src="app/userController.js"></script>&ndash;&gt;-->
-
-
-<!--Login-->
-<!--<f7-login>-->
-
-<!--</f7-login>-->
-
-
-<!--<f7-page>-->
-<!--<p>Register</p>-->
-<!--<f7-panel></f7-panel>-->
-
-<!--</f7-page>-->
 
 <!--Change password-->
 
@@ -118,7 +34,7 @@
     <!-- Panels overlay-->
     <div class="panel-overlay"></div>
     <!-- Left panel with reveal effect-->
-    <div class="panel panel-left panel-cover">
+    <div class="panel panel-left panel-cover layout-dark">
         <!-- Left view-->
         <div class="view view-left navbar-through">
             <div class="navbar">
@@ -129,7 +45,7 @@
                 </div>
             </div>
             <div class="pages">
-                <div data-page="index-left" class="page">
+                <div data-page="index-left" class="page layout-dark">
                     <div class="page-content">
                         <div class="content-block-title">Left View Links</div>
                         <div class="list-block">
@@ -153,14 +69,14 @@
                         <div class="content-block-title">Control Main View</div>
                         <div class="list-block">
                             <ul>
-                                <li><a href="about.html" data-view=".view-main" class="item-link close-panel">
+                                <li><a href="admin.html" data-view=".view-main" class="item-link close-panel">
                                     <div class="item-content">
                                         <div class="item-inner">
                                             <div class="item-title">About</div>
                                         </div>
                                     </div>
                                 </a></li>
-                                <li><a href="services.html" data-view=".view-main" class="item-link close-panel">
+                                <li><a href="layout.html" data-view=".view-main" class="item-link close-panel">
                                     <div class="item-content">
                                         <div class="item-inner">
                                             <div class="item-title">Services</div>
@@ -211,14 +127,14 @@
                     </div>
                     <div class="list-block">
                         <ul>
-                            <li><a href="about.html" class="item-link">
+                            <li><a href="admin.html" class="item-link">
                                 <div class="item-content">
                                     <div class="item-inner">
                                         <div class="item-title">About</div>
                                     </div>
                                 </div>
                             </a></li>
-                            <li><a href="services.html" class="item-link">
+                            <li><a href="admin.html" class="item-link">
                                 <div class="item-content">
                                     <div class="item-inner">
                                         <div class="item-title">Services</div>
@@ -235,8 +151,5 @@
 <script src="bower_components/Framework7/dist/js/framework7.js"></script>
 <script src="bower_components/Framework7-Vue/dist/framework7-vue.min.js"></script>
 <script src="./_build/index.js"></script>
-
-
-
 </body>
 </html>

@@ -36,7 +36,7 @@ if (!isIos)
 // Init App
 export var nauth2App = new Framework7({
     // Enable Material theme for Android device only
-    material: isAndroid ? true : false,
+    material: isIos ? false : true,
     // Enable Template7 pages
     template7Pages: true,
     pushState: true
@@ -61,7 +61,7 @@ export var nauth2MainView = nauth2App.addView('.view-main', {
             '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' +
             '<link rel="stylesheet" href="public/bower_components/Framework7/dist/css/framework7.material.colors.min.css">'
             // public/bower_components/Framework7/dist/css/framework7.material.rtl.min.css
-            // +            '<link rel="stylesheet" href="path/to/my-app.material.css">'
+            + '<link rel="stylesheet" href="css/style.css">'
         );
     }
     else
@@ -70,8 +70,8 @@ export var nauth2MainView = nauth2App.addView('.view-main', {
             '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' +
             '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">'
             // public/bower_components/Framework7/dist/css/framework7.ios.rtl.min.css
-            // +
-            // '<link rel="stylesheet" href="path/to/my-app.ios.css">'
+            +
+            '<link rel="stylesheet" href="css/style.css">'
         );
     }
 })();

@@ -10,7 +10,8 @@
     "initTestDB:SQLite": "node ./schema/initDB.js sqlite3",
     "initTestDB:MariaDB": "node ./schema/initDB.js mysql",
     "initTestDB:PostgreSQL": "node ./schema/initDB.js pg",
-    "knex:migrate": "cd ./schema && knex migrate:latest --debug"
+    "knex:migrate": "cd ./schema && knex migrate:latest --debug",
+    "webpack": "webpack --watch"
   },
   "repository": {
     "type": "git",
