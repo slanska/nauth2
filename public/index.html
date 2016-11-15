@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<% extend 'layout.html' %>
 
-    <title><%= @ApplicationName%></title>
-</head>
-<body>
+<% block 'body' : %>
 
 <!--Change password-->
 
@@ -148,8 +139,5 @@
         </div>
     </div>
 </div>
-<script src="bower_components/Framework7/dist/js/framework7.js"></script>
-<script src="bower_components/Framework7-Vue/dist/framework7-vue.min.js"></script>
-<script src="./_build/index.js"></script>
-</body>
-</html>
+
+<% end %>

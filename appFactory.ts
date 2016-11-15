@@ -16,8 +16,9 @@ var errors = require('feathers-errors/handler');
 import nauth2 = require('./lib/index');
 var cors = require('cors');
 var ECT = require('ect');
+import path = require('path');
 
-export = (config:Types.INAuth2Config) =>
+export = (config: Types.INAuth2Config) =>
 {
     var app = feathers();
 
@@ -37,12 +38,40 @@ export = (config:Types.INAuth2Config) =>
 
         .configure(nauth2(app, config));
 
-    var ectRenderer = ECT({ watch: true, root: __dirname + '/public', ext : '.html' });
+    var ectRenderer = ECT({watch: true, root: __dirname + '/public', ext: '.html'});
     app.set('view engine', 'ect');
     app.engine('ect', ectRenderer.render);
 
-    // Just like Express your error middleware needs to be
-    // set up last in your middleware chain.
+
+    function renderHtml(page?: string)
+    {
+        var result = (req, res, next)=>
+        {
+            if (!page)
+                page = req.params.page;
+            ectRenderer.render(page, {}, (error, html) =>
+            {
+                if (error)
+                    next(error);
+                else
+                {
+                    res.end(html);
+                }
+            });
+        };
+        return result;
+    }
+
+    app.get('/', renderHtml('index'));
+    app.get('/:page.html', renderHtml());
+
+
+    app.use(feathers.static(path.join(__dirname, 'public')));
+
+// app.use('/', feathers.static(path.join(__dirname, 'public')));
+
+// Just like Express your error middleware needs to be
+// set up last in your middleware chain.
     app.use(errors({
         html: function (error, req, res, next)
         {
