@@ -4,12 +4,10 @@
 
 ///<reference path="../../typings/browser.d.ts"/>
 
-declare var Template7;
-declare var Dom7;
-declare var Framework7;
-
 import Vue = require('vue');
 var Framework7Vue = require('framework7-vue');
+
+import {registerComponents} from '../components/index';
 
 Vue.use(Framework7Vue);
 
@@ -23,6 +21,8 @@ Template7.global = {
     ios: isIos
 };
 
+registerComponents();
+
 var $$ = Dom7;
 
 if (!isIos)
@@ -33,10 +33,12 @@ if (!isIos)
     $$('.view .navbar').prependTo('.view .page');
 }
 
+
 // Init Vue App
 export var nauth2App: any = new Vue({
     // Root Element
     el: '#app',
+
     // Framework7 Parameters
     framework7: {
         root: '#app', //Should be same as app el
@@ -49,9 +51,13 @@ export var nauth2App: any = new Vue({
         pushState: true
     },
     // Custom App Data
-    data: function ()
+    data: ()=>
     {
         return {
+            emailOrName: '',
+            password: '',
+            confirmPassword: '',
+            rememberMe: true,
             user: {
                 name: 'Vladimir',
                 lastName: 'Kharlampidi',
@@ -77,31 +83,35 @@ export var nauth2App: any = new Vue({
                 domCache: true
             });
 
-// set scripts based on client
-
-            (function ()
+            // set scripts based on client
+            if (!isIos)
             {
-                if (!isIos)
-                {
-                    Dom7('head').append(
-                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' +
-                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.colors.min.css">'
-                        + '<link rel="stylesheet" href="css/style.css">'
-                        + ' <link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
-                    );
-                }
-                else
-                {
-                    Dom7('head').append(
-                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' +
-                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">'
-                        +
-                        '<link rel="stylesheet" href="css/style.css">'
-                        +
-                        '<link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
-                    );
-                }
-            })();
+                Dom7('head').append(
+                    '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' +
+                    '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.colors.min.css">'
+                    + '<link rel="stylesheet" href="css/style.css">'
+                    + ' <link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
+                );
+            }
+            else
+            {
+                Dom7('head').append(
+                    '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' +
+                    '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">'
+                    +
+                    '<link rel="stylesheet" href="css/style.css">'
+                    +
+                    '<link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
+                );
+            }
+        },
+        proceedLogin: ()=>
+        {
+            console.log('proceedLogin');
+        },
+        resetPassword: ()=>
+        {
+            console.log('resetPassword');
         }
     }
 });

@@ -105,7 +105,7 @@
         <!-- Pages-->
         <div class="pages layout-white">
             <!-- Page, data-page contains page name-->
-            <div data-page="login" class="page">
+            <div data-page="login" class="page" id="loginPage">
                 <!-- Scrollable page content-->
                 <div class="page-content">
                     <!--<div class="content-block-title">Login</div>-->
@@ -120,30 +120,14 @@
                                         <ul>
 
                                             <li>
-                                                <div class="item-content">
-                                                    <div class="item-media">
-                                                        <i class="f7-icons">person</i>
-                                                    </div>
-                                                    <div class="item-inner">
-                                                        <!--<div class="item-title label">E-mail</div>-->
-                                                        <div class="item-input">
-                                                            <input type="email" placeholder="Email or user name"/>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <input-box className="item-content" type="text" icon="person"
+                                                           label="Email or User Name"
+                                                           placeHolder="Email or User Name"></input-box>
                                             </li>
                                             <li>
-                                                <div class="item-content">
-                                                    <div class="item-media">
-                                                        <i class="icon f7-icons">lock</i>
-                                                    </div>
-                                                    <div class="item-inner">
-                                                        <!--<div class="item-title label">Password</div>-->
-                                                        <div class="item-input">
-                                                            <input type="password" placeholder="Password"/>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <input-box className="item-content" type="password" icon="lock"
+                                                           label="Password"
+                                                           placeHolder="Password"></input-box>
                                             </li>
 
 
@@ -160,11 +144,11 @@
                                             </li>
 
                                         </ul>
-                                        <p class="row" style="margin-top: 1em;">
+                                        <p class="buttons-row" style="margin-top: 1em;">
                                             <a href="#register"
-                                               style="margin-right: 0.6em; min-width: 7em; color: #673ab7;"
+                                               style="margin-right: 0.6em; color: #673ab7;"
                                                class="button button-big  button-raised ">Register</a>
-                                            <a href="proceesLogin()" style="margin-left: 0.6em;min-width: 7em;"
+                                            <a @click="proceedLogin" style="margin-left: 0.6em;"
                                                class="button button-big button-fill button-raised color-teal">Login</a>
                                         </p>
                                         <p class="row">
@@ -181,7 +165,7 @@
                 </div>
             </div>
 
-            <div data-page="register" class="page cached">
+            <div data-page="register" class="page cached" id="registerPage">
                 <div class="page-content">
                     <div class="content-block-title">Register</div>
                     <div class="content-block">
@@ -192,45 +176,35 @@
                 </div>
             </div>
 
-            <div data-page="forgotPassword" class="page cached">
+            <div data-page="forgotPassword" class="page cached" id="resetPwdPage">
                 <div class="page-content">
                     <div class="content-block-title">Password Recovery</div>
                     <div class="content-block">
                         <div class="content-block-inner">
+                            <p>Enter your email address, click <strong>[Reset Password]</strong> button and
+                                we will send you
+                                instructions on how to reset your password.
+
+                            </p>
                             <div class="list-block">
                                 <ul>
                                     <li>
-                                        <p>Enter your email address, click <strong>[Reset Password]</strong> button and
-                                            we will send you
-                                            instructions on how to reset your password.
-
-                                        </p>
-
-                                    </li>
-                                    <li>
-                                        <div class="item-content">
-                                            <div class="item-media">
-                                                <i class="f7-icons">email</i>
-                                            </div>
-                                            <div class="item-inner">
-                                                <div class="item-title floating-label">Email</div>
-                                                <div class="item-input">
-                                                    <input type="email" placeholder="Email"/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <input-box className="item-content" type="email" icon="email" label="Email"
+                                                   placeHolder="Email"></input-box>
                                     </li>
                                 </ul>
                             </div>
+
+                            <div class="row">
+                                <div class="tablet-25 col-5"></div>
+                                <a @click="resetPassword" style="margin-left: 0.6em; "
+                                   class="button button-big button-fill button-raised active tablet-50 col-90">Reset
+                                    password</a>
+                                <div class="tablet-25 col-5"></div>
+                            </div>
                         </div>
 
-                        <div class="row">
-                            <div class="tablet-25 col-5"></div>
-                            <a href="resetPassword()" style="margin-left: 0.6em; "
-                               class="button button-big button-fill button-raised active tablet-50 col-90">Reset
-                                password</a>
-                            <div class="tablet-25 col-5"></div>
-                        </div>
+
                     </div>
                 </div>
 
