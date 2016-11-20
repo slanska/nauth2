@@ -105,13 +105,13 @@ export var nauth2App: any = new Vue({
                 );
             }
         },
-        proceedLogin: ()=>
+        proceedLogin: function ()
         {
-            console.log('proceedLogin');
+            console.log('proceedLogin' + this.emailOrName);
         },
-        resetPassword: ()=>
+        resetPassword: function  ()
         {
-            console.log('resetPassword');
+            console.log('resetPassword' + this.emailOrName);
         }
     }
 });

@@ -50,30 +50,16 @@ inputBoxComponent['render'] = function (createElement)
     return createElement('div', {class: {[self.className || 'item-content']: true}}, children);
 };
 
-// inputBoxComponent.template = `<div :class="className">
-//                                             <div class="item-media">
-//                                                 <i class="f7-icons">{{icon}}</i>
-//                                             </div>
-//                                             <div class="item-inner">
-//                                                 <div v-if="!isIOS" class="item-title floating-label">{{label}}</div>
-//                                                 <div class="item-input">
-//                                                     <input :type="type" :placeholder="placeHolder"/>
-//                                                 </div>
-//                                             </div>
-//                                         </div>`;
-
 inputBoxComponent.props = {
     'value': [String, Number],
     'icon': String,
     'type': String,
     'placeHolder': String,
     'className': String,
-    'label': String
+    'label': String,
+    'id': String,
+    'name': String
 };
 
-inputBoxComponent.data = ()=>
-{
-    return {};
-};
 
 export = inputBoxComponent;
