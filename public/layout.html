@@ -7,14 +7,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
+    <!--<link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">-->
     <title><%= @ApplicationName%></title>
+
 </head>
 <body>
+<div id="app">
+    <% content 'body' %>
+</div>
 
-<% content 'body' %>
-
-<script src="bower_components/Framework7/dist/js/framework7.js"></script>
-<script src="bower_components/Framework7-Vue/dist/framework7-vue.min.js"></script>
+<script src="./bower_components/Framework7/dist/js/framework7.js"></script>
+<script src="./bower_components/Framework7-Vue/dist/framework7-vue.min.js"></script>
 <script src="./_build/index.js"></script>
 </body>
 </html>

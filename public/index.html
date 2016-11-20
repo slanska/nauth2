@@ -14,9 +14,14 @@
 <!-- Status bar overlay for fullscreen mode-->
 <div class="statusbar-overlay"></div>
 <!-- Right panel with cover effect-->
-<div class="panel panel-right panel-reveal">
-    <div class="content-block">
-        <p>Right panel content goes here</p>
+<div class="layout-dark">
+    <div class="panel panel-right panel-reveal layout-dark">
+        <div class="content-block">
+            <p>Right panel content goes here</p>
+            <p>Right panel content goes here</p>
+            <p>Right panel content goes here</p>
+            <p>Right panel content goes here</p>
+        </div>
     </div>
 </div>
 <!-- Views-->
@@ -60,17 +65,17 @@
                         <div class="content-block-title">Control Main View</div>
                         <div class="list-block">
                             <ul>
-                                <li><a href="admin.html" data-view=".view-main" class="item-link close-panel">
+                                <li><a href="#login" data-view=".view-main" class="item-link  close-panel">
                                     <div class="item-content">
                                         <div class="item-inner">
-                                            <div class="item-title">About</div>
+                                            <div class="item-title">Login</div>
                                         </div>
                                     </div>
                                 </a></li>
-                                <li><a href="layout.html" data-view=".view-main" class="item-link close-panel">
+                                <li><a href="#register" data-view=".view-main" class="item-link close-panel">
                                     <div class="item-content">
                                         <div class="item-inner">
-                                            <div class="item-title">Services</div>
+                                            <div class="item-title">Register</div>
                                         </div>
                                     </div>
                                 </a></li>
@@ -98,43 +103,137 @@
             </div>
         </div>
         <!-- Pages-->
-        <div class="pages">
+        <div class="pages layout-white">
             <!-- Page, data-page contains page name-->
-            <div data-page="index-1" class="page">
+            <div data-page="login" class="page">
                 <!-- Scrollable page content-->
                 <div class="page-content">
-                    <div class="content-block-title">Hello</div>
+                    <!--<div class="content-block-title">Login</div>-->
                     <div class="content-block">
                         <div class="content-block-inner">
-                            <p>This is an example of split view application layout where left view degrades to panel on
-                                narrow screens (iPad portrait and iPhone). It behaves like default Mail app on iOS
-                                7.</p>
-                            <p>Each view may have different layout, different navbar type (dynamic, fixed or static) or
-                                without navbar. You can easily control one view from another without any line of
-                                JavaScript just using "data-view" attribute on links.</p>
-                            <p>Additional right panel is also available: <a href="#" data-panel="right"
-                                                                            class="open-panel">right panel</a></p>
+                            <div class="row">
+                                <div class="tablet-25">
+                                    <p></p>
+                                </div>
+                                <div class="tablet-50 col-100">
+                                    <div class="list-block">
+                                        <ul>
+
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="f7-icons">person</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <!--<div class="item-title label">E-mail</div>-->
+                                                        <div class="item-input">
+                                                            <input type="email" placeholder="Email or user name"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon f7-icons">lock</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <!--<div class="item-title label">Password</div>-->
+                                                        <div class="item-input">
+                                                            <input type="password" placeholder="Password"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+
+                                            <li style="margin-top: 1em;">
+                                                <label class="label-checkbox item-content">
+                                                    <input type="checkbox" name="ks-checkbox" value="Remember Me"
+                                                           checked="checked">
+                                                    <div class="item-media"><i class="icon icon-form-checkbox"></i>
+                                                    </div>
+                                                    <div class="item-inner" style="padding-top: 0.9em;">
+                                                        <div class="item-title">Remember Me</div>
+                                                    </div>
+                                                </label>
+                                            </li>
+
+                                        </ul>
+                                        <p class="row" style="margin-top: 1em;">
+                                            <a href="#register"
+                                               style="margin-right: 0.6em; min-width: 7em; color: #673ab7;"
+                                               class="button button-big  button-raised ">Register</a>
+                                            <a href="proceesLogin()" style="margin-left: 0.6em;min-width: 7em;"
+                                               class="button button-big button-fill button-raised color-teal">Login</a>
+                                        </p>
+                                        <p class="row">
+                                            <a href="#forgotPassword" class="link">Forgot Password?</a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="tablet-25">
+                                    <p></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="list-block">
-                        <ul>
-                            <li><a href="admin.html" class="item-link">
-                                <div class="item-content">
-                                    <div class="item-inner">
-                                        <div class="item-title">About</div>
-                                    </div>
-                                </div>
-                            </a></li>
-                            <li><a href="admin.html" class="item-link">
-                                <div class="item-content">
-                                    <div class="item-inner">
-                                        <div class="item-title">Services</div>
-                                    </div>
-                                </div>
-                            </a></li>
-                        </ul>
+                </div>
+            </div>
+
+            <div data-page="register" class="page cached">
+                <div class="page-content">
+                    <div class="content-block-title">Register</div>
+                    <div class="content-block">
+                        <div class="content-block-inner">
+
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div data-page="forgotPassword" class="page cached">
+                <div class="page-content">
+                    <div class="content-block-title">Password Recovery</div>
+                    <div class="content-block">
+                        <div class="content-block-inner">
+                            <div class="list-block">
+                                <ul>
+                                    <li>
+                                        <p>Enter your email address, click <strong>[Reset Password]</strong> button and
+                                            we will send you
+                                            instructions on how to reset your password.
+
+                                        </p>
+
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <i class="f7-icons">email</i>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title floating-label">Email</div>
+                                                <div class="item-input">
+                                                    <input type="email" placeholder="Email"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="tablet-25 col-5"></div>
+                            <a href="resetPassword()" style="margin-left: 0.6em; "
+                               class="button button-big button-fill button-raised active tablet-50 col-90">Reset
+                                password</a>
+                            <div class="tablet-25 col-5"></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
