@@ -34,14 +34,19 @@ if (!isIos)
 }
 
 // Init Vue App
-var app = new Vue({
+export var nauth2App: any = new Vue({
     // Root Element
     el: '#app',
     // Framework7 Parameters
     framework7: {
         root: '#app', //Should be same as app el
         animateNavBackIcon: true,
-        routes: Routes,
+        // TODO routes: Routes,
+        // Enable Material theme for Android device only
+        material: isIos ? false : true,
+        // Enable Template7 pages
+        template7Pages: true,
+        pushState: true
     },
     // Custom App Data
     data: function ()
@@ -60,56 +65,46 @@ var app = new Vue({
     },
     // Custom App Methods
     methods: {
-        onF7Init: ()=>
+        onF7Init: (nauth2App)=>
         {
-            debugger;
-            console.log('f7-init');
+            // Init View
+            var nauth2MainView = nauth2App.addView('.view-main', {
+                // Material doesn't support it but don't worry about it
+                // F7 will ignore it for Material theme
+                dynamicNavbar: true,
 
+                //Needed to enable navigation between inline pages
+                domCache: true
+            });
+
+// set scripts based on client
+
+            (function ()
+            {
+                if (!isIos)
+                {
+                    Dom7('head').append(
+                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' +
+                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.colors.min.css">'
+                        + '<link rel="stylesheet" href="css/style.css">'
+                        + ' <link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
+                    );
+                }
+                else
+                {
+                    Dom7('head').append(
+                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' +
+                        '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">'
+                        +
+                        '<link rel="stylesheet" href="css/style.css">'
+                        +
+                        '<link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
+                    );
+                }
+            })();
         }
     }
 });
 
-// Init App
-export var nauth2App = new Framework7({
-    // Enable Material theme for Android device only
-    material: isIos ? false : true,
-    // Enable Template7 pages
-    template7Pages: true,
-    pushState: true
-});
 
-// Init View
-export var nauth2MainView = nauth2App.addView('.view-main', {
-    // Material doesn't support it but don't worry about it
-    // F7 will ignore it for Material theme
-    dynamicNavbar: true,
 
-    //Needed to enable navigation between inline pages
-    domCache: true
-});
-
-// set scripts based on client
-
-(function ()
-{
-    if (!isIos)
-    {
-        Dom7('head').append(
-            '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.material.min.css">' +
-            '<link rel="stylesheet" href="public/bower_components/Framework7/dist/css/framework7.material.colors.min.css">'
-            + '<link rel="stylesheet" href="css/style.css">'
-            + ' <link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
-        );
-    }
-    else
-    {
-        Dom7('head').append(
-            '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.min.css">' +
-            '<link rel="stylesheet" href="bower_components/Framework7/dist/css/framework7.ios.colors.min.css">'
-            +
-            '<link rel="stylesheet" href="css/style.css">'
-            +
-            '<link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
-        );
-    }
-})();
