@@ -42,7 +42,6 @@ export = (config: Types.INAuth2Config) =>
     app.set('view engine', 'ect');
     app.engine('ect', ectRenderer.render);
 
-
     function renderHtml(page?: string)
     {
         var result = (req, res, next)=>
@@ -65,8 +64,16 @@ export = (config: Types.INAuth2Config) =>
     app.get('/', renderHtml('index'));
     app.get('/:page.html', renderHtml());
 
-
     app.use(feathers.static(path.join(__dirname, 'public')));
+
+    /*
+     Returns basePath for API calls and other publicly available configuration
+     */
+    app.get('/config',
+        (req, res, next)=>
+        {
+            res.json({basePath: config.basePath});
+        });
 
 // app.use('/', feathers.static(path.join(__dirname, 'public')));
 

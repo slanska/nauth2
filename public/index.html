@@ -122,12 +122,13 @@
                                             <li>
                                                 <input-box className="item-content" type="text" icon="person"
                                                            label="Email or User Name"
-                                                           placeHolder="Email or User Name" ></input-box>
+                                                           placeHolder="Email or User Name"
+                                                           v-model="emailOrName"></input-box>
                                             </li>
                                             <li>
                                                 <input-box className="item-content" type="password" icon="lock"
                                                            label="Password"
-                                                           placeHolder="Password" ></input-box>
+                                                           placeHolder="Password" v-model="password"></input-box>
                                             </li>
 
 
@@ -190,7 +191,7 @@
                                 <ul>
                                     <li>
                                         <input-box className="item-content" type="email" icon="email" label="Email"
-                                                   placeHolder="Email"></input-box>
+                                                   placeHolder="Email" v-model="emailOrName"></input-box>
                                     </li>
                                 </ul>
                             </div>

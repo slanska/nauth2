@@ -8,14 +8,17 @@
  - user profile
  - roles
  - domains
- - domain edit
+ - domain edit (uses domainController)
  - log
 
  - create domain
  */
 
-import profileController = require('./profileController');
+import {ProfileController} from './profileController';
+import {DomainController} from './domainController';
 
-export function init2()
+export class AdminController
 {
+    private profileController = new ProfileController();
+    private domainController = new DomainController();
 }

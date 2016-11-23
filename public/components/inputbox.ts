@@ -26,6 +26,14 @@ inputBoxComponent['render'] = function (createElement)
             })
         ]));
 
+    var on = {
+        focus: self.onFocus,
+        blur: self.onBlur,
+        input: self.onInput,
+        change: self.onChange,
+        click: self.onClick
+    };
+
     var inputEl = [];
     if (!Framework7.prototype.device.ios)
     {
@@ -40,6 +48,7 @@ inputBoxComponent['render'] = function (createElement)
             attrs: {
                 type: self.type || 'text', placeholder: self.placeHolder || self.label
             },
+            on: on,
             domProps: {
                 value: self.value || '', placeholder: self.placeHolder || self.label
             }
@@ -60,6 +69,24 @@ inputBoxComponent.props = {
     'id': String,
     'name': String
 };
+
+inputBoxComponent.methods = (function ()
+{
+    var eventMethods = {
+        onInput: function (event)
+        {
+            this.$emit('input', event.target.value);
+        }
+    };
+    'Focus Blur Change Click'.split(' ').forEach(function (ev)
+    {
+        eventMethods['on' + ev] = function (event)
+        {
+            this.$emit(ev.toLowerCase(), event)
+        }
+    });
+    return eventMethods
+})() as any;
 
 
 export = inputBoxComponent;

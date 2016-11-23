@@ -8,8 +8,11 @@ import Vue = require('vue');
 var Framework7Vue = require('framework7-vue');
 
 import {registerComponents} from '../components/index';
+import {UserController} from './userController';
 
 Vue.use(Framework7Vue);
+
+var userController = new UserController();
 
 import _ = require('lodash');
 
@@ -107,11 +110,11 @@ export var nauth2App: any = new Vue({
         },
         proceedLogin: function ()
         {
-            console.log('proceedLogin' + this.emailOrName);
+            userController.login(this.emailOrName, this.password);
         },
-        resetPassword: function  ()
+        resetPassword: function ()
         {
-            console.log('resetPassword' + this.emailOrName);
+            userController.requestPasswordReset(this.emailOrName);
         }
     }
 });
