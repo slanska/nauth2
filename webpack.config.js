@@ -12,8 +12,7 @@ module.exports = {
     devtool: 'source-map',
     entry: {
         index: path.join(__dirname, './public/app/userController'),
-        admin: path.join(__dirname, './public/app/adminController'),
-        profile: path.join(__dirname, './public/app/profileController')
+        admin: path.join(__dirname, './public/app/adminController')
     },
 
     output: {
@@ -29,19 +28,22 @@ module.exports = {
             'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.js'),
             'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js')
         },
-        extensions: ['', '.ts', '.js', '.json', '.tsx']
+        extensions: ['', '.vue', '.ts', '.js', '.jsx', '.json', '.tsx']
     },
     // Empty list of plugins
     plugins: [],
+
     module: {
         loaders: [
             {
                 test: /\.vue$/,
-                loader: 'vue'
+                loader: 'vue',
+                exclude: /node_modules/
             },
             {
                 test: /\.css$/,
-                loader: "style!css"
+                loader: "style!css",
+                exclude: /node_modules/
             },
             {
                 test: /\.tsx?$/,

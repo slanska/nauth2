@@ -78,6 +78,7 @@
     "vue-template-compiler": "^2.0.8",
     "webdriverio": "^4.4.0",
     "webpack": "^1.13.3",
+    "webpack-node-externals": "^1.5.4",
     "webpack-typescript": "^0.5.6"
   }
 }

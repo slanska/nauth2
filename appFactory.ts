@@ -67,18 +67,17 @@ export = (config: Types.INAuth2Config) =>
     app.use(feathers.static(path.join(__dirname, 'public')));
 
     /*
-     Returns basePath for API calls and other publicly available configuration
+     Returns basePath for API calls and other publicly available configuration.
+     Unlike configurable base path (which is 'auth' by default), this path is obviously hardcoded.
      */
-    app.get('/config',
-        (req, res, next)=>
+    app.get('/auth/config',
+        (req, res)=>
         {
             res.json({basePath: config.basePath});
         });
 
-// app.use('/', feathers.static(path.join(__dirname, 'public')));
-
-// Just like Express your error middleware needs to be
-// set up last in your middleware chain.
+    // Just like Express your error middleware needs to be
+    // set up last in your middleware chain.
     app.use(errors({
         html: function (error, req, res, next)
         {
