@@ -32,6 +32,7 @@
     "feathers-client": "^1.6.2",
     "lodash": "^4.16.6",
     "fsmrouter": "*",
-    "framework7-icons": "^0.8.7"
+    "framework7-icons": "^0.8.7",
+    "promiz": "^1.0.6"
   }
 }

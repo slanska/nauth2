@@ -26,7 +26,8 @@ module.exports = {
             'framework7-vue': path.join(__dirname, './public/bower_components/Framework7-Vue/dist/framework7-vue.js'),
             'feathers-client': path.join(__dirname, './public/bower_components/feathers-client/dist/feathers.js'),
             'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.js'),
-            'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js')
+            'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js'),
+            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js')
         },
         extensions: ['', '.vue', '.ts', '.js', '.jsx', '.json', '.tsx']
     },
@@ -35,11 +36,11 @@ module.exports = {
 
     module: {
         loaders: [
-            // {
-            //     test: /\.vue$/,
-            //     loader: 'vue',
-            //     exclude: /node_modules/
-            // },
+            {
+                test: /\.vue$/,
+                loader: 'vue',
+                exclude: /node_modules/
+            },
             {
                 test: /\.css$/,
                 loader: "style!css",

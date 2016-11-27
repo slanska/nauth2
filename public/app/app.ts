@@ -12,7 +12,10 @@ import Vue = require('vue');
 var Framework7Vue = require('framework7-vue');
 import {registerComponents} from '../components/index';
 import _ = require('lodash');
+var feathers = require('feathers-client');
+var Promise = require('promiz');
 
+global.Promise = Promise;
 Vue.use(Framework7Vue);
 
 var isAndroid = Framework7.prototype.device.android === true;
@@ -119,6 +122,22 @@ export var appConfig = {
         // }
     }
 } as vuejs.ComponentOption;
+
+/*
+ Returns promise which resolves to auth configuration
+ */
+var _authConfig = null;
+export function getAuthConfig(): Promise<any>
+{
+    if (_authConfig)
+        return Promise.resolve(_authConfig);
+
+    return new Promise((resolve, reject) =>
+    {
+        // feathers.
+    });
+
+}
 
 
 

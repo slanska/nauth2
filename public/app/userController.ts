@@ -29,6 +29,7 @@ class UserController
      */
     public login(emailOrName: string, password: string)
     {
+
     }
 
     /*
@@ -62,7 +63,14 @@ class UserController
 
 
 var userController = new UserController();
-appConfig.methods['proceedLogin'] = userController.login;
-appConfig.methods['resetPassword'] = userController.register;
+appConfig.methods['proceedLogin'] = () =>
+{
+    return userController.login(this.emailOrName, this.password);
+};
+
+appConfig.methods['resetPassword'] = () =>
+{
+    return userController.requestPasswordReset(this.emailOrPassword);
+};
 
 export var nauth2App: any = new Vue(appConfig);
