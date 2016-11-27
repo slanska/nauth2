@@ -4,17 +4,16 @@
 
 ///<reference path="../../typings/browser.d.ts"/>
 
+/*
+ Helper class for application initialization
+ */
+
 import Vue = require('vue');
 var Framework7Vue = require('framework7-vue');
-
 import {registerComponents} from '../components/index';
-import {UserController} from './userController';
+import _ = require('lodash');
 
 Vue.use(Framework7Vue);
-
-var userController = new UserController();
-
-import _ = require('lodash');
 
 var isAndroid = Framework7.prototype.device.android === true;
 var isIos = Framework7.prototype.device.ios === true;
@@ -26,6 +25,7 @@ Template7.global = {
 
 registerComponents();
 
+// TODO ?? Needed
 var $$ = Dom7;
 
 if (!isIos)
@@ -37,8 +37,8 @@ if (!isIos)
 }
 
 
-// Init Vue App
-export var nauth2App: any = new Vue({
+// Vue app configuration
+export var appConfig = {
     // Root Element
     el: '#app',
 
@@ -54,7 +54,7 @@ export var nauth2App: any = new Vue({
         pushState: true
     },
     // Custom App Data
-    data: ()=>
+    data: () =>
     {
         return {
             emailOrName: '',
@@ -74,7 +74,7 @@ export var nauth2App: any = new Vue({
     },
     // Custom App Methods
     methods: {
-        onF7Init: (nauth2App)=>
+        onF7Init: (nauth2App) =>
         {
             // Init View
             var nauth2MainView = nauth2App.addView('.view-main', {
@@ -107,17 +107,20 @@ export var nauth2App: any = new Vue({
                     '<link rel="stylesheet" href="./bower_components/framework7-icons/css/framework7-icons.css">'
                 );
             }
-        },
-        proceedLogin: function ()
-        {
-            userController.login(this.emailOrName, this.password);
-        },
-        resetPassword: function ()
-        {
-            userController.requestPasswordReset(this.emailOrName);
         }
+        // ,
+        // proceedLogin: function ()
+        // {
+        //     userController.login(this.emailOrName, this.password);
+        // },
+        // resetPassword: function ()
+        // {
+        //     userController.requestPasswordReset(this.emailOrName);
+        // }
     }
-});
+} as vuejs.ComponentOption;
+
+
 
 
 

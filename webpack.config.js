@@ -11,8 +11,8 @@ var path = require('path');
 module.exports = {
     devtool: 'source-map',
     entry: {
-        index: path.join(__dirname, './public/app/userController'),
-        admin: path.join(__dirname, './public/app/adminController')
+        index: path.join(__dirname, './public/app/userController.ts'),
+        admin: path.join(__dirname, './public/app/adminController.ts')
     },
 
     output: {
@@ -35,11 +35,11 @@ module.exports = {
 
     module: {
         loaders: [
-            {
-                test: /\.vue$/,
-                loader: 'vue',
-                exclude: /node_modules/
-            },
+            // {
+            //     test: /\.vue$/,
+            //     loader: 'vue',
+            //     exclude: /node_modules/
+            // },
             {
                 test: /\.css$/,
                 loader: "style!css",

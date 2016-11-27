@@ -12,16 +12,15 @@
  - reset password request
  - view/edit profile (via profileController)
  - invite other users
-
-
  */
 
-import {ProfileController} from "./profileController";
 var F7Vue = require('framework7-vue');
 import _ = require('lodash');
-import app = require('./app');
+import {appConfig} from './app';
+import {ProfileController} from "./profileController";
+import Vue = require('vue');
 
-export class UserController
+class UserController
 {
     private profileController = new ProfileController();
 
@@ -60,3 +59,10 @@ export class UserController
     {
     }
 }
+
+
+var userController = new UserController();
+appConfig.methods['proceedLogin'] = userController.login;
+appConfig.methods['resetPassword'] = userController.register;
+
+export var nauth2App: any = new Vue(appConfig);
