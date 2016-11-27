@@ -27,7 +27,6 @@ import hooks = require('feathers-hooks');
 import feathers = require('feathers');
 import bcrypt = require('bcryptjs');
 
-var env = process.env.NODE_ENV || 'development';
 import config = require('../config/index');
 
 import initRuntimeConfig = require('../lib/middleware/initRuntimeConfig');
