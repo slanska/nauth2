@@ -16,7 +16,7 @@
 
 var F7Vue = require('framework7-vue');
 import _ = require('lodash');
-import {appConfig} from './app';
+import {initApp} from './app';
 import {ProfileController} from "./profileController";
 import Vue = require('vue');
 
@@ -29,7 +29,7 @@ class UserController
      */
     public login(emailOrName: string, password: string)
     {
-
+        console.log(`login: ${emailOrName}, ${password}`);
     }
 
     /*
@@ -37,6 +37,7 @@ class UserController
      */
     public requestPasswordReset(email: string)
     {
+        console.log(`requestPasswordReset: ${email}`);
     }
 
     /*
@@ -61,16 +62,21 @@ class UserController
     }
 }
 
-
 var userController = new UserController();
-appConfig.methods['proceedLogin'] = () =>
-{
-    return userController.login(this.emailOrName, this.password);
-};
 
-appConfig.methods['resetPassword'] = () =>
-{
-    return userController.requestPasswordReset(this.emailOrPassword);
-};
-
-export var nauth2App: any = new Vue(appConfig);
+var app = initApp({
+        emailOrName: '',
+        password: '',
+        confirmPassword: '',
+        rememberMe: true
+    },
+    {
+        resetPassword: () =>
+        {
+            return userController.requestPasswordReset(app.emailOrName);
+        },
+        proceedLogin: () =>
+        {
+            return userController.login(app.emailOrName, app.password);
+        }
+    });

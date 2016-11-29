@@ -33,6 +33,7 @@
     "lodash": "^4.16.6",
     "fsmrouter": "*",
     "framework7-icons": "^0.8.7",
-    "promiz": "^1.0.6"
+    "promiz": "^1.0.6",
+    "axios": "^0.15.2"
   }
 }

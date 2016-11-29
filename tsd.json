@@ -100,6 +100,9 @@
     },
     "phantomjs/phantomjs.d.ts": {
       "commit": "f5ab2df94e1aabf0fc6d783ad01c4c4671760627"
+    },
+    "axios/axios.d.ts": {
+      "commit": "74b1c0a2c243f5c81b948470f5400596c562fd92"
     }
   }
 }

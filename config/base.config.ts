@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-04.
  */
 
-import NAuth = require('../lib/Router');
+import NAuth = require('../lib/index');
 import * as Types from '../lib/Types';
 import path = require('path');
 var knexConfig = require('../schema/knexfile');

@@ -2,12 +2,159 @@
 
 <% block 'body' : %>
 
-Users
+<!-- Put panels-overlay and left-panel with view inside of views-->
+<!-- Panels overlay-->
+<div class="panel-overlay"></div>
+<!-- Left panel with reveal effect-->
+<div class="panel panel-left panel-cover layout-dark">
+    <!-- Left view-->
+    <div class="view view-left navbar-through">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="left"></div>
+                <div class="center sliding">Left View</div>
+                <div class="right"></div>
+            </div>
+        </div>
+        <div class="pages">
+            <div data-page="index-left" class="page layout-dark">
+                <div class="page-content">
+                    <div class="content-block-title">Control Main View</div>
+                    <div class="list-block">
+                        <ul>
+                            <li>
+                                <a href="#users" data-view=".view-main" class="item-link  close-panel">
 
-Roles
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="f7-icons">persons</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Users</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#roles" data-view=".view-main" class="item-link close-panel">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="f7-icons">check_round</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Roles</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <% if @appConfig?.subDomains : %>
+                            <li>
+                                <a href="#domains" data-view=".view-main" class="item-link close-panel">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="f7-icons">collection</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Domains</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <% end %>
+                            <li>
+                                <a href="#log" data-view=".view-main" class="item-link close-panel">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="f7-icons">list</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Log Viewer</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-Domains
+<div class="view view-main navbar-through">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="center sliding">Main View</div>
+            <div class="right"><a href="#" data-panel="left" class="link open-panel icon-only"><i
+                    class="icon icon-bars"></i></a></div>
+        </div>
+    </div>
 
-ManageUser
+    <div class="pages layout-white">
+        <!-- Page, data-page contains page name-->
+        <div data-page="users" class="page" id="usersPage">
+            <!-- Scrollable page content-->
+            <div class="page-content">
+                <!--<div class="content-block-title">Login</div>-->
+                <div class="content-block">
+                    <div class="content-block-inner">
+                        <div class="row">
+                            <h3>Users</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-page="roles" class="page" id="rolesPage">
+            <!-- Scrollable page content-->
+            <div class="page-content">
+                <!--<div class="content-block-title">Login</div>-->
+                <div class="content-block">
+                    <div class="content-block-inner">
+                        <div class="row">
+                            <h3>Roles</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <% if @appConfig?.subDomains : %>
+        <div data-page="domains" class="page" id="domainsPage">
+            <!-- Scrollable page content-->
+            <div class="page-content">
+                <!--<div class="content-block-title">Login</div>-->
+                <div class="content-block">
+                    <div class="content-block-inner">
+                        <div class="row">
+                            <h3>Domains</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% end %>
+
+
+        <div data-page="log" class="page" id="logPage">
+            <!-- Scrollable page content-->
+            <div class="page-content">
+                <!--<div class="content-block-title">Login</div>-->
+                <div class="content-block">
+                    <div class="content-block-inner">
+                        <div class="row">
+                            <h3>Log Viewer</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<% end %>
+
+<% block 'scripts' : %>
+<script src="./_build/admin.js"></script>
 <% end %>

@@ -27,7 +27,8 @@ module.exports = {
             'feathers-client': path.join(__dirname, './public/bower_components/feathers-client/dist/feathers.js'),
             'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.js'),
             'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js'),
-            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js')
+            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js'),
+            'axios': path.join(__dirname, './public/bower_components/axios/dist/axios.js')
         },
         extensions: ['', '.vue', '.ts', '.js', '.jsx', '.json', '.tsx']
     },

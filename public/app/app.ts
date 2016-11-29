@@ -13,9 +13,9 @@ var Framework7Vue = require('framework7-vue');
 import {registerComponents} from '../components/index';
 import _ = require('lodash');
 var feathers = require('feathers-client');
-var Promise = require('promiz');
+// var Promise = require('promiz');
 
-global.Promise = Promise;
+// global.Promise = Promise;
 Vue.use(Framework7Vue);
 
 var isAndroid = Framework7.prototype.device.android === true;
@@ -39,9 +39,16 @@ if (!isIos)
     $$('.view .navbar').prependTo('.view .page');
 }
 
+var appData: any = {
+    popupOpened: false,
+    loginScreenOpened: false,
+    pickerOpened: false,
+    actionsOpened: false
+};
+
 
 // Vue app configuration
-export var appConfig = {
+var appConfig = {
     // Root Element
     el: '#app',
 
@@ -59,21 +66,7 @@ export var appConfig = {
     // Custom App Data
     data: () =>
     {
-        return {
-            emailOrName: '',
-            password: '',
-            confirmPassword: '',
-            rememberMe: true,
-            user: {
-                name: 'Vladimir',
-                lastName: 'Kharlampidi',
-                age: 30
-            },
-            popupOpened: false,
-            loginScreenOpened: false,
-            pickerOpened: false,
-            actionsOpened: false
-        };
+        return appData;
     },
     // Custom App Methods
     methods: {
@@ -111,15 +104,6 @@ export var appConfig = {
                 );
             }
         }
-        // ,
-        // proceedLogin: function ()
-        // {
-        //     userController.login(this.emailOrName, this.password);
-        // },
-        // resetPassword: function ()
-        // {
-        //     userController.requestPasswordReset(this.emailOrName);
-        // }
     }
 } as vuejs.ComponentOption;
 
@@ -135,8 +119,18 @@ export function getAuthConfig(): Promise<any>
     return new Promise((resolve, reject) =>
     {
         // feathers.
-    });
 
+    });
+}
+
+/*
+
+ */
+export function initApp(data: Object, methods: {[name: string]: Function})
+{
+    appData = _.merge(appData, data);
+    appConfig.methods = _.merge(appConfig.methods, methods);
+    return new Vue(appConfig);
 }
 
 

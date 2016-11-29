@@ -48,7 +48,7 @@ export = (config: Types.INAuth2Config) =>
         {
             if (!page)
                 page = req.params.page;
-            ectRenderer.render(page, {}, (error, html) =>
+            ectRenderer.render(page, {appConfig: config}, (error, html) =>
             {
                 if (error)
                     next(error);
@@ -62,7 +62,7 @@ export = (config: Types.INAuth2Config) =>
     }
 
     app.get('/', renderHtml('index'));
-    app.get('/:page.html', renderHtml());
+    app.get('/:page', renderHtml());
 
     app.use(feathers.static(path.join(__dirname, 'public')));
 
