@@ -28,7 +28,7 @@ module.exports = {
             'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.js'),
             'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js'),
             'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js'),
-            'axios': path.join(__dirname, './public/bower_components/axios/dist/axios.js')
+            'jquery': path.join(__dirname, './public/bower_components/jquery/dist/jquery.js')
         },
         extensions: ['', '.vue', '.ts', '.js', '.jsx', '.json', '.tsx']
     },

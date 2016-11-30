@@ -13,6 +13,7 @@ var Framework7Vue = require('framework7-vue');
 import {registerComponents} from '../components/index';
 import _ = require('lodash');
 var feathers = require('feathers-client');
+import $ = require('jquery');
 // var Promise = require('promiz');
 
 // global.Promise = Promise;
@@ -132,6 +133,9 @@ export function initApp(data: Object, methods: {[name: string]: Function})
     appConfig.methods = _.merge(appConfig.methods, methods);
     return new Vue(appConfig);
 }
+
+export var feathersApp = feathers();
+feathersApp.configure(rest(),jquery($));
 
 
 
