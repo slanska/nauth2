@@ -6,7 +6,7 @@
 ///<reference path="feathers.d.ts"/>
 /// <reference path="bluebird/bluebird-2.0.d.ts" />
 /// <reference path="vue/vue.d.ts" />
-/// <reference path="jquery/jquery.d.ts" />
+/// <reference path="webix/webix.d.ts" />
 
 declare var Framework7;
 declare var Template7;

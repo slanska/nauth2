@@ -109,6 +109,9 @@
     },
     "jquery.dataTables/jquery.dataTables.d.ts": {
       "commit": "43f460ab2d1de304886e6eeba6cbb3d213e8949b"
+    },
+    "webix/webix.d.ts": {
+      "commit": "e2af6d0bd5dffabdb363e779c5ab7f47e6ff3423"
     }
   }
 }

@@ -15,6 +15,10 @@ module.exports = {
         admin: path.join(__dirname, './public/app/adminController.ts')
     },
 
+    externals: {
+        'webix': path.join(__dirname, './public/bower_components/webix/codebase/webix.js')
+    },
+
     output: {
         path: './public/_build',
         filename: "[name].js",
@@ -27,8 +31,8 @@ module.exports = {
             'feathers-client': path.join(__dirname, './public/bower_components/feathers-client/dist/feathers.js'),
             'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.js'),
             'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js'),
-            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js'),
-            'jquery': path.join(__dirname, './public/bower_components/jquery/dist/jquery.js')
+            'webix': path.join(__dirname, './public/bower_components/webix/codebase/webix.js'),
+            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js')
         },
         extensions: ['', '.vue', '.ts', '.js', '.jsx', '.json', '.tsx']
     },

@@ -33,9 +33,7 @@
     "lodash": "^4.16.6",
     "fsmrouter": "*",
     "framework7-icons": "^0.8.7",
-    "jquery": "^3.1.1",
-    "datatables.net": "^1.10.12",
-    "datatables.net-dt": "^1.10.12",
-    "font-awesome": "^4.7.0"
+    "webix": "^4.1.0",
+    "promiz": "^1.0.6"
   }
 }

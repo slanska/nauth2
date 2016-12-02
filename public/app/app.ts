@@ -13,10 +13,8 @@ var Framework7Vue = require('framework7-vue');
 import {registerComponents} from '../components/index';
 import _ = require('lodash');
 var feathers = require('feathers-client');
-import $ = require('jquery');
-// var Promise = require('promiz');
+var Promise = require('promiz');
 
-// global.Promise = Promise;
 Vue.use(Framework7Vue);
 
 var isAndroid = Framework7.prototype.device.android === true;
@@ -108,6 +106,7 @@ var appConfig = {
     }
 } as vuejs.ComponentOption;
 
+
 /*
  Returns promise which resolves to auth configuration
  */
@@ -135,7 +134,7 @@ export function initApp(data: Object, methods: {[name: string]: Function})
 }
 
 export var feathersApp = feathers();
-feathersApp.configure(rest(),jquery($));
+// feathersApp.configure(rest(),jquery($));
 
 
 

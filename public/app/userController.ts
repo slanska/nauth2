@@ -64,7 +64,7 @@ class UserController
 
 var userController = new UserController();
 
-var app = initApp({
+var app:any = initApp({
         emailOrName: '',
         password: '',
         confirmPassword: '',
