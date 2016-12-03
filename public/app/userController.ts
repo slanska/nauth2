@@ -38,13 +38,13 @@ class UserController
             })
             .then(res =>
             {
+                // store access token
+                window.localStorage.setItem('nauth2.accessToken', res.accessToken);
                 if (rememberMe)
                 // store refresh token
                 {
-
+                    window.localStorage.setItem('nauth2.refreshToken', res.refreshToken);
                 }
-
-                // store access token
 
                 // show toast message
                 // TODO Translate
@@ -52,6 +52,9 @@ class UserController
                 toast('Successfully logged in');
 
                 // redirect to landing page
+                // admin - for admin, user admin
+                // change password
+                // home page for regular users
             })
             .catch(err =>
             {
@@ -65,28 +68,67 @@ class UserController
      */
     public requestPasswordReset(email: string)
     {
-        console.log(`requestPasswordReset: ${email}`);
+        // Validate email
+        F7App.showPreloader('Processing...');
+        return getAuthConfig()
+            .then(cfg =>
+            {
+                var url = `${cfg.basePath}/resetPassword`;
+                return http.post(url, {email: email});
+            })
+            .then(res =>
+            {
+                // Redirect
+
+                // TODO Translate
+
+                F7App.hidePreloader();
+                F7App.alert('Success!', `Password reset request has been emailed to ${email}`);
+            })
+            .catch(err =>
+            {
+                F7App.hidePreloader();
+                showError(err);
+            });
     }
 
     /*
      TODO IUserObject
      */
-    public register()
+    public register(userData)
     {
+        F7App.showPreloader();
+        var url = ``;
+        return http.post(url, userData)
+            .then(res =>
+            {
+            })
+            .catch(err =>
+            {
+                F7App.hidePreloader();
+            });
     }
 
     /*
      User is expected to be logged in
      */
-    public changePassword()
+    public changePassword(oldPassword: string, newPassword: string, confirmPassword: string)
     {
+
     }
 
     /*
+     Only authenticated user can invite another prospective user
      TODO Use row
      */
     public invite(email: string, salutaion: string, firstName: string, lastName: string)
     {
+
+    }
+
+    public logout()
+    {
+        // TODO redirect to
     }
 }
 
@@ -106,5 +148,19 @@ var app: any = initApp({
         proceedLogin: () =>
         {
             return userController.login(app.emailOrName, app.password, app.rememberMe);
+        },
+        register: () =>
+        {
+            var userData = {} as any;
+            return userController.register(userData);
+        },
+        invite: () =>
+        {
+            return userController.invite(app.emailOrName, app.salutation, app.firstName, app.lastName);
+        },
+        logout: () =>
+        {
+            return userController.logout();
         }
+
     });

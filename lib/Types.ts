@@ -21,27 +21,27 @@ namespace Types
          */
         Auto = 0,
 
-        /*
-         Only authorized users can add new user. /register is not allowed
-         */
+            /*
+             Only authorized users can add new user. /register is not allowed
+             */
         ByAdminOnly = 1,
 
-        /*
-         New user can register and email with confirmation link will be sent. Once link is processed,
-         user becomes a registered member
-         */
+            /*
+             New user can register and email with confirmation link will be sent. Once link is processed,
+             user becomes a registered member
+             */
         SelfAndConfirm = 2,
 
-        /*
-         Prospective member fill registration form, user admin(s) will be notified via email and
-         either approve or reject a new user. User will be notified via email
-         */
+            /*
+             Prospective member fill registration form, user admin(s) will be notified via email and
+             either approve or reject a new user. User will be notified via email
+             */
         SelfAndApproveByAdmin = 3,
 
-        /*
-         A new user fills registration form and immediately becomes registered. User admin(s) will
-         get notified via email
-         */
+            /*
+             A new user fills registration form and immediately becomes registered. User admin(s) will
+             get notified via email
+             */
         SelfStart = 4
     }
 
@@ -61,49 +61,49 @@ namespace Types
 
          Default: 'auth'
          */
-        basePath?:string;
+        basePath?: string;
 
         /*
          Your secret used to sign JWT's.
          If this gets compromised you need to rotate it immediately!
          (default: a strong auto generated one)
          */
-        tokenSecret?:string,
+        tokenSecret?: string,
 
         /*
          Lifetime of access token. By default: '1d'
          */
-        tokenExpiresIn?:string;
+        tokenExpiresIn?: string;
 
         /*
          Lifetime of refresh token. By default: '15 days'
          */
-        refreshTokenExpiresIn?:string;
+        refreshTokenExpiresIn?: string;
 
         /*
          Lifetime of token sent after user registration.
          Default: '1 day'
          */
-        confirmTokenExpiresIn?:string;
+        confirmTokenExpiresIn?: string;
 
         /*
          Optional configuration for subdomains.
          Based on configuration: https://github.com/patmood/wildcard-subdomains
 
          */
-        subDomains?:{
+        subDomains?: {
             /*
              Ignore 'www' subdomain
              Default: true
              */
-            www?:boolean;
+            www?: boolean;
 
             /*
              Prepended to the path
              Default: '_sub'.
              Example: mydomain.example.com -> example.com/_sub/mydomain
              */
-            namespace?:string;
+            namespace?: string;
         };
 
         /*
@@ -111,43 +111,43 @@ namespace Types
          If true, users with role [Domain Admin] can create domain specific roles
          Default: false
          */
-        allowDomainRoles?:boolean;
+        allowDomainRoles?: boolean;
 
         /*
          Roles assigned to a new member upon creation/registration
          Array of role names
          Default: none
          */
-        newMemberRoles?:string[];
+        newMemberRoles?: string[];
 
         /*
          Defines how new users will be registered.
          Default: ByAdminOnly
          */
-        userCreateMode?:UserCreateMode;
+        userCreateMode?: UserCreateMode;
 
         /*
          Path to email templates.
          Default: /templates
          */
-        templatePath?:string;
+        templatePath?: string;
 
         /*
          Knex configuration for database connection
          */
-        dbConfig:knex.Config;
+        dbConfig: knex.Config;
 
         /*
          configuration to send emails
          */
-        emailTransport:nodemailer.Transporter;
+        emailTransport: nodemailer.Transporter;
 
         /*
          If true, newly created domains will have their paths reversed from their names
          I.e. name 'state.county.city' will be converted to path 'city.county.state'.
          Default: false
          */
-        reverseDomainPath?:boolean;
+        reverseDomainPath?: boolean;
 
         /*
          Regular expression for good password validation.
@@ -167,24 +167,24 @@ namespace Types
 
          If password does not match rules, message 'WeakPassword' from templates/phrases.json will be sent back
          */
-        passwordRules?:string|RegExp,
+        passwordRules?: string|RegExp,
 
         /*
          Your company name, to be included into emails etc.
          By default: 'YOUR_COMPANY_NAME'
          */
-        companyName?:string,
+        companyName?: string,
 
         /*
          Company contact information. Used for rendering view and email footers
          */
-        contactInfo?:{
-            addressLine1:string,
-            addressLine2?:string,
-            city:string,
-            provinceOrState:string,
-            postalCode:string,
-            country:string
+        contactInfo?: {
+            addressLine1: string,
+            addressLine2?: string,
+            city: string,
+            provinceOrState: string,
+            postalCode: string,
+            country: string
         },
 
         /*
@@ -194,17 +194,17 @@ namespace Types
         /*
          Link to navigate after user clicked [Confirm my email] link in email
          */
-        afterConfirmEmailEndpoint?:string,
+        afterConfirmEmailEndpoint?: string,
 
         /*
          Link to navigate after user clicked [Change password] link in email
          */
-        changePasswordEndpoint?:string,
+        changePasswordEndpoint?: string,
 
         /*
          Base link to navigate for taking action for the given user
          */
-        userProfileEndpoint?:string,
+        userProfileEndpoint?: string,
 
         /*
          Runtime mode for NAuth2.
@@ -212,8 +212,11 @@ namespace Types
          In website mode simple integrated SPA application will be used (see /public for content)
          *Endpoint links are optional. If not set, integrated endpoints will be used
          Default value: 'website'
+
+         TODO? Confirm design: apiservice/website dilemman may be not relevant as type of application
+         can be determined based on AJAX and non-AJAX calls
          */
-        run_mode:'apiservice'|'website',
+        run_mode: 'apiservice'|'website',
 
         /*
          Publicly available web address to be used for interaction with user
@@ -224,7 +227,7 @@ namespace Types
 
          By default publicHostUrl = request.headers.host + '/' + basePath
          */
-        publicHostUrl?:string;
+        publicHostUrl?: string;
 
         /*
          'from' email used to send all generated messages to the users
@@ -232,39 +235,62 @@ namespace Types
          (publicHostUrl will have website url portion only, e.g.
          if publicHostUrl == 'www.example.com/auth', then email will have 'example.com' only)
          */
-        supportEmail?:string;
+        supportEmail?: string;
 
         /*
          Link to end user's Terms of Service.
          By default: link to /templates/<language>/termsOfService.html
          */
-        termsOfServiceUrl?:string;
+        termsOfServiceUrl?: string;
 
         /*
          true if running in development/debug mode (process.env.ENV === 'development').
          Default: false
          */
-        debug?:boolean;
+        debug?: boolean;
 
         /*
          UI settings for embedded website
          */
-        ui?:{
+        ui?: {
             /*
              default: auto
              */
-            skin?:'auto' | 'ios' | 'material',
+            skin?: 'auto' | 'ios' | 'material',
 
             /*
              default: white
              */
-            theme?:'white' | 'dark',
+            theme?: 'white' | 'dark',
 
             /*
              default: blue
              */
-            color?:string
-        }
+            color?: string
+        },
+
+        /*
+        List of supported cultures
+        Default: ['en']
+         */
+        supportedCultures?: string[];
+
+        /*
+         List of fields from nauth2_users table to be filled in during registration.
+         Default: ['email', 'userName']
+         Item can be:
+         * array of strings
+         * object with field names as keys
+         */
+        registerFields?: string[];
+
+        /*
+         List of extra fields from nauth2_users table to be viewed/edited in user profile/registration forms.
+         Complete list of fields in user profile is determined by joining registerFields and extraUserProfileFields
+         Default: ['firstName', 'lastName', 'gender', 'birthDate', 'avatar', 'culture']
+         */
+        extraUserProfileFields?: string[];
+
     }
 
     /*
@@ -274,38 +300,38 @@ namespace Types
      */
     export interface ICaptcha
     {
-        hash:string
-        value?:string,
-        imageBase64?:string
+        hash: string
+        value?: string,
+        imageBase64?: string
     }
 
     /*
      Function to be used as template builder (e.g. for dynamic email subject texts)
      */
-    export type TemplateFunction = (params:Object)=>string;
+    export type TemplateFunction = (params: Object)=>string;
 
     /*
 
      */
     export interface IUserRecord
     {
-        userId:number;
-        name:string;
-        password:string;
-        email:string;
-        created_at:Date;
-        updated_at:Date;
-        firstName?:string;
-        lastName?:string;
-        extData?:Object;
-        status?:'A'|'P'|'D'|'S';
-        birthData?:Date;
-        gender?:string;
-        avatar?:string;
-        culture?:string;
-        maxCreatedDomains?:number;
-        changePasswordOnNextLogin?:boolean;
-        pwdSalt:string;
+        userId: number;
+        name: string;
+        password: string;
+        email: string;
+        created_at: Date;
+        updated_at: Date;
+        firstName?: string;
+        lastName?: string;
+        extData?: Object;
+        status?: 'A'|'P'|'D'|'S';
+        birthData?: Date;
+        gender?: string;
+        avatar?: string;
+        culture?: string;
+        maxCreatedDomains?: number;
+        changePasswordOnNextLogin?: boolean;
+        pwdSalt: string;
         // TODO TBC
     }
 
@@ -314,14 +340,14 @@ namespace Types
      */
     export interface IDomainRecord
     {
-        domainId:number;
+        domainId: number;
         // TODO TBC
     }
 
     export interface INAuth2Controller
     {
-        AuthConfig:authentication.AuthConfig;
-        cfg:Types.INAuth2Config;
+        AuthConfig: authentication.AuthConfig;
+        cfg: Types.INAuth2Config;
     }
 
     /*
@@ -329,15 +355,15 @@ namespace Types
      */
     export interface IRefreshTokenRecord
     {
-        tokenUuid:string;
-        userId:number;
-        userAgent:Object;
-        ipAddress:string;
-        validUntil:Date;
-        state:string;
-        signatureHash:string;
-        created_at:Date;
-        updated_at:Date;
+        tokenUuid: string;
+        userId: number;
+        userAgent: Object;
+        ipAddress: string;
+        validUntil: Date;
+        state: string;
+        signatureHash: string;
+        created_at: Date;
+        updated_at: Date;
     }
 }
 

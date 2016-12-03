@@ -250,4 +250,10 @@ jsonwebtoken
 object-hash
 bcryptjs
 wildcard-subdomains
+webix
+pureCSS
 
+### License
+
+Most of project is MIT licensed.
+Stuff under **/public** is GPL licensed (due to licensing policy of [Webix](www.webix.com) library)

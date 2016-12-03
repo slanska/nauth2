@@ -190,6 +190,8 @@ export class http
             options.error = (xhr, status) =>
             {
                 var error = xhr.response;
+                if (xhr.status === 404)
+                    return reject(`${xhr.status}: ${url} not found`);
                 if (typeof error === 'string')
                     error = JSON.parse(error);
                 return reject(error);

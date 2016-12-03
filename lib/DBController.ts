@@ -37,6 +37,7 @@ module NAuth2
             Login:string;
             DomainRegister?:string;
             DomainLogin?:string;
+            ResetPassword?:string;
         };
 
         Services:{
@@ -422,7 +423,8 @@ module NAuth2
                 Roles: `${cfg.basePath}/roles`,
                 UserRoles: `${cfg.basePath}/userroles`,
                 Log: `${cfg.basePath}/log`,
-                Login: `${cfg.basePath}/login`
+                Login: `${cfg.basePath}/login`,
+                ResetPassword: `${cfg.basePath}/resetPassword`
             };
 
             this.Services = {} as any;
