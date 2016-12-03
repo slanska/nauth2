@@ -13,97 +13,14 @@
 
 <!-- Status bar overlay for fullscreen mode-->
 <div class="statusbar-overlay"></div>
-<!-- Right panel with cover effect-->
-<div class="layout-dark">
-    <div class="panel panel-right panel-reveal layout-dark">
-        <div class="content-block">
-            <p>Right panel content goes here</p>
-            <p>Right panel content goes here</p>
-            <p>Right panel content goes here</p>
-            <p>Right panel content goes here</p>
-        </div>
-    </div>
-</div>
 <!-- Views-->
 <div class="views">
-    <!-- Put panels-overlay and left-panel with view inside of views-->
-    <!-- Panels overlay-->
-    <!--<div class="panel-overlay"></div>-->
-    <!--&lt;!&ndash; Left panel with reveal effect&ndash;&gt;-->
-    <!--<div class="panel panel-left panel-cover layout-dark">-->
-        <!--&lt;!&ndash; Left view&ndash;&gt;-->
-        <!--<div class="view view-left navbar-through">-->
-            <!--<div class="navbar">-->
-                <!--<div class="navbar-inner">-->
-                    <!--<div class="left"></div>-->
-                    <!--<div class="center sliding">Left View</div>-->
-                    <!--<div class="right"></div>-->
-                <!--</div>-->
-            <!--</div>-->
-            <!--<div class="pages">-->
-                <!--<div data-page="index-left" class="page layout-dark">-->
-                    <!--<div class="page-content">-->
-                        <!--<div class="content-block-title">Left View Links</div>-->
-                        <!--<div class="list-block">-->
-                            <!--<ul>-->
-                                <!--<li><a href="left-page-1.html" class="item-link">-->
-                                    <!--<div class="item-content">-->
-                                        <!--<div class="item-inner">-->
-                                            <!--<div class="item-title">Left Page 1</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</a></li>-->
-                                <!--<li><a href="left-page-2.html" class="item-link">-->
-                                    <!--<div class="item-content">-->
-                                        <!--<div class="item-inner">-->
-                                            <!--<div class="item-title">Left Page 2</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</a></li>-->
-                            <!--</ul>-->
-                        <!--</div>-->
-                        <!--<div class="content-block-title">Control Main View</div>-->
-                        <!--<div class="list-block">-->
-                            <!--<ul>-->
-                                <!--<li><a href="#login" data-view=".view-main" class="item-link  close-panel">-->
-                                    <!--<div class="item-content">-->
-                                        <!--<div class="item-inner">-->
-                                            <!--<div class="item-title">Login</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</a></li>-->
-                                <!--<li><a href="#register" data-view=".view-main" class="item-link close-panel">-->
-                                    <!--<div class="item-content">-->
-                                        <!--<div class="item-inner">-->
-                                            <!--<div class="item-title">Register</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</a></li>-->
-                                <!--<li><a href="#" data-view=".view-main" class="back item-link close-panel">-->
-                                    <!--<div class="item-content">-->
-                                        <!--<div class="item-inner">-->
-                                            <!--<div class="item-title">Back in history</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</a></li>-->
-                            <!--</ul>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-    <!-- Right view, it is main view-->
-    <div class="view view-main navbar-through">
-        <div class="navbar">
-            <div class="navbar-inner">
-                <div class="center sliding">Main View</div>
-                <div class="right"><a href="#" data-panel="left" class="link open-panel icon-only"><i
-                        class="icon icon-bars"></i></a></div>
-            </div>
+    <div class="view  navbar-through" id="mainView">
+
+        <div class="pure-u-0 pure-u-sm-1-12 pure-u-md-1-12 pure-u-lg-1-4">
+
         </div>
-        <!-- Pages-->
-        <div class="pages layout-white" >
+        <div class=" pure-u-12 pure-u-sm-10-12 pure-u-md-10-12 pure-u-lg-1-2 pages layout-white">
             <!-- Page, data-page contains page name-->
             <div data-page="login" class="page" id="loginPage">
                 <!-- Scrollable page content-->
@@ -171,7 +88,7 @@
                     <div class="content-block-title">Register</div>
                     <div class="content-block">
                         <div class="content-block-inner">
-
+                            <!--TODO Register form-->
                         </div>
                     </div>
                 </div>
@@ -210,6 +127,13 @@
                 </div>
 
             </div>
+
+            <div data-page="invite" class="page cached" id="inviteForm">
+
+            </div>
+        </div>
+        <div class="pure-u-0 pure-u-sm-1-12 pure-u-md-1-12 pure-u-lg-1-4">
+
         </div>
     </div>
 </div>

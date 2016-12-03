@@ -74,7 +74,7 @@ var appConfig = {
         {
             F7App = nauth2App;
             // Init View
-            var nauth2MainView = nauth2App.addView('.view-main', {
+            var nauth2MainView = nauth2App.addView('#mainView', {
                 // Material doesn't support it but don't worry about it
                 // F7 will ignore it for Material theme
                 dynamicNavbar: true,
@@ -245,7 +245,7 @@ export function showError(error)
 export function toast(message: string)
 {
     if (F7App)
-        F7App.addNotification({title: message, closeOnClick: true});
+        F7App.addNotification({title: message, closeOnClick: true, hold: 3000});
 }
 
 export var feathersApp = feathers();
