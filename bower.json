@@ -34,6 +34,7 @@
     "fsmrouter": "*",
     "framework7-icons": "^0.8.7",
     "webix": "^4.1.0",
-    "promiz": "^1.0.6"
+    "promiz": "^1.0.6",
+    "pure": "^0.6.0"
   }
 }

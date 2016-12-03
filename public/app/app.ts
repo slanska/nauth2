@@ -45,6 +45,7 @@ var appData: any = {
     actionsOpened: false
 };
 
+export var F7App;
 
 // Vue app configuration
 var appConfig = {
@@ -71,6 +72,7 @@ var appConfig = {
     methods: {
         onF7Init: (nauth2App) =>
         {
+            F7App = nauth2App;
             // Init View
             var nauth2MainView = nauth2App.addView('.view-main', {
                 // Material doesn't support it but don't worry about it
@@ -106,6 +108,32 @@ var appConfig = {
     }
 } as vuejs.ComponentOption;
 
+declare type HttpMethod = 'GET'|'POST'|'PUT'|'DELETE'|'PATCH';
+
+export interface Dom7AjaxOptions
+{
+    url: string;
+    async?: boolean;
+    method?: HttpMethod;
+    cache?: boolean;
+    contentType?: string;
+    crossDomain?: boolean;
+    data?: any;
+    processData?: boolean;
+    dataType?: string;
+    headers?: Object;
+    xhrFields?: Object;
+    username?: string;
+    password?: string;
+    timeout?: number;
+    beforeSend?: Function;
+    error?: Function;
+    success?: Function;
+    complete?: Function;
+    statusCode?: Object;
+
+}
+
 
 /*
  Returns promise which resolves to auth configuration
@@ -116,11 +144,12 @@ export function getAuthConfig(): Promise<any>
     if (_authConfig)
         return Promise.resolve(_authConfig);
 
-    return new Promise((resolve, reject) =>
-    {
-        // feathers.
-
-    });
+    return http.get('/auth/config')
+        .then(d =>
+        {
+            _authConfig = d;
+            return _authConfig;
+        });
 }
 
 /*
@@ -131,6 +160,92 @@ export function initApp(data: Object, methods: {[name: string]: Function})
     appData = _.merge(appData, data);
     appConfig.methods = _.merge(appConfig.methods, methods);
     return new Vue(appConfig);
+}
+
+/*
+
+ */
+export class http
+{
+    private static ajax(method: HttpMethod, url: string, data?: any, headers?: Object)
+    {
+        var options = {} as Dom7AjaxOptions;
+
+        var result = new Promise((resolve, reject) =>
+        {
+            options.method = method;
+            options.data = data;
+            options.headers = headers;
+            options.url = url;
+            options.success = (data, status, xhr) =>
+            {
+                if (status !== 200 && status !== 201)
+                    return reject(new Error(`${status}: ${data}`));
+
+                if (typeof data === 'string')
+                    data = JSON.parse(data);
+                return resolve(data);
+            };
+
+            options.error = (xhr, status) =>
+            {
+                var error = xhr.response;
+                if (typeof error === 'string')
+                    error = JSON.parse(error);
+                return reject(error);
+            };
+
+            $$.ajax(options);
+        });
+        return result;
+    }
+
+    public static get(url: string, data?: any, headers?: Object)
+    {
+        return http.ajax('GET', url, data, headers);
+    }
+
+    public static post(url: string, data?: any, headers?: Object)
+    {
+        return http.ajax('POST', url, data, headers);
+    }
+
+    public static put(url: string, data?: any, headers?: Object)
+    {
+        return http.ajax('PUT', url, data, headers);
+    }
+
+    public static delete(url: string, data?: any, headers?: Object)
+    {
+        return http.ajax('DELETE', url, data, headers);
+    }
+
+    public static patch(url: string, data?: any, headers?: Object)
+    {
+        return http.ajax('PATCH', url, data, headers);
+    }
+}
+
+/*
+ Generic handler for displaying error messages
+ */
+export function showError(error)
+{
+    if (typeof error === 'object')
+    {
+        error = `${error.code}: ${error.message}`;
+    }
+
+    if (F7App)
+    {
+        F7App.alert(error, 'Error');
+    }
+}
+
+export function toast(message: string)
+{
+    if (F7App)
+        F7App.addNotification({title: message, closeOnClick: true});
 }
 
 export var feathersApp = feathers();

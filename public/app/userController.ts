@@ -16,7 +16,7 @@
 
 var F7Vue = require('framework7-vue');
 import _ = require('lodash');
-import {initApp} from './app';
+import {initApp, http, getAuthConfig, showError, toast, F7App} from './app';
 import {ProfileController} from "./profileController";
 import Vue = require('vue');
 
@@ -27,9 +27,37 @@ class UserController
     /*
      Logs user in. Returns promise which is resolved to access and refresh tokens
      */
-    public login(emailOrName: string, password: string)
+    public login(emailOrName: string, password: string, rememberMe: boolean)
     {
-        console.log(`login: ${emailOrName}, ${password}`);
+        F7App.showPreloader();
+        return getAuthConfig()
+            .then(cfg =>
+            {
+                var url = `${cfg.basePath}/login`;
+                return http.post(url, {email: emailOrName, password: password});
+            })
+            .then(res =>
+            {
+                if (rememberMe)
+                // store refresh token
+                {
+
+                }
+
+                // store access token
+
+                // show toast message
+                // TODO Translate
+                F7App.hidePreloader();
+                toast('Successfully logged in');
+
+                // redirect to landing page
+            })
+            .catch(err =>
+            {
+                F7App.hidePreloader();
+                showError(err);
+            });
     }
 
     /*
@@ -64,7 +92,7 @@ class UserController
 
 var userController = new UserController();
 
-var app:any = initApp({
+var app: any = initApp({
         emailOrName: '',
         password: '',
         confirmPassword: '',
@@ -77,6 +105,6 @@ var app:any = initApp({
         },
         proceedLogin: () =>
         {
-            return userController.login(app.emailOrName, app.password);
+            return userController.login(app.emailOrName, app.password, app.rememberMe);
         }
     });
