@@ -18,12 +18,31 @@
     <!--[if gt IE 8]><!-->
     <link rel="stylesheet" href="./bower_components/pure/grids-responsive-min.css">
     <!--<![endif]-->
+
+    <% content 'styles' %>
 </head>
 <body>
+<style>
+    [v-cloak] {
+        display: none;
+    }
+</style>
 <div id="app" v-cloak>
+    <!--TODO Show only on mobile screens-->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="left" style="z-index:10000; transform: translate3d(0px, 0px, 0px);"><a href="#"
+                                                                                               class="back link"><i
+                    class="icon icon-back" style="transform: translate3d(0px, 0px, 0px);"></i><span>Back</span></a>
+            </div>
 
-    <div class="left sliding" style="transform: translate3d(0px, 0px, 0px);"><a href="forms.html" class="back link"><i
-            class="icon icon-back" style="transform: translate3d(0px, 0px, 0px);"></i><span>Back</span></a></div>
+            <div class="right">
+                <a href="#" class="link icon-only open-panel">
+                    <i class="icon icon-bars"></i>
+                </a>
+            </div>
+        </div>
+    </div>
     <% content 'body' %>
 </div>
 

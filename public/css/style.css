@@ -42,7 +42,7 @@ body.with-panel-right-reveal .panel-overlay {
     -ms-transform: translate3d(0px, 0, 0);
     transform: translate3d(0px, 0, 0);
   }
-  .view-main {
+  .view-main-right {
     float: right;
     width: -webkit-calc(100% - 320px);
     width: -moz-calc(100% - 320px);

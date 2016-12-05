@@ -42,7 +42,8 @@ var appData: any = {
     popupOpened: false,
     loginScreenOpened: false,
     pickerOpened: false,
-    actionsOpened: false
+    actionsOpened: false,
+    appReady: false
 };
 
 export var F7App;
@@ -56,9 +57,10 @@ var appConfig = {
     framework7: {
         root: '#app', //Should be same as app el
         animateNavBackIcon: true,
-        // TODO routes: Routes,
+
         // Enable Material theme for Android device only
         material: isIos ? false : true,
+
         // Enable Template7 pages
         template7Pages: true,
         pushState: true
@@ -159,7 +161,13 @@ export function initApp(data: Object, methods: {[name: string]: Function})
 {
     appData = _.merge(appData, data);
     appConfig.methods = _.merge(appConfig.methods, methods);
-    return new Vue(appConfig);
+    var app = new Vue(appConfig) as any;
+    Vue.nextTick(() =>
+    {
+        app.appReady = true;
+    });
+
+    return app;
 }
 
 /*
@@ -250,6 +258,7 @@ export function toast(message: string)
         F7App.addNotification({title: message, closeOnClick: true, hold: 3000});
 }
 
+// TODO Needed?
 export var feathersApp = feathers();
 // feathersApp.configure(rest(),jquery($));
 

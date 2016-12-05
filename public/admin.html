@@ -9,17 +9,17 @@
 <div class="panel panel-left panel-cover layout-dark">
     <!-- Left view-->
     <div class="view view-left navbar-through">
-        <div class="navbar">
-            <div class="navbar-inner">
-                <div class="left"></div>
-                <div class="center sliding">Left View</div>
-                <div class="right"></div>
-            </div>
-        </div>
+        <!--<div class="navbar">-->
+        <!--<div class="navbar-inner">-->
+        <!--<div class="left"></div>-->
+        <!--<div class="center sliding">Left View</div>-->
+        <!--<div class="right"></div>-->
+        <!--</div>-->
+        <!--</div>-->
         <div class="pages">
             <div data-page="index-left" class="page layout-dark">
                 <div class="page-content">
-                    <div class="content-block-title">Control Main View</div>
+                    <div class="content-block-title">Admin Dashboard</div>
                     <div class="list-block">
                         <ul>
                             <li>
@@ -81,18 +81,18 @@
     </div>
 </div>
 
-<div class="view view-main navbar-through">
-    <div class="navbar">
-        <div class="navbar-inner">
-            <div class="center sliding">Main View</div>
-            <div class="right"><a href="#" data-panel="left" class="link open-panel icon-only"><i
-                    class="icon icon-bars"></i></a></div>
-        </div>
-    </div>
+<div class="view view-main navbar-through view-main-right" id="mainView">
+    <!--<div class="navbar">-->
+        <!--<div class="navbar-inner">-->
+            <!--<div class="center sliding">Main View</div>-->
+            <!--<div class="right"><a href="#" data-panel="left" class="link open-panel icon-only"><i-->
+                    <!--class="icon icon-bars"></i></a></div>-->
+        <!--</div>-->
+    <!--</div>-->
 
     <div class="pages layout-white">
         <!-- Page, data-page contains page name-->
-        <div data-page="users" class="page" id="usersPage">
+        <div data-page="users" class="page cached" id="usersPage">
             <!-- Scrollable page content-->
             <div class="page-content">
                 <!--<div class="content-block-title">Login</div>-->
@@ -105,7 +105,7 @@
                 </div>
             </div>
         </div>
-        <div data-page="roles" class="page" id="rolesPage">
+        <div data-page="roles" class="page cached" id="rolesPage">
             <!-- Scrollable page content-->
             <div class="page-content">
                 <!--<div class="content-block-title">Login</div>-->
@@ -120,7 +120,7 @@
         </div>
 
         <% if @appConfig?.subDomains : %>
-        <div data-page="domains" class="page" id="domainsPage">
+        <div data-page="domains" class="page cached" id="domainsPage">
             <!-- Scrollable page content-->
             <div class="page-content">
                 <!--<div class="content-block-title">Login</div>-->
@@ -135,8 +135,7 @@
         </div>
         <% end %>
 
-
-        <div data-page="log" class="page" id="logPage">
+        <div data-page="log" class="page cached" id="logPage">
             <!-- Scrollable page content-->
             <div class="page-content">
                 <!--<div class="content-block-title">Login</div>-->
@@ -151,7 +150,6 @@
         </div>
     </div>
 </div>
-
 
 <% end %>
 

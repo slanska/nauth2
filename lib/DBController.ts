@@ -24,47 +24,47 @@ module NAuth2
 {
     export class DBController
     {
-        public db:knex;
+        public db: knex;
 
-        Path:{
-            Users:string,
-            Roles:string,
-            UserRoles:string;
-            Log:string;
-            Domains?:string;
-            DomainUsers?:string;
-            Register?:string;
-            Login:string;
-            DomainRegister?:string;
-            DomainLogin?:string;
-            ResetPassword?:string;
+        Path: {
+            Users: string,
+            Roles: string,
+            UserRoles: string;
+            Log: string;
+            Domains?: string;
+            DomainUsers?: string;
+            Register?: string;
+            Login: string;
+            DomainRegister?: string;
+            DomainLogin?: string;
+            ResetPassword?: string;
         };
 
-        Services:{
+        Services: {
 
-            Users:feathers.Service;
-            Roles:feathers.Service;
-            UserRoles:feathers.Service;
-            Log:feathers.Service;
-            Domains:feathers.Service;
-            DomainUsers:feathers.Service;
+            Users: feathers.Service;
+            Roles: feathers.Service;
+            UserRoles: feathers.Service;
+            Log: feathers.Service;
+            Domains: feathers.Service;
+            DomainUsers: feathers.Service;
 
             /*
              Similar to Users service, but intended for internal usage
              Exposes only POST /register
              */
-            RegisterUsers:feathers.Service;
+            RegisterUsers: feathers.Service;
 
             /*
              Exposes only POST /login
              */
-            Login:feathers.Service;
+            Login: feathers.Service;
         };
 
         /*
          Create a new instance of users service, without hooks and other customization
          */
-        protected initUserService(path:string)
+        protected initUserService(path: string)
         {
             var svcCfg = knexServiceFactory(
                 {
@@ -79,7 +79,7 @@ module NAuth2
         /*
          Configures service for REST /auth/users
          */
-        protected createUserService():feathers.Service
+        protected createUserService(): feathers.Service
         {
             this.Services.Users = this.initUserService(this.Path.Users);
             this.Services.Users.before({
@@ -117,12 +117,12 @@ module NAuth2
         {
             var self = this;
 
-            var result = (p:hooks.HookParams)=>
+            var result = (p: hooks.HookParams) =>
             {
                 return self.db.table('NAuth2_Roles').where({'name': {$in: self.cfg.newMemberRoles || []}})
                     .then(rr =>
                     {
-                        var roles = _.map(rr, (r:any)=>
+                        var roles = _.map(rr, (r: any) =>
                         {
                             return {userId: p.result.userId, roleId: r.roleId};
                         });
@@ -144,7 +144,7 @@ module NAuth2
         private setNewUserStatusHook()
         {
             var self = this;
-            var result = (p:hooks.HookParams)=>
+            var result = (p: hooks.HookParams) =>
             {
                 if (self.cfg.userCreateMode === Types.UserCreateMode.SelfStart)
                     p.data.status = 'A';
@@ -189,7 +189,7 @@ module NAuth2
                         // TODO Localize
                         _.template('Welcome to <%-companyName%>! Confirm your email')),
 
-                    (p:hooks.HookParams)=>
+                    (p: hooks.HookParams) =>
                     {
                         p.result = {} as feathers.ResponseBody;
                         p.result.name = 'Success';
@@ -208,10 +208,10 @@ module NAuth2
         {
             var self = this;
 
-            var result = (p:hooks.HookParams)=>
+            var result = (p: hooks.HookParams) =>
             {
                 return self.db.table('NAuth2_Users').select('*').where({userId: p.params['payload'].userId})
-                    .then(users=>
+                    .then(users =>
                     {
                         if (!users || users.length === 0)
                             throw new errors.GeneralError(`User ${p.data.userId} not found`);
@@ -225,7 +225,7 @@ module NAuth2
         /*
          Creates entry for refresh token
          */
-        createRefreshToken(userId:number, userAgent:Object):Promise<Types.IRefreshTokenRecord>
+        createRefreshToken(userId: number, userAgent: Object): Promise<Types.IRefreshTokenRecord>
         {
             var self = this;
             var it = {} as Types.IRefreshTokenRecord;
@@ -239,13 +239,16 @@ module NAuth2
         /*
          Finds user by his/her email or name. Returns promise
          */
-        findUserByNameOrEmail(emailOrName:string):Promise<Types.IUserRecord>
+        findUserByNameOrEmail(emailOrName: string): Promise<Types.IUserRecord>
         {
             var self = this;
-            return new Promise((resolve, reject)=>
+            if (_.isEmpty(emailOrName))
+                return Promise.reject(new Error(`Missing email or name`));
+
+            return new Promise((resolve, reject) =>
             {
                 self.db('NAuth2_Users').where({email: emailOrName}).orWhere({userName: emailOrName})
-                    .then(users=>
+                    .then(users =>
                     {
                         if (!users || users.length !== 1)
                             return resolve(null);
@@ -260,12 +263,12 @@ module NAuth2
             var self = this;
             var path = `${self.cfg.basePath}/confirmRegister`;
             var svc = self.app.service(path, {
-                find: (params:feathers.MethodParams)=>
+                find: (params: feathers.MethodParams) =>
                 {
-                    return new Promise((resolve, reject)=>
+                    return new Promise((resolve, reject) =>
                     {
                         jwt.verify(params.query.t, self.authCfg.token.secret,
-                            (err, decoded)=>
+                            (err, decoded) =>
                             {
                                 if (err)
                                     return reject(err);
@@ -273,7 +276,7 @@ module NAuth2
                                 // Update status of user to '(A)ctive'
                                 return this.Services.RegisterUsers.find(
                                     {query: {email: decoded.email}, paginate: {limit: 1}})
-                                    .then(users=>
+                                    .then(users =>
                                     {
                                         // Check if user is found
                                         // Check if user is marked as suspended or deleted
@@ -288,7 +291,7 @@ module NAuth2
                                             {status: 'A'},
                                             {});
                                     })
-                                    .then(d=>
+                                    .then(d =>
                                     {
                                         // Redirects or renders default page
                                         if (self.cfg.run_mode === 'website')
@@ -308,7 +311,7 @@ module NAuth2
                                         result.message = 'Registration successful. Check your email';
                                         return resolve(result);
                                     })
-                                    .catch(err=>
+                                    .catch(err =>
                                     {
                                         return reject(err);
                                     });
@@ -412,9 +415,9 @@ module NAuth2
             return Promise.resolve('Obana!');
         }
 
-        constructor(public app:feathers.Application,
-                    public cfg:Types.INAuth2Config,
-                    public authCfg:auth.AuthConfig)
+        constructor(public app: feathers.Application,
+                    public cfg: Types.INAuth2Config,
+                    public authCfg: auth.AuthConfig)
         {
             this.db = knex(cfg.dbConfig);
 
@@ -521,36 +524,36 @@ module NAuth2
      */
     class LoginService
     {
-        constructor(protected DBController:DBController)
+        constructor(protected DBController: DBController)
         {
         }
 
-        protected app:feathers.Application;
+        protected app: feathers.Application;
 
-        setup(app:feathers.Application)
+        setup(app: feathers.Application)
         {
             this.app = app;
         }
 
-        create(data, params:feathers.MethodParams)
+        create(data, params: feathers.MethodParams)
         {
             var self = this;
             return new Promise((resolve, reject) =>
             {
-                var user:Types.IUserRecord = null;
+                var user: Types.IUserRecord = null;
                 // Load user by email or name
                 self.DBController.findUserByNameOrEmail(data.email)
-                    .then(user=>
+                    .then(user =>
                     {
                         if (!user)
                             throw DBController.invalidLoginError();
                         return user;
                     })
-                    .then((uu:Types.IUserRecord)=>
+                    .then((uu: Types.IUserRecord) =>
                     {
                         user = uu;
                     })
-                    .then(()=>
+                    .then(() =>
                     {
                         // Verify password
                         if (!bcrypt.compareSync(data.password, user.password))
@@ -561,6 +564,7 @@ module NAuth2
                         if (user.changePasswordOnNextLogin)
                         {
                             // Redirect or return warning
+                            return resolve({navigateTo: 'changePassword'});
                         }
 
                         switch (user.status)
@@ -593,12 +597,21 @@ module NAuth2
                                         var signOptions = {} as jwt.SignOptions;
                                         signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
                                         signOptions.subject = 'signin';
-                                        jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token)=>
+                                        jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token) =>
                                         {
                                             if (err)
                                                 return reject(err);
 
-                                            return resolve({token: token, refreshToken: ''});
+                                            /*
+                                             'navigateTo' (user's landing page) will depend on primary user's role
+                                             SysAdmin: Admin dashboard
+                                             SysUserAdmin: User Admin
+                                             regular user: default home page
+                                             */
+                                            if (payload.roles.indexOf(1) !== -1)
+                                            {}
+
+                                            return resolve({token: token, refreshToken: '', navigateTo: ''});
                                         });
                                     });
 
@@ -614,7 +627,7 @@ module NAuth2
                         }
 
                     })
-                    .catch(err=>
+                    .catch(err =>
                     {
                         return reject(err);
                     });

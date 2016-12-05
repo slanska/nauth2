@@ -277,8 +277,13 @@ namespace Types
 
         /*
          List of fields from nauth2_users table to be filled in during registration.
-         Default: ['email', 'userName']
-         Item can be:
+         Default: ['email']
+
+         Complete list of all available fields:
+         ['email', 'userName', 'firstName', 'lastName', 'gender', 'birthDate', 'avatar', 'culture',
+         'addressLine1', 'addressLine2', 'city', 'stateOrProvince', 'postalCode', 'country',
+         'homePhone', 'cellPhone', 'dayTimePhone']
+         Fields can be:
          * array of strings
          * object with field names as keys
          */
@@ -290,7 +295,6 @@ namespace Types
          Default: ['firstName', 'lastName', 'gender', 'birthDate', 'avatar', 'culture']
          */
         extraUserProfileFields?: string[];
-
     }
 
     /*
