@@ -20,6 +20,9 @@ import {initApp, http, getAuthConfig, showError, toast, F7App} from './app';
 import {ProfileController} from "./profileController";
 import Vue = require('vue');
 
+const LocalStorage_AccessToken = 'nauth2.accessToken';
+const LocalStorage_RefreshToken = 'nauth2.refreshToken';
+
 class UserController
 {
     private profileController = new ProfileController();
@@ -30,6 +33,9 @@ class UserController
     public login(emailOrName: string, password: string, rememberMe: boolean)
     {
         F7App.showPreloader();
+
+        this.clearTokens();
+
         return getAuthConfig()
             .then(cfg =>
             {
@@ -38,18 +44,42 @@ class UserController
             })
             .then(res =>
             {
-                // store access token
-                window.localStorage.setItem('nauth2.accessToken', res.accessToken);
-                if (rememberMe)
-                // store refresh token
+                if (res.navigateTo === 'changePassword')
+                // If password needs to be changed or has expired, there will not be refresh token and access token.
+                // Response will have a special token returned which can be only used for password change.
                 {
-                    window.localStorage.setItem('nauth2.refreshToken', res.refreshToken);
+
+                }
+                else
+                {
+                    // store access token
+                    window.localStorage.setItem(LocalStorage_AccessToken, res.accessToken);
+                    if (rememberMe)
+                    // store refresh token
+                    {
+                        window.localStorage.setItem(LocalStorage_RefreshToken, res.refreshToken);
+                    }
                 }
 
                 // show toast message
                 // TODO Translate
                 F7App.hidePreloader();
                 toast('Successfully logged in');
+
+                switch (res.navigateTo)
+                {
+                    case 'admin:dashboard':
+                        break;
+
+                    case 'admin:users':
+                        break;
+
+                    case 'admin:domains':
+                        break;
+
+                    default:
+                        break;
+                }
 
                 // redirect to landing page
                 // admin - for admin, user admin
@@ -112,7 +142,7 @@ class UserController
     /*
      User is expected to be logged in
      */
-    public changePassword(oldPassword: string, newPassword: string, confirmPassword: string)
+    public changePassword(oldPassword: string, password: string, confirmPassword: string)
     {
 
     }
@@ -128,7 +158,14 @@ class UserController
 
     public logout()
     {
+        this.clearTokens();
         // TODO redirect to
+    }
+
+    private clearTokens()
+    {
+        window.localStorage.removeItem(LocalStorage_AccessToken);
+        window.localStorage.removeItem(LocalStorage_RefreshToken);
     }
 }
 
@@ -138,7 +175,8 @@ var app: any = initApp({
         emailOrName: '',
         password: '',
         confirmPassword: '',
-        rememberMe: true
+        rememberMe: true,
+        newPassword: ''
     },
     {
         resetPassword: () =>
@@ -161,6 +199,10 @@ var app: any = initApp({
         logout: () =>
         {
             return userController.logout();
+        },
+        changePassword: () =>
+        {
+            return userController.changePassword(app.password, app.newPassword, app.confirmPassword);
         }
 
     });

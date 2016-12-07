@@ -270,8 +270,8 @@ namespace Types
         },
 
         /*
-        List of supported cultures
-        Default: ['en']
+         List of supported cultures
+         Default: ['en']
          */
         supportedCultures?: string[];
 
@@ -369,6 +369,23 @@ namespace Types
         created_at: Date;
         updated_at: Date;
     }
+
+    /*
+     Mapping to nauth2_roles record
+     */
+    export interface INauth2Role
+    {
+        roleId: number;
+        domainId: number;
+        name: string;
+        title: string;
+        systemRole: boolean;
+        domainSpecific: boolean;
+        created_at: Date;
+        updated_at: Date;
+    }
+
+    export type RolesHash =  {[roleName: string]: Types.INauth2Role};
 }
 
 export = Types;

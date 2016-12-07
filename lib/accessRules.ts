@@ -139,24 +139,24 @@ var _rules = void 0;
 /*
  Called once, on first request, to replace access rules' role names into role IDs
  */
-export function getRules(db:Knex):Promise<any>
+export function getRules(db: Knex): Promise<any>
 {
     if (_rules)
         return Promise.resolve(_rules);
 
     return db.table('NAuth2_Roles')
-        .then(roles=>
+        .then(roles =>
         {
             var roleIDs = {};
-            _.forEach(roles, (rr)=>
+            _.forEach(roles, (rr) =>
             {
                 roleIDs[rr.name] = rr.roleId;
             });
-            _.forEach(ruleList, (it)=>
+            _.forEach(ruleList, (it) =>
             {
                 if (_.isArray(it.role))
                 {
-                    it.role = _.map(it.role, (rn:string)=>
+                    it.role = _.map(it.role, (rn: string) =>
                     {
                         let rid = roleIDs[rn];
                         if (rid)
@@ -187,4 +187,7 @@ export const methodMap = {
     'update': 'update',
     'patch': 'update'
 };
+
+
+
 

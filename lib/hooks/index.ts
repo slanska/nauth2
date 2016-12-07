@@ -17,6 +17,7 @@ import setRegisterConfirmActionUrl = require('./setRegisterConfirmActionUrl');
 import {jsonDataParse, jsonDataStringify} from './jsonDataConvertor';
 import copyDataToResult = require('./copyDataToResult');
 import {setPasswordSalt, hashPassword} from './passwordHelpers';
+import {loadSystemRoles} from './loadSysRoles';
 
 export =
 {
@@ -36,5 +37,6 @@ export =
     jsonDataStringify,
     copyDataToResult,
     setPasswordSalt,
-    hashPassword
+    hashPassword,
+    loadSystemRoles
 }

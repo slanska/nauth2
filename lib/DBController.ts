@@ -19,6 +19,7 @@ import Qs = require('qs');
 import bcrypt = require('bcryptjs');
 var uuid = require('uuid');
 import objectHash = require('object-hash');
+import {getSystemRoles} from "./hooks/loadSysRoles";
 
 module NAuth2
 {
@@ -41,7 +42,6 @@ module NAuth2
         };
 
         Services: {
-
             Users: feathers.Service;
             Roles: feathers.Service;
             UserRoles: feathers.Service;
@@ -345,7 +345,6 @@ module NAuth2
 
             self.Services.Login.after({
                 create: [
-
                     // nhooks.afterUserLogin(this.app, this.cfg)
                     /*
                      TODO
@@ -412,7 +411,7 @@ module NAuth2
         protected createDomainUserRegistrationService()
         {
             //TODO
-            return Promise.resolve('Obana!');
+            return Promise.resolve('Obana 2!');
         }
 
         constructor(public app: feathers.Application,
@@ -526,6 +525,7 @@ module NAuth2
     {
         constructor(protected DBController: DBController)
         {
+
         }
 
         protected app: feathers.Application;
@@ -533,6 +533,33 @@ module NAuth2
         setup(app: feathers.Application)
         {
             this.app = app;
+        }
+
+        /*
+         Returns promise which will resolve to string 'navigateTo' (user's landing page)
+         which depends on primary user's role
+         SysAdmin: Admin dashboard
+         SysUserAdmin: User Admin
+         regular user: default home page
+         */
+        private getNavigateToLink(payload): Promise<string>
+        {
+            var self = this;
+            var roles = payload.roles;
+            return getSystemRoles(self.DBController.db)
+                .then(rr =>
+                {
+                    if (roles.indexOf(rr['SystemAdmin'].roleId) >= 0)
+                        return 'admin:dashboard';
+
+                    if (roles.indexOf(rr['UserAdmin'].roleId) >= 0)
+                        return 'admin:users';
+
+                    if (roles.indexOf(rr['DomainSuperAdmin'].roleId) >= 0)
+                        return 'admin:domains';
+
+                    return 'home';
+                });
         }
 
         create(data, params: feathers.MethodParams)
@@ -561,6 +588,7 @@ module NAuth2
                             return reject(DBController.invalidLoginError());
                         }
 
+                        // TODO user.pwd_expires_at
                         if (user.changePasswordOnNextLogin)
                         {
                             // Redirect or return warning
@@ -592,9 +620,12 @@ module NAuth2
                                     .then(dd =>
                                     {
                                         payload.domains = _.map(dd, 'domainId');
-
+                                        return self.getNavigateToLink(payload);
+                                    })
+                                    .then((navigateTo: string) =>
+                                    {
                                         // generate tokens
-                                        var signOptions = {} as jwt.SignOptions;
+                                        let signOptions = {} as jwt.SignOptions;
                                         signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
                                         signOptions.subject = 'signin';
                                         jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token) =>
@@ -602,16 +633,15 @@ module NAuth2
                                             if (err)
                                                 return reject(err);
 
-                                            /*
-                                             'navigateTo' (user's landing page) will depend on primary user's role
-                                             SysAdmin: Admin dashboard
-                                             SysUserAdmin: User Admin
-                                             regular user: default home page
-                                             */
-                                            if (payload.roles.indexOf(1) !== -1)
-                                            {}
-
-                                            return resolve({token: token, refreshToken: '', navigateTo: ''});
+                                            self.DBController.createRefreshToken(user.userId, params as any)
+                                                .then(refreshToken =>
+                                                {
+                                                    return resolve({
+                                                        token,
+                                                        refreshToken,
+                                                        navigateTo
+                                                    });
+                                                });
                                         });
                                     });
 

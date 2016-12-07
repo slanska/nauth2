@@ -14,16 +14,19 @@
 <!-- Status bar overlay for fullscreen mode-->
 <div class="statusbar-overlay"></div>
 
+<!--<div class="pure-g">-->
+<!--Left column-->
+<!--<div class="pure-u-1-24 pure-u-sm-1-12 pure-u-md-1-12 pure-u-lg-1-4">-->
+<!--<p></p>-->
+<!--</div>-->
+<!--<div class=" pure-u-22-24 pure-u-sm-10-12 pure-u-md-10-12 pure-u-lg-1-2">-->
+
 <div class="views">
+
     <!-- Views-->
     <div class="view left-view view-main navbar-through" id="mainView">
-        <!--Left column-->
-        <div class="pure-u-0 pure-u-sm-1-12 pure-u-md-1-12 pure-u-lg-1-4">
-
-        </div>
         <!--Center column-->
-        <div class=" pure-u-12 pure-u-sm-10-12 pure-u-md-10-12 pure-u-lg-1-2 pages layout-white">
-
+        <div class="pages layout-white">
 
             <!-- Page, data-page contains page name-->
             <div data-page="login" class="page" id="loginPage">
@@ -32,55 +35,48 @@
                     <!--<div class="content-block-title">Login</div>-->
                     <div class="content-block">
                         <div class="content-block-inner">
-                            <div class="row">
-                                <div class="tablet-20">
-                                    <p></p>
-                                </div>
-                                <div class="tablet-60 col-100">
-                                    <div class="list-block">
-                                        <ul>
+                            <div class="list-block">
+                                <ul>
 
-                                            <li>
-                                                <input-box className="item-content" type="text" icon="person"
-                                                           label="Email or User Name"
-                                                           placeHolder="Email or User Name"
-                                                           v-model="emailOrName"></input-box>
-                                            </li>
-                                            <li>
-                                                <input-box className="item-content" type="password" icon="lock"
-                                                           label="Password"
-                                                           placeHolder="Password" v-model="password"></input-box>
-                                            </li>
+                                    <li>
+                                        <input-box className="item-content" type="text" icon="person"
+                                                   label="Email or User Name"
+                                                   placeHolder="Email or User Name"
+                                                   v-model="emailOrName"></input-box>
+                                    </li>
+                                    <li>
+                                        <input-box className="item-content" type="password" icon="lock"
+                                                   label="Password"
+                                                   placeHolder="Password"
+                                                   v-model="password"></input-box>
+                                    </li>
 
 
-                                            <li style="margin-top: 1em;">
-                                                <label class="label-checkbox item-content">
-                                                    <input type="checkbox" name="ks-checkbox" value="Remember Me"
-                                                           checked="checked">
-                                                    <div class="item-media"><i class="icon icon-form-checkbox"></i>
-                                                    </div>
-                                                    <div class="item-inner" style="padding-top: 0.9em;">
-                                                        <div class="item-title">Remember Me</div>
-                                                    </div>
-                                                </label>
-                                            </li>
+                                    <li style="margin-top: 1em;">
+                                        <label class="label-checkbox item-content">
+                                            <input type="checkbox" name="ks-checkbox"
+                                                   value="Remember Me"
+                                                   checked="checked">
+                                            <div class="item-media"><i
+                                                    class="icon icon-form-checkbox"></i>
+                                            </div>
+                                            <div class="item-inner" style="padding-top: 0.9em;">
+                                                <div class="item-title">Remember Me</div>
+                                            </div>
+                                        </label>
+                                    </li>
 
-                                        </ul>
-                                        <p class="buttons-row" style="margin-top: 1em;">
-                                            <a href="#register"
-                                               style="margin-right: 0.6em;"
-                                               class="button button-big  button-raised ">Register</a>
-                                            <a @click="proceedLogin" style="margin-left: 0.6em;"
-                                               class="button button-big button-fill button-raised color-teal">Login</a>
-                                        </p>
-                                        <p class="row">
-                                            <a href="#forgotPassword" class="link">Forgot Password?</a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="tablet-20">
-                                    <p></p>
-                                </div>
+                                </ul>
+                                <p class="buttons-row" style="margin-top: 1em;">
+                                    <a href="#register"
+                                       style="margin-right: 0.6em;"
+                                       class="button button-big  button-raised ">Register</a>
+                                    <a @click="proceedLogin" style="margin-left: 0.6em;"
+                                       class="button button-big button-fill button-raised color-teal">Login</a>
+                                </p>
+                                <p class="row">
+                                    <a href="#forgotPassword" class="link">Forgot Password?</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -111,7 +107,8 @@
                             <div class="list-block">
                                 <ul>
                                     <li>
-                                        <input-box className="item-content" type="email" icon="email" label="Email"
+                                        <input-box className="item-content" type="email" icon="email"
+                                                   label="Email"
                                                    placeHolder="Email" v-model="emailOrName"></input-box>
                                     </li>
                                 </ul>
@@ -139,10 +136,12 @@
         </div>
     </div>
 </div>
-<!--Right column-->
-<div class="pure-u-0 pure-u-sm-1-12 pure-u-md-1-12 pure-u-lg-1-4">
 
-</div>
+<!--</div>-->
+<!--<div class="pure-u-1-24 pure-u-sm-1-12 pure-u-md-1-12 pure-u-lg-1-4">-->
+<!--<p></p>-->
+<!--</div>-->
+<!--</div>-->
 
 <% end %>
 
