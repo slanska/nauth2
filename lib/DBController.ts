@@ -39,6 +39,7 @@ module NAuth2
             DomainRegister?: string;
             DomainLogin?: string;
             ResetPassword?: string;
+            ChangePassword?: string;
         };
 
         Services: {
@@ -59,6 +60,11 @@ module NAuth2
              Exposes only POST /login
              */
             Login: feathers.Service;
+
+            /*
+             POST /changePassword
+             */
+            ChangePassword: feathers.Service;
         };
 
         /*
@@ -331,6 +337,7 @@ module NAuth2
 
         static invalidLoginError()
         {
+            // TODO translate
             return new errors.GeneralError('Invalid email, user name or password, suspended or deleted account');
         }
 
@@ -359,6 +366,49 @@ module NAuth2
                      if domain login - add to domain, assign domain policy
                      */
                 ]
+            });
+        }
+
+        /*
+         POST /changePassword
+         Payload:
+         @param password
+         @param newPassword
+         @param confirmPassword
+         @param token
+         */
+        protected createChangePasswordService()
+        {
+            var self = this;
+            self.Path.ChangePassword = `${self.cfg.basePath}/changePassword`;
+            self.Services.ChangePassword = self.app.service(self.Path.ChangePassword, {
+                create: (data, params: feathers.MethodParams) =>
+                {
+                    var token = data.accessToken;
+
+
+                    // Check token
+
+                    // Check newPassword === confirmPassword
+                    if (data.newPassword !== data.confirmPassword)
+                    {
+                        throw new Error(`Password mismatch`);
+                    }
+
+                    // Check if newPassword !== password
+                    if (data.password === data.newPassword)
+                    {
+                        throw new Error(`Cannot re-use old password`);
+                    }
+
+                    // Check newPassword is not in password history
+
+                    // Save new password: clear changePasswordOnNextLogin, set prePwdHash, pwdExpireOn
+
+                    // Automatically proceed with login: generate tokens etc.
+
+                    return {};
+                }
             });
         }
 
@@ -456,6 +506,8 @@ module NAuth2
             }
 
             this.createUserLoginService();
+
+            this.createChangePasswordService();
 
             if (cfg.subDomains)
             {

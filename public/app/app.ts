@@ -48,6 +48,8 @@ var appData: any = {
 
 export var F7App;
 
+export var nauth2MainView = void 0;
+
 // Vue app configuration
 var appConfig = {
     // Root Element
@@ -76,7 +78,7 @@ var appConfig = {
         {
             F7App = nauth2App;
             // Init View
-            var nauth2MainView = nauth2App.addView('#mainView', {
+            nauth2MainView = nauth2App.addView('#mainView', {
                 // Material doesn't support it but don't worry about it
                 // F7 will ignore it for Material theme
                 dynamicNavbar: true,

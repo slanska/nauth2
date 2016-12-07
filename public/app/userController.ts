@@ -16,7 +16,7 @@
 
 var F7Vue = require('framework7-vue');
 import _ = require('lodash');
-import {initApp, http, getAuthConfig, showError, toast, F7App} from './app';
+import {initApp, http, getAuthConfig, showError, toast, F7App, nauth2MainView} from './app';
 import {ProfileController} from "./profileController";
 import Vue = require('vue');
 
@@ -48,7 +48,7 @@ class UserController
                 // If password needs to be changed or has expired, there will not be refresh token and access token.
                 // Response will have a special token returned which can be only used for password change.
                 {
-
+                    nauth2MainView.router.load({pageName: 'changePassword'});
                 }
                 else
                 {
@@ -142,14 +142,44 @@ class UserController
     /*
      User is expected to be logged in
      */
-    public changePassword(oldPassword: string, password: string, confirmPassword: string)
+    public changePassword(password: string, newPassword: string, confirmPassword: string)
     {
+        console.log(`changePassword: ${password}, ${newPassword}, ${confirmPassword}`);
 
+        // Validate input
+        if (newPassword !== confirmPassword)
+        {
+
+        }
+
+        F7App.showPreloader();
+        getAuthConfig()
+            .then(cfg =>
+            {
+                var token = window.localStorage.getItem(LocalStorage_AccessToken);
+                var url = `${cfg.basePath}/changePassword`;
+                var data = {
+                    password,
+                    newPassword,
+                    confirmPassword,
+                    accessToken: token
+                };
+                return http.post(url, data);
+            })
+            .then(() =>
+            {
+                F7App.hidePreloader();
+            })
+            .catch(err =>
+            {
+                F7App.hidePreloader();
+                showError(err);
+            });
     }
 
     /*
      Only authenticated user can invite another prospective user
-     TODO Use row
+     TODO Use object
      */
     public invite(email: string, salutaion: string, firstName: string, lastName: string)
     {
@@ -204,5 +234,4 @@ var app: any = initApp({
         {
             return userController.changePassword(app.password, app.newPassword, app.confirmPassword);
         }
-
     });
