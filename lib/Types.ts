@@ -295,6 +295,12 @@ namespace Types
          Default: ['firstName', 'lastName', 'gender', 'birthDate', 'avatar', 'culture']
          */
         extraUserProfileFields?: string[];
+
+        /*
+         If true, notification email will be sent on user's password change
+         Default: true
+         */
+        sendEmailOnChangePassword?: boolean;
     }
 
     /*

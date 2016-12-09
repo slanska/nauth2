@@ -16,8 +16,11 @@ import Captcha = require('./Captcha');
 import initRuntimeCfg = require('./middleware/initRuntimeConfig');
 import _ = require('lodash');
 
+// Services
+import {ChangePasswordService} from './services/changePasswordService';
+
 /*
- Router:
+ index:
  -  registers routes with handlers
  -  opens db connection
  -  calls db init if needed
@@ -39,7 +42,7 @@ import _ = require('lodash');
  -  constant declaration
 
  Types
- -  typed interfaces for payload etc.
+ -  typed interfaces for payloads etc.
 
  */
 
@@ -48,16 +51,12 @@ import _ = require('lodash');
  */
 class Controller implements Types.INAuth2Controller
 {
-    public DBController:DBController;
-    public Emailer:Emailer;
+    public DBController: DBController;
+    public Emailer: Emailer;
 
-    public Paths:{};
+    public AuthConfig: authentication.AuthConfig = {} as authentication.AuthConfig;
 
-    public Services:{};
-
-    public AuthConfig:authentication.AuthConfig = {} as authentication.AuthConfig;
-
-    constructor(protected app:feathers.Application, public cfg:Types.INAuth2Config = {} as Types.INAuth2Config)
+    constructor(protected app: feathers.Application, public cfg: Types.INAuth2Config = {} as Types.INAuth2Config)
     {
         app.use(initRuntimeCfg(this));
 
@@ -76,10 +75,17 @@ class Controller implements Types.INAuth2Controller
 
         var captchaPath = `${this.cfg.basePath}/captcha`;
         Captcha.init(this.app, captchaPath, this.cfg.debug);
+
+        this.initRoutes();
+    }
+
+    public initRoutes()
+    {
+        this.app.use(`${this.cfg.basePath}/changePassword`, new ChangePasswordService(this.DBController));
     }
 }
 
-export = (app:feathers.Application, cfg:Types.INAuth2Config)=>
+export = (app: feathers.Application, cfg: Types.INAuth2Config) =>
 {
     return function ()
     {

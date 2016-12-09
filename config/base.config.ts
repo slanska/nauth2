@@ -5,16 +5,15 @@
 import NAuth = require('../lib/index');
 import * as Types from '../lib/Types';
 import path = require('path');
-var knexConfig = require('../schema/knexfile');
 import nodemailer = require('nodemailer');
-var nodemailerSendGrid = require('nodemailer-sendgrid-transport');
 import _ = require('lodash');
 import fs = require('fs');
 
 var common_cfg = {
     subDomains: {},
     userCreateMode: Types.UserCreateMode.SelfAndConfirm,
-    tokenSecret: 'PLACE_YOUR_TOKEN_SECRET_HERE'
+    tokenSecret: 'PLACE_YOUR_TOKEN_SECRET_HERE',
+    sendEmailOnChangePassword: true
 
     /*
      emailTransport: nodemailer.createTransport(nodemailerSendGrid(

@@ -327,6 +327,8 @@ module NAuth2
                     });
                 }
             });
+
+            // TODO Needed?
             svc.before({find: []});
         }
 
@@ -409,6 +411,42 @@ module NAuth2
 
                     return {};
                 }
+            });
+
+            self.Services.ChangePassword.before({
+                create: [
+
+                    // Parse and verify token
+
+                    // Set attributes: oldPassword, password, confirmPassword
+                    (p: hooks.HookParams) =>
+                    {
+
+                    },
+
+
+                    nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
+
+                    // Compare old and new password - should not be the same, depending on configuration
+
+                    auth.hooks.hashPassword(this.authCfg)
+
+                    // Update Nauth2_Users
+
+
+                ]
+            });
+
+            self.Services.ChangePassword.after({
+                create: [
+                    // Init payload
+
+                    // Generate login tokens: accessToken and refreshToken
+
+                    // Set 'navigateTo' link
+
+                    // Send notification email ('Password has changed'), if configured
+                ]
             });
         }
 
@@ -568,6 +606,7 @@ module NAuth2
                     paginate: {max: 200, "default": 50}
                 });
         }
+
     }
 
     /*
@@ -630,6 +669,7 @@ module NAuth2
                     })
                     .then((uu: Types.IUserRecord) =>
                     {
+                        // Remember instance of user
                         user = uu;
                     })
                     .then(() =>
@@ -654,7 +694,7 @@ module NAuth2
                                  TODO Payload includes:
                                  userId
                                  all assigned general roles (not domain specific)
-                                 top 10 assigned domains and all their roles (if applicable)
+                                 top N assigned domains and all their roles (if applicable)
                                  */
                                 var payload = {userId: user.userId, roles: [], domains: []};
 
@@ -664,7 +704,7 @@ module NAuth2
                                     {
                                         payload.roles = _.map(rr, 'roleId');
 
-                                        // load top 10 domains (if applicable)
+                                        // load top 10 freshly used domains, based on refresh tokens history (if applicable)
                                         return self.DBController.db.table('NAuth2_DomainUsers')
                                             .where({userId: user.userId})
                                             .limit(10); // TODO Use config for limit? How about orderBy

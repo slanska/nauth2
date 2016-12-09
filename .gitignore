@@ -127,3 +127,15 @@ lib/Types.js.map
 /public/app/index.js
 /public/app/profileController.js.map
 /public/app/profileController.js
+/lib/services/changePasswordService.js
+/lib/services/changePasswordService.js.map
+/lib/services/imports.js.map
+/lib/services/imports.js
+/lib/services/loginService.js.map
+/lib/services/loginService.js
+/lib/services/registerService.js
+/lib/services/registerService.js.map
+/lib/services/baseService.js.map
+/lib/services/baseService.js
+/lib/services/baseLoginService.js
+/lib/services/baseLoginService.js.map
