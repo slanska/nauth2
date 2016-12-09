@@ -19,11 +19,14 @@ import Emailer = require('../Emailer');
  @param subject : email subject. Can be template string in ECT format.
  */
 function sendEmailToUser(app:feathers.Application, cfg:Types.INAuth2Config,
-                         templateName:string, subject:string|Types.TemplateFunction, emailField = 'email')
+                         templateName:string, subject:string|Types.TemplateFunction, emailField = 'email', condition?:Function)
 {
     var emailer = new Emailer(app, cfg);
     var result = (p:hooks.HookParams)=>
     {
+        if (condition && !condition())
+            return;
+
         var emailOptions = {} as nodemailer.SendMailOptions;
         emailOptions.to = p.data[emailField];
         emailOptions.from = cfg.supportEmail;

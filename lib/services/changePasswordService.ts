@@ -24,7 +24,7 @@ import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
 
 /*
- Service for password changing
+ Service for user password changing
  */
 export class ChangePasswordService extends BaseLoginService
 {
@@ -87,8 +87,9 @@ export class ChangePasswordService extends BaseLoginService
 
                 // Compare old and new password - should not be the same, depending on configuration
 
-                // Pluck attributes
-                hooks.hooks.remove('newPassword', 'confirmPassword'),
+                // Remove attributes
+                //nhooks.
+                hooks.remove('newPassword', 'confirmPassword'),
 
                 auth.hooks.hashPassword(this.DBController.authCfg)
 
@@ -99,13 +100,24 @@ export class ChangePasswordService extends BaseLoginService
         self.asService.after({
             create: [
                 // Init payload
-
+                self.initPayload,
 
                 // Generate login tokens: accessToken and refreshToken
+                self.generateAccessToken,
+                self.generateRefreshToken,
 
                 // Set 'navigateTo' link
+                self.setNavigateTo,
 
                 // Send notification email ('Password has changed'), if configured
+                nhooks.sendEmailToUser(app, self.DBController.cfg, 'changePassword',
+                    () =>
+                    {
+                        return ''
+                    },
+                    'email',
+                    () => self.DBController.cfg.sendEmailOnChangePassword
+                    )
             ]
         });
     }

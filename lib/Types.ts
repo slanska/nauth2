@@ -301,6 +301,11 @@ namespace Types
          Default: true
          */
         sendEmailOnChangePassword?: boolean;
+
+        /*
+
+         */
+        returnUserProfileOnLogin?: 'auto' | 'yes' | 'no';
     }
 
     /*

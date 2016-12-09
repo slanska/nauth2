@@ -139,3 +139,5 @@ lib/Types.js.map
 /lib/services/baseService.js
 /lib/services/baseLoginService.js
 /lib/services/baseLoginService.js.map
+/lib/services/resetPasswordService.js
+/lib/services/resetPasswordService.js.map

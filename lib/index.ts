@@ -82,6 +82,13 @@ class Controller implements Types.INAuth2Controller
     public initRoutes()
     {
         this.app.use(`${this.cfg.basePath}/changePassword`, new ChangePasswordService(this.DBController));
+        // register
+        // login
+        // logout
+        // resetPassword
+        // invite
+        // mergeDomains
+        // splitDomains
     }
 }
 

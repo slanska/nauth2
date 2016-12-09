@@ -37,22 +37,22 @@ export abstract class BaseLoginService
         return this as any;
     }
 
-    public setNavigateToHook()
+    public setNavigateTo(p:hooks.HookParams)
     {
 
     }
 
-    public generateAccessTokenHook()
+    public generateAccessToken(p:hooks.HookParams)
     {
 
     }
 
-    public generateRefreshTokenHook()
+    public generateRefreshToken(p:hooks.HookParams)
     {
 
     }
 
-    public initPayloadHook()
+    public initPayload(p:hooks.HookParams)
     {
 
     }
