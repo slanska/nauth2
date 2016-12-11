@@ -13,7 +13,8 @@ var common_cfg = {
     subDomains: {},
     userCreateMode: Types.UserCreateMode.SelfAndConfirm,
     tokenSecret: 'PLACE_YOUR_TOKEN_SECRET_HERE',
-    sendEmailOnChangePassword: true
+    sendEmailOnChangePassword: true,
+    numberOfDomainsInToken: 10
 
     /*
      emailTransport: nodemailer.createTransport(nodemailerSendGrid(

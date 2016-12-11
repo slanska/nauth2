@@ -543,9 +543,9 @@ module NAuth2
                     break;
             }
 
-            this.createUserLoginService();
+            // TODO this.createUserLoginService();
 
-            this.createChangePasswordService();
+            // TODO this.createChangePasswordService();
 
             if (cfg.subDomains)
             {

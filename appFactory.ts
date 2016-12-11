@@ -36,6 +36,14 @@ export = (config: Types.INAuth2Config) =>
         // Turn on URL-encoded parser for REST services
         .use(bodyParser.urlencoded({extended: true}))
 
+        .use((req, res, next) =>
+        {
+            // userAgent will be set by previously set middleware. We need to assign to feathers to have
+            // it accessible from services' handlers
+            req['feathers'].request = req;
+            next();
+        })
+
         .configure(nauth2(app, config));
 
     var ectRenderer = ECT({watch: true, root: __dirname + '/public', ext: '.html'});
@@ -44,7 +52,7 @@ export = (config: Types.INAuth2Config) =>
 
     function renderHtml(page?: string)
     {
-        var result = (req, res, next)=>
+        var result = (req, res, next) =>
         {
             if (!page)
                 page = req.params.page;
@@ -71,7 +79,7 @@ export = (config: Types.INAuth2Config) =>
      Unlike configurable base path (which is 'auth' by default), this path is obviously hardcoded.
      */
     app.get('/auth/config',
-        (req, res)=>
+        (req, res) =>
         {
             res.json({basePath: config.basePath});
         });

@@ -6,19 +6,19 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "express-serve-static-core/express-serve-static-core.d.ts": {
-      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+      "commit": "e45879a3b4a6d7e265f21103ae044cefb3cee37c"
     },
     "serve-static/serve-static.d.ts": {
-      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+      "commit": "e45879a3b4a6d7e265f21103ae044cefb3cee37c"
     },
     "express/express.d.ts": {
-      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+      "commit": "e45879a3b4a6d7e265f21103ae044cefb3cee37c"
     },
     "node/node.d.ts": {
-      "commit": "121ddf1be68def3f5dc245eacd0d0471eac590b0"
+      "commit": "e45879a3b4a6d7e265f21103ae044cefb3cee37c"
     },
     "mime/mime.d.ts": {
-      "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"
+      "commit": "e45879a3b4a6d7e265f21103ae044cefb3cee37c"
     },
     "knex/knex.d.ts": {
       "commit": "2c65d5ca7267fda6d49a3b447c8b089632fb5358"

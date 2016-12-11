@@ -114,6 +114,11 @@ namespace Types
         allowDomainRoles?: boolean;
 
         /*
+         Number of domain IDs to be added to access token by default. Default: 10
+         */
+        numberOfDomainsInToken?: number;
+
+        /*
          Roles assigned to a new member upon creation/registration
          Array of role names
          Default: none

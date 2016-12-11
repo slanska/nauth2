@@ -18,6 +18,7 @@ import _ = require('lodash');
 
 // Services
 import {ChangePasswordService} from './services/changePasswordService';
+import {LoginService} from './services/loginService';
 
 /*
  index:
@@ -81,14 +82,31 @@ class Controller implements Types.INAuth2Controller
 
     public initRoutes()
     {
+        /*
+         POST /changePassword
+         Payload:
+         @param password - current password
+         @param newPassword  - new password
+         @param confirmPassword - confirm new password (should be the same as 'newPassword')
+         'token' - could be either:
+         @param token - could be either:
+         a) regular accessToken
+         b) special 'change_password' token (valid for change password only)
+         */
         this.app.use(`${this.cfg.basePath}/changePassword`, new ChangePasswordService(this.DBController));
+
         // register
+
         // login
+        this.app.use(`${this.cfg.basePath}/login`, new LoginService(this.DBController));
+
         // logout
         // resetPassword
         // invite
         // mergeDomains
         // splitDomains
+        // renewToken
+
     }
 }
 

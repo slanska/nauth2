@@ -21,6 +21,7 @@ var uuid = require('uuid');
 import objectHash = require('object-hash');
 import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
+import assign = require("lodash/assign");
 
 /*
  Base class to serve login/signing calls
@@ -32,34 +33,188 @@ export abstract class BaseLoginService
     {
     }
 
+    static JWTSignAsync: (payload: any, secret, signOptions)=>Promise<any>;
+
     protected get asService(): feathers.Service
     {
         return this as any;
     }
 
-    public setNavigateTo(p:hooks.HookParams)
+    /*
+     Returns promise which will resolve to string 'navigateTo' (user's landing page)
+     which depends on primary user's role
+     SysAdmin: Admin dashboard
+     SysUserAdmin: User Admin
+     regular user: default home page
+     */
+    public getNavigateToLink(roles)
     {
+        var self = this;
+        return getSystemRoles(self.DBController.db)
+            .then(rr =>
+                {
+                    if (roles.indexOf(rr['SystemAdmin'].roleId) >= 0)
+                        return 'admin:dashboard';
+
+                    if (roles.indexOf(rr['UserAdmin'].roleId) >= 0)
+                        return 'admin:users';
+
+                    if (roles.indexOf(rr['DomainSuperAdmin'].roleId) >= 0)
+                        return 'admin:domains';
+
+                    return 'home';
+                }
+            );
+    }
+
+    /*
+     Returns promise which will resolve to string 'navigateTo' (user's landing page)
+     which depends on primary user's role
+     SysAdmin: Admin dashboard
+     SysUserAdmin: User Admin
+     regular user: default home page
+
+     Expects:
+     * p.data.roles
+     */
+    public setNavigateToLinkHook(p: hooks.HookParams)
+    {
+        return this.getNavigateToLink(p.data.roles);
+    }
+
+    /*
+     Hook to load user by his/her email or name.
+     Prerequisites:
+     p.data.email should be set to email or name
+
+     Uses: DBController.findUserByEmailOrName
+     */
+    public findUserByEmailOrName(p: hooks.HookParams)
+    {
+        const self = this;
+        if (!p.data || !p.data.email)
+            throw NAuth2.DBController.invalidLoginError();
+
+        return self.DBController.findUserByNameOrEmail(p.data.email)
+            .then(uu =>
+            {
+                if (!uu)
+                    throw NAuth2.DBController.invalidLoginError();
+                p.params['user'] = uu;
+            });
+    }
+
+    /*
+     Hook to generate change password token
+     This token typically has short lifetime (configurable)
+     and can be used ONLY for password change
+
+     Expects:
+     * p.params.user
+
+     Returns:
+     * p.result.accessToken (with subject 'change_password')
+     */
+    public generateChangePasswordToken(p: hooks.HookParams)
+    {
+        var self = this;
+        const user = p.params['user'];
+        var payload = {userId: user.userId, roles: [], domains: []};
 
     }
 
-    public generateAccessToken(p:hooks.HookParams)
+    public generateAccessTokenHook(p: hooks.HookParams)
     {
+        return this.generateAccessToken(p.params['user'])
+            .then(tt =>
+            {
+                p.result.accessToken = tt;
+            });
+    }
+
+    /*
+     Generates access token.
+     Token payload will have:
+     * userId
+     * roles - all user roles
+     * domains - limited list of domains
+     Expects:
+     * p.result.refreshToken
+     * p.params.user
+     Returns:
+     * p.result.accessToken (with subject 'access')
+     */
+    public generateAccessToken(user: Types.IUserRecord)
+    {
+        var self = this;
+        var payload = {userId: user.userId, roles: [], domains: []};
+
+        // load roles
+        return self.DBController.db.select('roleId').from('NAuth2_UserRoles').where({userId: user.userId})
+            .then(rr =>
+            {
+                payload.roles = _.map(rr, 'roleId');
+
+                // load top 10 freshly used domains, based on refresh tokens history (if applicable)
+                return self.DBController.db.table('NAuth2_DomainUsers')
+                    .where({userId: user.userId})
+                    .limit(10); // TODO Use config for limit? How about orderBy
+            })
+            .then(dd =>
+            {
+                payload.domains = _.map(dd, 'domainId');
+
+                let signOptions = {} as jwt.SignOptions;
+                signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
+                signOptions.subject = 'access';
+                return BaseLoginService.JWTSignAsync(payload, self.DBController.authCfg.token.secret, signOptions);
+            });
+    }
+
+    /*
+     'after' hook
+     Generates refresh token after successful login.
+     Prerequisites: p.params.user set to IUserRecord
+     Returns: p.result.refreshToken
+     */
+    public generateRefreshTokenHook(p: hooks.HookParams)
+    {
+        return this.generateRefreshToken(p.params['user'], p.params['request']);
+    }
+
+    /*
+
+     */
+    public generateRefreshToken(user: Types.IUserRecord, req)
+    {
+        var self = this;
+        var it = {} as Types.IRefreshTokenRecord;
+        it.tokenUuid = uuid.v4();
+        // var req = p.params['request'];
+        it.userAgent = JSON.stringify(req.headers['user-agent']);
+        it.userId = user.userId;
+
+        // Determine client IP address taking into account possible proxy server (e.g. nginx)
+        it.ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        it.signatureHash = objectHash(it.userAgent, {});
+        return self.DBController.db.table('NAuth2_RefreshTokens').insert(it);
 
     }
 
-    public generateRefreshToken(p:hooks.HookParams)
+    /*
+     Hook to load user profile (if configuration allow this
+     and login request has corresponding flag)
+     Expects:
+     * p.params.user
+     *
+     */
+    public loadUserProfile()
     {
-
+        var self = this;
+        if (self.DBController.cfg.returnUserProfileOnLogin)
+        {
+        }
     }
-
-    public initPayload(p:hooks.HookParams)
-    {
-
-    }
-
-    public loadUserProfileHook()
-    {
-    }
-
-
 }
+
+BaseLoginService.JWTSignAsync = Promise.promisify(jwt.sign);

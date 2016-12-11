@@ -37,20 +37,7 @@ export class ChangePasswordService extends BaseLoginService
 
         var token = data.accessToken;
 
-
         // Check token
-
-        // Check newPassword === confirmPassword
-        if (data.newPassword !== data.confirmPassword)
-        {
-            throw new Error(`Password mismatch`);
-        }
-
-        // Check if newPassword !== password
-        if (data.password === data.newPassword)
-        {
-            throw new Error(`Cannot re-use old password`);
-        }
 
         // Check newPassword is not in password history
 
@@ -75,21 +62,36 @@ export class ChangePasswordService extends BaseLoginService
             create: [
 
                 // Parse and verify token
+                auth.hooks.verifyToken(self.DBController.authCfg),
+
+                self.findUserByEmailOrName,
+
+                nhooks.verifyNewPassword(this.DBController.cfg, 'newPassword', 'confirmPassword'),
 
                 // Set attributes: oldPassword, password, confirmPassword
+                (p: hooks.HookParams) =>
+                {
+                    const pwd = p.data['password'];
+                    p.data['oldPassword'] = pwd;
+                    p.data['password'] = p.data['newPassword'];
+                },
+
+                // Make sure that new password differs from old one
+                (p: hooks.HookParams) =>
+                {
+                    if (p.data.password === p.data.newPassword)
+                        throw new Error(`Cannot re-use old password`);
+                },
+
+                // Compare old and new password - should not be the same, depending on configuration
                 (p: hooks.HookParams) =>
                 {
 
                 },
 
-
-                nhooks.verifyNewPassword(this.DBController.cfg, 'newPassword', 'confirmPassword'),
-
-                // Compare old and new password - should not be the same, depending on configuration
-
                 // Remove attributes
                 //nhooks.
-                hooks.remove('newPassword', 'confirmPassword'),
+                hooks.remove('oldPassword', 'confirmPassword'),
 
                 auth.hooks.hashPassword(this.DBController.authCfg)
 
@@ -103,21 +105,21 @@ export class ChangePasswordService extends BaseLoginService
                 self.initPayload,
 
                 // Generate login tokens: accessToken and refreshToken
-                self.generateAccessToken,
                 self.generateRefreshToken,
+                self.generateAccessToken,
 
                 // Set 'navigateTo' link
-                self.setNavigateTo,
+                self.getNavigateToLink,
 
                 // Send notification email ('Password has changed'), if configured
-                nhooks.sendEmailToUser(app, self.DBController.cfg, 'changePassword',
+                nhooks.sendEmailToUser(app, self.DBController.cfg, 'passwordChanged',
                     () =>
                     {
                         return ''
                     },
                     'email',
                     () => self.DBController.cfg.sendEmailOnChangePassword
-                    )
+                )
             ]
         });
     }
