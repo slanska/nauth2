@@ -45,15 +45,7 @@ export class LoginService extends BaseLoginService
                 {
                     if (!bcrypt.compareSync(p.data.password, p.params['user'].password))
                         throw NAuth2.DBController.invalidLoginError();
-                },
-
-
-            ]
-        });
-
-        self.asService.after({
-            create: [
-                self.generateAccessTokenHook
+                }
             ]
         });
     }
@@ -102,12 +94,8 @@ export class LoginService extends BaseLoginService
                         })
                         .then(tt =>
                         {
-                            result.accessToken = tt;
-                            return self.DBController.db.select('roleId').from('NAuth2_UserRoles').where({userId: user.userId});
-                        })
-                        .then(roles =>
-                        {
-                            return self.getNavigateToLink(roles);
+                            result.accessToken = tt.token;
+                            return self.getNavigateToLink(tt.roles);
                         })
                         .then(link =>
                         {

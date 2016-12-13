@@ -34,9 +34,6 @@ export abstract class BaseLoginService
     {
     }
 
-    static JWTSignAsync: (payload: string | Buffer | Object, secretOrPrivateKey: string | Buffer,
-                          options?: jsonwebtoken.SignOptions)=>Promise<any>;
-
     protected get asService(): feathers.Service
     {
         return this as any;
@@ -164,6 +161,7 @@ export abstract class BaseLoginService
     public generateAccessToken(user: Types.IUserRecord)
     {
         var self = this;
+        var roles;
         var payload = {userId: user.userId, roles: [], domains: []};
 
         // load roles
@@ -171,6 +169,7 @@ export abstract class BaseLoginService
             .then(rr =>
             {
                 payload.roles = _.map(rr, 'roleId');
+                roles = rr;
 
                 // load top 10 freshly used domains, based on refresh tokens history (if applicable)
                 return self.DBController.db.table('NAuth2_DomainUsers')
@@ -184,7 +183,7 @@ export abstract class BaseLoginService
                 let signOptions = {} as jwt.SignOptions;
                 signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
                 signOptions.subject = 'access';
-                return BaseLoginService.JWTSignAsync(payload, self.DBController.authCfg.token.secret, signOptions);
+                return {roles, token: jsonwebtoken.sign(payload, self.DBController.authCfg.token.secret, signOptions)};
             });
     }
 
@@ -219,19 +218,17 @@ export abstract class BaseLoginService
         // Determine client IP address taking into account possible proxy server (e.g. nginx)
         it.ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         it.signatureHash = objectHash(it.userAgent, {});
+
         let payload = {userId: user.userId, tokenID: it.tokenUuid} as any;
         let options = {} as jsonwebtoken.SignOptions;
         options.expiresIn = self.DBController.cfg.refreshTokenExpiresIn;
         options.subject = 'refresh';
-        return BaseLoginService.JWTSignAsync(payload, self.DBController.cfg.tokenSecret, options)
-            .then(tt =>
-            {
-                token = tt;
-                let t = jsonwebtoken.decode(tt);
-                console.log(t);
-                it.validUntil = t.exp; // TODO
-                return self.DBController.db.table('NAuth2_RefreshTokens').insert(it);
-            })
+        token = jsonwebtoken.sign(payload, self.DBController.cfg.tokenSecret, options)
+
+        let t = jsonwebtoken.decode(token);
+        console.log(t);
+        it.validUntil = new Date(t.exp * 1000); // TODO
+        return self.DBController.db.table('NAuth2_RefreshTokens').insert(it)
             .then(() =>
             {
                 return token;
@@ -253,5 +250,3 @@ export abstract class BaseLoginService
         }
     }
 }
-
-BaseLoginService.JWTSignAsync = Promise.promisify(jwt.sign);

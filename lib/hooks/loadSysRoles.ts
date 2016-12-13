@@ -26,7 +26,7 @@ export function getSystemRoles(db: Knex): Promise<Types.RolesHash>
                     var rr = {} as any;
                     _.forEach(roles, (it) =>
                     {
-                        rr[it.roleId] = it;
+                        rr[it.name] = it;
                     });
                     return rr;
                 })
