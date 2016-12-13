@@ -4,9 +4,9 @@
 
 import * as Types from '../Types';
 import knex = require('knex');
-import * as DB from '../Consts';
+// import * as DB from '../Consts';
 import Promise = require('bluebird');
-var knexServiceFactory = require('feathers-knex');
+// var knexServiceFactory = require('feathers-knex');
 import feathers = require("feathers");
 import nhooks = require('../hooks/index');
 import hooks = require('feathers-hooks');
@@ -22,6 +22,7 @@ import objectHash = require('object-hash');
 import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
+import jsonwebtoken = require('jsonwebtoken');
 
 /*
  Base class to serve login/signing calls
@@ -33,7 +34,8 @@ export abstract class BaseLoginService
     {
     }
 
-    static JWTSignAsync: (payload: any, secret, signOptions)=>Promise<any>;
+    static JWTSignAsync: (payload: string | Buffer | Object, secretOrPrivateKey: string | Buffer,
+                          options?: jsonwebtoken.SignOptions)=>Promise<any>;
 
     protected get asService(): feathers.Service
     {
@@ -105,6 +107,20 @@ export abstract class BaseLoginService
     }
 
     /*
+     Generates temporary token which is valid for changing password only
+     Returns promise which resolved to token
+     */
+    public generateChangePasswordToken(user: Types.IUserRecord)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            var self = this;
+            var payload = {userId: user.userId, roles: [], domains: []};
+            return resolve(payload);
+        });
+    }
+
+    /*
      Hook to generate change password token
      This token typically has short lifetime (configurable)
      and can be used ONLY for password change
@@ -115,12 +131,13 @@ export abstract class BaseLoginService
      Returns:
      * p.result.accessToken (with subject 'change_password')
      */
-    public generateChangePasswordToken(p: hooks.HookParams)
+    public generateChangePasswordTokenHook(p: hooks.HookParams)
     {
-        var self = this;
-        const user = p.params['user'];
-        var payload = {userId: user.userId, roles: [], domains: []};
-
+        return this.generateChangePasswordToken(p.params['user'])
+            .then(tt =>
+            {
+                p.result.accessToken = tt;
+            });
     }
 
     public generateAccessTokenHook(p: hooks.HookParams)
@@ -179,7 +196,11 @@ export abstract class BaseLoginService
      */
     public generateRefreshTokenHook(p: hooks.HookParams)
     {
-        return this.generateRefreshToken(p.params['user'], p.params['request']);
+        return this.generateRefreshToken(p.params['user'], p.params['request'])
+            .then(token =>
+            {
+                p.result.refreshToken = token;
+            });
     }
 
     /*
@@ -187,18 +208,34 @@ export abstract class BaseLoginService
      */
     public generateRefreshToken(user: Types.IUserRecord, req)
     {
-        var self = this;
-        var it = {} as Types.IRefreshTokenRecord;
+        var token;
+        const self = this;
+        let it = {} as Types.IRefreshTokenRecord;
         it.tokenUuid = uuid.v4();
         // var req = p.params['request'];
-        it.userAgent = JSON.stringify(req.headers['user-agent']);
+        it.userAgent = req.headers['user-agent'];
         it.userId = user.userId;
 
         // Determine client IP address taking into account possible proxy server (e.g. nginx)
         it.ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         it.signatureHash = objectHash(it.userAgent, {});
-        return self.DBController.db.table('NAuth2_RefreshTokens').insert(it);
-
+        let payload = {userId: user.userId, tokenID: it.tokenUuid} as any;
+        let options = {} as jsonwebtoken.SignOptions;
+        options.expiresIn = self.DBController.cfg.refreshTokenExpiresIn;
+        options.subject = 'refresh';
+        return BaseLoginService.JWTSignAsync(payload, self.DBController.cfg.tokenSecret, options)
+            .then(tt =>
+            {
+                token = tt;
+                let t = jsonwebtoken.decode(tt);
+                console.log(t);
+                it.validUntil = t.exp; // TODO
+                return self.DBController.db.table('NAuth2_RefreshTokens').insert(it);
+            })
+            .then(() =>
+            {
+                return token;
+            });
     }
 
     /*
@@ -208,7 +245,7 @@ export abstract class BaseLoginService
      * p.params.user
      *
      */
-    public loadUserProfile()
+    public loadUserProfile(p: hooks.HookParams)
     {
         var self = this;
         if (self.DBController.cfg.returnUserProfileOnLogin)

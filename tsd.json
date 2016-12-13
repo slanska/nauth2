@@ -112,6 +112,9 @@
     },
     "webix/webix.d.ts": {
       "commit": "e2af6d0bd5dffabdb363e779c5ab7f47e6ff3423"
+    },
+    "moment/moment.d.ts": {
+      "commit": "6b3bc735ad028ca115c06721fb1c71ffc0e7a546"
     }
   }
 }

@@ -4,9 +4,9 @@
 
 import * as Types from '../Types';
 import knex = require('knex');
-import * as DB from '../Consts';
+// import * as DB from '../Consts';
 import Promise = require('bluebird');
-var knexServiceFactory = require('feathers-knex');
+// var knexServiceFactory = require('feathers-knex');
 import feathers = require("feathers");
 import nhooks = require('../hooks/index');
 import hooks = require('feathers-hooks');
@@ -19,7 +19,7 @@ import Qs = require('qs');
 import bcrypt = require('bcryptjs');
 var uuid = require('uuid');
 import objectHash = require('object-hash');
-import {getSystemRoles} from "../hooks/loadSysRoles";
+// import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
 
@@ -59,35 +59,6 @@ export class LoginService extends BaseLoginService
     }
 
     /*
-     Returns promise which will resolve to string 'navigateTo' (user's landing page)
-     which depends on primary user's role
-     SysAdmin: Admin dashboard
-     SysUserAdmin: User Admin
-     regular user: default home page
-
-
-     */
-    // private getNavigateToLink(payload): Promise<string>
-    // {
-    //     var self = this;
-    //     var roles = payload.roles;
-    //     return getSystemRoles(self.DBController.db)
-    //         .then(rr =>
-    //         {
-    //             if (roles.indexOf(rr['SystemAdmin'].roleId) >= 0)
-    //                 return 'admin:dashboard';
-    //
-    //             if (roles.indexOf(rr['UserAdmin'].roleId) >= 0)
-    //                 return 'admin:users';
-    //
-    //             if (roles.indexOf(rr['DomainSuperAdmin'].roleId) >= 0)
-    //                 return 'admin:domains';
-    //
-    //             return 'home';
-    //         });
-    // }
-
-    /*
      POST /auth/login
      Expects:
      * params.user
@@ -99,13 +70,17 @@ export class LoginService extends BaseLoginService
         var self = this;
         return new Promise((resolve, reject) =>
         {
-            var user: Types.IUserRecord = data.params.user;
+            var user: Types.IUserRecord = params['user'];
 
             // TODO user.pwd_expires_at
             if (user.changePasswordOnNextLogin)
             {
                 // Redirect or return warning
-                return resolve({navigateTo: 'changePassword'});
+                return self.generateChangePasswordToken(user)
+                    .then(() =>
+                    {
+                        return resolve({navigateTo: 'changePassword'});
+                    });
             }
 
             switch (user.status)
@@ -116,18 +91,14 @@ export class LoginService extends BaseLoginService
                      userId
                      all assigned general roles (not domain specific)
                      top N assigned domains and all their roles (if applicable)
-
                      */
                     var result = {accessToken: void 0, refreshToken: void 0, navigateTo: void 0};
 
-                    // Check if password has expired or has to be changed
-                    // if ()
-
-                    return self.generateRefreshToken(params['user'], params['request'])
+                    return self.generateRefreshToken(user, params['request'])
                         .then(tt =>
                         {
                             result.refreshToken = tt;
-                            return self.generateAccessToken(params['user'])
+                            return self.generateAccessToken(user);
                         })
                         .then(tt =>
                         {
@@ -136,53 +107,17 @@ export class LoginService extends BaseLoginService
                         })
                         .then(roles =>
                         {
-                            return self.getNavigateToLink(roles)
+                            return self.getNavigateToLink(roles);
                         })
                         .then(link =>
                         {
                             result.navigateTo = link;
-                            return result;
+                            return resolve(result);
+                        })
+                        .catch(err =>
+                        {
+                            return reject(err);
                         });
-
-
-                    // load roles
-                    // return self.DBController.db.select('roleId').from('NAuth2_UserRoles').where({userId: user.userId})
-                    //     .then(rr =>
-                    //     {
-                    //         result.roles = _.map(rr, 'roleId');
-                    //
-                    //         // load top 10 freshly used domains, based on refresh tokens history (if applicable)
-                    //         return self.DBController.db.table('NAuth2_DomainUsers')
-                    //             .where({userId: user.userId})
-                    //             .limit(10); // TODO Use config for limit? How about orderBy
-                    //     })
-                    //     .then(dd =>
-                    //     {
-                    //         result.domains = _.map(dd, 'domainId');
-                    //         return self.getNavigateToLink(result);
-                    //     })
-                    //     .then((navigateTo: string) =>
-                    //     {
-                    //         // generate tokens
-                    //         let signOptions = {} as jwt.SignOptions;
-                    //         signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
-                    //         signOptions.subject = 'signin';
-                    //         jwt.sign(result, self.DBController.authCfg.token.secret, signOptions, (err, token) =>
-                    //         {
-                    //             if (err)
-                    //                 return reject(err);
-                    //
-                    //             self.DBController.createRefreshToken(user.userId, params as any)
-                    //                 .then(refreshToken =>
-                    //                 {
-                    //                     return resolve({
-                    //                         token,
-                    //                         refreshToken,
-                    //                         navigateTo
-                    //                     });
-                    //                 });
-                    //         });
-                    //     });
 
                 case 'S':
                 case 'D':

@@ -107,6 +107,8 @@ class Controller implements Types.INAuth2Controller
         // splitDomains
         // renewToken
 
+        // revokeToken
+
     }
 }
 

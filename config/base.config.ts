@@ -14,7 +14,8 @@ var common_cfg = {
     userCreateMode: Types.UserCreateMode.SelfAndConfirm,
     tokenSecret: 'PLACE_YOUR_TOKEN_SECRET_HERE',
     sendEmailOnChangePassword: true,
-    numberOfDomainsInToken: 10
+    numberOfDomainsInToken: 10,
+    refreshTokenExpiresIn: '30d'
 
     /*
      emailTransport: nodemailer.createTransport(nodemailerSendGrid(

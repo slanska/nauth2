@@ -53,6 +53,7 @@
     "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",
     "lodash": "^4.16.2",
+    "moment": "^2.17.1",
     "nodemailer": "^2.6.4",
     "object-hash": "^1.1.4",
     "shortid": "^2.2.6",
