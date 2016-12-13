@@ -4,9 +4,7 @@
 
 import * as Types from '../Types';
 import knex = require('knex');
-// import * as DB from '../Consts';
 import Promise = require('bluebird');
-// var knexServiceFactory = require('feathers-knex');
 import feathers = require("feathers");
 import nhooks = require('../hooks/index');
 import hooks = require('feathers-hooks');
@@ -105,7 +103,7 @@ export abstract class BaseLoginService
 
     /*
      Generates temporary token which is valid for changing password only
-     Returns promise which resolved to token
+     Returns promise which resolves to token
      */
     public generateChangePasswordToken(user: Types.IUserRecord)
     {
@@ -113,7 +111,11 @@ export abstract class BaseLoginService
         {
             var self = this;
             var payload = {userId: user.userId, roles: [], domains: []};
-            return resolve(payload);
+            var options = {} as jsonwebtoken.SignOptions;
+            options.expiresIn = '15 min'; // TODO use config?
+            options.subject = 'change_password';
+            var token = jsonwebtoken.sign(payload, self.DBController.cfg.tokenSecret, options);
+            return resolve(token);
         });
     }
 
@@ -247,6 +249,7 @@ export abstract class BaseLoginService
         var self = this;
         if (self.DBController.cfg.returnUserProfileOnLogin)
         {
+            // TODO
         }
     }
 }
