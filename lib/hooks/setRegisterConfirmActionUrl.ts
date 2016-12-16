@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-23.
  */
 
-import * as Types from '../Types';
+import {Types} from "../../typings/server.d";
 import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');

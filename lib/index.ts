@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-04.
  */
 
-import Types = require("./Types");
+import {Types} from '../typings/server.d';
 import Nodemailer = require('nodemailer');
 import NodemailerSmtpTransport = require('nodemailer-smtp-transport');
 import Promise = require('bluebird');

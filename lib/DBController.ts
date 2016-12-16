@@ -2,7 +2,8 @@
  * Created by slanska on 2016-10-02.
  */
 
-import * as Types from './Types';
+import {Types} from "../typings/server.d";
+import {Types as SharedTypes} from "../typings/shared.d";
 import knex = require('knex');
 import * as DB from './Consts';
 import Promise = require('bluebird');
@@ -245,7 +246,7 @@ module NAuth2
         /*
          Finds user by his/her email or name. Returns promise
          */
-        findUserByNameOrEmail(emailOrName: string): Promise<Types.IUserRecord>
+        findUserByNameOrEmail(emailOrName: string): Promise<SharedTypes.IUserRecord>
         {
             var self = this;
             if (_.isEmpty(emailOrName))
@@ -658,7 +659,7 @@ module NAuth2
             var self = this;
             return new Promise((resolve, reject) =>
             {
-                var user: Types.IUserRecord = null;
+                var user: SharedTypes.IUserRecord = null;
                 // Load user by email or name
                 self.DBController.findUserByNameOrEmail(data.email)
                     .then(user =>
@@ -667,7 +668,7 @@ module NAuth2
                             throw DBController.invalidLoginError();
                         return user;
                     })
-                    .then((uu: Types.IUserRecord) =>
+                    .then((uu: SharedTypes.IUserRecord) =>
                     {
                         // Remember instance of user
                         user = uu;

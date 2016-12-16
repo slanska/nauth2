@@ -8,7 +8,7 @@
  2) password and confirm password should match
  */
 
-import * as Types from '../Types';
+import {Types} from "../../typings/server.d";
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 

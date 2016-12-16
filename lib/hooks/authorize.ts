@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-16.
  */
 
-import * as Types from '../Types';
+import {Types} from '../../typings/server.d';
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 import {methodMap, getRules} from '../accessRules';

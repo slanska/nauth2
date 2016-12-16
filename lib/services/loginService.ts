@@ -2,7 +2,8 @@
  * Created by slanska on 2016-12-08.
  */
 
-import * as Types from '../Types';
+import {Types} from '../../typings/server.d';
+import {Types as SharedTypes} from '../../typings/shared.d';
 import Promise = require('bluebird');
 import feathers = require("feathers");
 import nhooks = require('../hooks/index');
@@ -67,7 +68,7 @@ export class LoginService extends BaseLoginService
         var self = this;
         return new Promise((resolve, reject) =>
         {
-            var user: Types.IUserRecord = params['user'];
+            var user: SharedTypes.IUserRecord = params['user'];
 
             // TODO also check user.pwd_expires_at
             if (user.changePasswordOnNextLogin)

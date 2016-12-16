@@ -2,7 +2,7 @@
  * Created by slanska on 2016-12-08.
  */
 
-import * as Types from '../Types';
+import {Types} from '../../typings/server.d';
 import knex = require('knex');
 import * as DB from '../Consts';
 import Promise = require('bluebird');
@@ -19,7 +19,7 @@ import Qs = require('qs');
 import bcrypt = require('bcryptjs');
 var uuid = require('uuid');
 import objectHash = require('object-hash');
-import {getSystemRoles} from "../hooks/loadSysRoles";
+// import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
 
@@ -49,6 +49,10 @@ export class ChangePasswordService extends BaseLoginService
 
 
         // Automatically proceed with login: generate tokens etc.
+    }
+
+    private initPayload()
+    {
     }
 
     /*
@@ -120,7 +124,7 @@ export class ChangePasswordService extends BaseLoginService
                     'email',
                     () => self.DBController.cfg.sendEmailOnChangePassword
                 )
-            ]
+            ] as any
         });
     }
 }

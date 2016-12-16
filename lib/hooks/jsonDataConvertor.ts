@@ -8,7 +8,7 @@
  Result is set to params.context.ownUser
  */
 
-import * as Types from '../Types';
+import {Types} from '../../typings/server.d';
 import hooks = require("feathers-hooks");
 import _ = require('lodash');
 

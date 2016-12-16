@@ -7,7 +7,7 @@
  Expects 'captcha' attribute in params.data 
  */
 
-import * as Types from '../Types';
+import {Types} from "../../typings/server.d";
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 import Captcha = require('../Captcha');
