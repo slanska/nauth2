@@ -7,7 +7,7 @@
  This instance can be run standalone, in cluster, or be configured for 
  */
 
-import {Types} from './typings/server.d';
+import Types = require('./lib/Types');
 import feathers = require('feathers');
 var rest = require('feathers-rest');
 import hooks = require('feathers-hooks');

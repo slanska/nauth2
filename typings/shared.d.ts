@@ -7,45 +7,46 @@
 /// <reference path="qs/qs.d.ts" />
 /// <reference path="moment/moment.d.ts" />
 
-export namespace Types
+
+/*
+
+ */
+interface IUserRecord
 {
-    /*
+    userId: number;
+    name: string;
+    password: string;
+    email: string;
+    created_at: Date;
+    updated_at: Date;
+    firstName?: string;
+    lastName?: string;
+    extData?: Object;
+    status?: 'A'|'P'|'D'|'S';
+    birthData?: Date;
+    gender?: string;
+    avatar?: string;
+    culture?: string;
+    maxCreatedDomains?: number;
+    changePasswordOnNextLogin?: boolean;
+    pwdSalt: string;
+    // TODO TBC
+}
 
-     */
-    export interface IUserRecord
-    {
-        userId: number;
-        name: string;
-        password: string;
-        email: string;
-        created_at: Date;
-        updated_at: Date;
-        firstName?: string;
-        lastName?: string;
-        extData?: Object;
-        status?: 'A'|'P'|'D'|'S';
-        birthData?: Date;
-        gender?: string;
-        avatar?: string;
-        culture?: string;
-        maxCreatedDomains?: number;
-        changePasswordOnNextLogin?: boolean;
-        pwdSalt: string;
-        // TODO TBC
-    }
-
-    /*
-     Result of POST /auth/login
-     */
-    export interface ILoginResponse
-    {
-        navigateTo: string;
-        accessToken?: string;
-        refreshToken?: string;
-        userProfile?: IUserRecord
-        message?: string;
-
-    }
+/*
+ Result of POST /auth/login
+ */
+interface ILoginResponse
+{
+    navigateTo: string;
+    accessToken?: string;
+    refreshToken?: string;
+    userProfile?: IUserRecord
+    message?: string;
 
 }
+
+
+
+
 

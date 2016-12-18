@@ -4,9 +4,7 @@
 
 // /<reference path="../../typings/server.d.ts"/>
 
-import {Types} from "../../typings/server.d";
-import {Types as SharedTypes} from '../../typings/shared.d';
-
+import Types = require('../Types');
 import knex = require('knex');
 import Promise = require('bluebird');
 import feathers = require("feathers");
@@ -109,7 +107,7 @@ export abstract class BaseLoginService
      Generates temporary token which is valid for changing password only
      Returns promise which resolves to token
      */
-    public generateChangePasswordToken(user: SharedTypes.IUserRecord)
+    public generateChangePasswordToken(user: IUserRecord)
     {
         return new Promise((resolve, reject) =>
         {
@@ -164,7 +162,7 @@ export abstract class BaseLoginService
      Returns:
      * p.result.accessToken (with subject 'access')
      */
-    public generateAccessToken(user: SharedTypes.IUserRecord)
+    public generateAccessToken(user: IUserRecord)
     {
         var self = this;
         var roles;
@@ -211,7 +209,7 @@ export abstract class BaseLoginService
     /*
 
      */
-    public generateRefreshToken(user: SharedTypes.IUserRecord, req)
+    public generateRefreshToken(user: IUserRecord, req)
     {
         var token;
         const self = this;

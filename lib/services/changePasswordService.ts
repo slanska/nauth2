@@ -2,7 +2,7 @@
  * Created by slanska on 2016-12-08.
  */
 
-import {Types} from '../../typings/server.d';
+import Types = require('../Types');
 import knex = require('knex');
 import * as DB from '../Consts';
 import Promise = require('bluebird');

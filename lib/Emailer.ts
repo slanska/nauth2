@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-10.
  */
 
-import {Types} from '../typings/server.d';
+import Types = require('./Types');
 import nodemailer = require('nodemailer');
 import feathers = require('feathers');
 import errors = require('feathers-errors');

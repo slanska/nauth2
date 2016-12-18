@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-04.
  */
 
-import {Types} from '../typings/server.d';
+import Types = require('./Types');
 import Nodemailer = require('nodemailer');
 import NodemailerSmtpTransport = require('nodemailer-smtp-transport');
 import Promise = require('bluebird');
@@ -57,7 +57,8 @@ class Controller implements Types.INAuth2Controller
 
     public AuthConfig: authentication.AuthConfig = {} as authentication.AuthConfig;
 
-    constructor(protected app: feathers.Application, public cfg: Types.INAuth2Config = {} as Types.INAuth2Config)
+    constructor(protected app: feathers.Application,
+                public cfg: Types.INAuth2Config = {} as Types.INAuth2Config)
     {
         app.use(initRuntimeCfg(this));
 

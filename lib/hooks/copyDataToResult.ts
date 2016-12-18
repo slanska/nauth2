@@ -6,7 +6,7 @@
  Copies given field values from params.data to params.result
  */
 
-import {Types} from "../../typings/server.d";
+import Types = require('../Types');
 import hooks = require("feathers-hooks");
 import _ = require('lodash');
 

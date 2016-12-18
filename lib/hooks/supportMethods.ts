@@ -6,8 +6,7 @@
  Checks if hook method matches allowed list. Cancels processing if no match found
  */
 
-// import * as Types from '../Types';
-import {Types} from "../../typings/server.d";
+import Types = require('../Types');
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
 

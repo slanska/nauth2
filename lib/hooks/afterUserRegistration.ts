@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-09.
  */
 
-import {Types} from '../../typings/server.d';
+import Types = require('../Types');
 import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
@@ -13,14 +13,14 @@ import Knex = require('knex');
  Checks registration mode and depending on it,
  sets attributes for sending notification and/or confirmation emails
  */
-function afterUserRegistration(knex:Knex, cfg:Types.INAuth2Config, emailField = 'email')
+function afterUserRegistration(knex: Knex, cfg: Types.INAuth2Config, emailField = 'email')
 {
     /*
      registrationComplete
      welcome
      */
 
-    var f = (p:hooks.HookParams)=>
+    var f = (p: hooks.HookParams) =>
     {
         if (cfg.userCreateMode === Types.UserCreateMode.Auto)
         {
@@ -40,7 +40,8 @@ function afterUserRegistration(knex:Knex, cfg:Types.INAuth2Config, emailField = 
                 var result = knex.select('email').from('NAuth2_Users')
                     .join('NAuth2_UserRoles', 'roleId', 'roleId')
                     .where('roleId').then;
-                result(d=> {
+                result(d =>
+                {
                     p['emailOptions'] = [{
                         templateName: 'approveNewUser',
                         to: '', // TODO UserAdmin email

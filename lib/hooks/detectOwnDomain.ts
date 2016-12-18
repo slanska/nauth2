@@ -9,7 +9,7 @@
  Result is set to params.context.ownDomain
  */
 
-import {Types} from '../../typings/server.d';
+import Types = require('../Types');
 import hooks = require("feathers-hooks");
 
 function detectOwnDomain()

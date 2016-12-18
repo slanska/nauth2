@@ -2,7 +2,7 @@
  * Created by slanska on 2015-11-02.
  */
 
-import {Types} from '../typings/server.d';
+import Types = require('./Types');
 import express = require('express');
 import crypto = require('crypto');
 var captchapng = require('captchapng');

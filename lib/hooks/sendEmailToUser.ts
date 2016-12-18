@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-09.
  */
 
-import {Types} from '../../typings/server.d';
+import Types = require('../Types');
 import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
@@ -19,7 +19,8 @@ import Emailer = require('../Emailer');
  @param subject : email subject. Can be template string in ECT format.
  */
 function sendEmailToUser(app:feathers.Application, cfg:Types.INAuth2Config,
-                         templateName:string, subject:string|Types.TemplateFunction, emailField = 'email', condition?:Function)
+                         templateName:string, subject:string|Types.TemplateFunction,
+                         emailField = 'email', condition?:Function)
 {
     var emailer = new Emailer(app, cfg);
     var result = (p:hooks.HookParams)=>

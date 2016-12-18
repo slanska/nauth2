@@ -6,7 +6,7 @@
 Service to handle /auth/confirmRegister request
  */
 
-import {Types} from '../../typings/server.d';
+import Types = require('../Types');
 import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');

@@ -2,7 +2,7 @@
  * Created by slanska on 2016-10-23.
  */
 
-import {Types} from "../../typings/server.d";
+import Types = require('../Types');
 import feathers = require("feathers");
 import hooks = require("feathers-hooks");
 import errors = require('feathers-errors');
@@ -21,13 +21,13 @@ import Qs = require('qs');
  @param cfg : global NAuth2 configuration. emailConfig is needed
  */
 function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthConfig,
-                                     emailFiield = 'email')
+                                     emailField = 'email')
 {
     var result = function (p:hooks.HookParams)
     {
         return new Promise((resolve, reject)=>
         {
-            var payload = {email: p.data[emailFiield]};
+            var payload = {email: p.data[emailField]};
             var signOptions = {} as jwt.SignOptions;
             signOptions.expiresIn = cfg.confirmTokenExpiresIn;
             signOptions.subject = 'confirm_registration';

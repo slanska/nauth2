@@ -8,7 +8,7 @@
  Initializes database if needed
  */
 
-import {Types} from '../../typings/server.d';
+import Types = require('../Types');
 import _ = require('lodash');
 import express = require('express');
 import url = require('url');

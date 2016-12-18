@@ -7,7 +7,7 @@
  */
 
 import crypto = require('crypto');
-import {Types} from "../../typings/server.d";
+import Types = require('../Types');
 import hooks = require("feathers-hooks");
 import Promise = require('bluebird');
 
