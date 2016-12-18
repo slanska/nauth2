@@ -50,6 +50,7 @@
     "feathers-rest": "^1.5.0",
     "feathers-sendgrid": "^0.2.1",
     "http-status": "^0.2.3",
+    "httpstatus": "^1.0.0",
     "jsonwebtoken": "^7.1.9",
     "knex": "^0.12.2",
     "lodash": "^4.16.2",

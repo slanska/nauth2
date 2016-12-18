@@ -42,7 +42,7 @@ class UserController
                 var url = `${cfg.basePath}/login`;
                 return http.post(url, {email: emailOrName, password: password});
             })
-            .then(res =>
+            .then((res:ILoginResponse) =>
             {
                 if (res.navigateTo === 'changePassword')
                 // If password needs to be changed or has expired, there will not be refresh token and access token.

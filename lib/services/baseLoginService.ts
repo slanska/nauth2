@@ -114,9 +114,11 @@ export abstract class BaseLoginService
             var self = this;
             var payload = {userId: user.userId, roles: [], domains: []};
             var options = {} as jsonwebtoken.SignOptions;
-            options.expiresIn = '15 min'; // TODO use config?
+            options.expiresIn = self.DBController.cfg.changePasswordTokenExpiresIn || '15 min';
             options.subject = 'change_password';
-            var token = jsonwebtoken.sign(payload, self.DBController.cfg.tokenSecret, options);
+
+            // Use reversed token secret
+            var token = jsonwebtoken.sign(payload, self.DBController.cfg.changePasswordTokenSecret, options);
             return resolve(token);
         });
     }
@@ -249,9 +251,10 @@ export abstract class BaseLoginService
     public loadUserProfile(p: hooks.HookParams)
     {
         var self = this;
-        if (self.DBController.cfg.returnUserProfileOnLogin)
+        if (self.DBController.cfg.returnUserProfileOnLogin
+            && (p.result as ILoginResponse).accessToken)
         {
-            // TODO
+            (p.result as ILoginResponse).userProfile = p.params['user'];
         }
     }
 }

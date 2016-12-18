@@ -7,7 +7,6 @@
 /// <reference path="qs/qs.d.ts" />
 /// <reference path="moment/moment.d.ts" />
 
-
 /*
 
  */
@@ -22,6 +21,13 @@ interface IUserRecord
     firstName?: string;
     lastName?: string;
     extData?: Object;
+
+    /*
+     A - Active
+     P - Pending confirmation
+     D - Deleted
+     S - Suspended
+     */
     status?: 'A'|'P'|'D'|'S';
     birthData?: Date;
     gender?: string;
@@ -43,7 +49,7 @@ interface ILoginResponse
     refreshToken?: string;
     userProfile?: IUserRecord
     message?: string;
-
+    status?: number;
 }
 
 

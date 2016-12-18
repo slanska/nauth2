@@ -13,6 +13,7 @@ import _ = require('lodash');
 import bcrypt = require('bcryptjs');
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
+import HTTPStatus = require('http-status');
 
 /*
  Service for user password changing
@@ -42,7 +43,22 @@ export class LoginService extends BaseLoginService
 
         self.asService.after({
             create: [
-                self.loadUserProfile
+                self.loadUserProfile,
+
+                nhooks.sendEmailToUser(self.app, self.DBController.cfg, 'registerConfirmReminder',
+                    (p:hooks.HookParams) =>
+                    {
+                        // TODO
+                        return '';
+                    },
+                    'email',
+                    () =>
+                    {
+                        // TODO
+                        // send this email only if result status = OK and navigateTo = 'registerNotComplete'
+
+                        return false;
+                    })
             ]
         });
     }
@@ -65,6 +81,8 @@ export class LoginService extends BaseLoginService
     create(data, params: feathers.MethodParams)
     {
         var self = this;
+        var result = {} as ILoginResponse;
+
         return new Promise((resolve, reject) =>
         {
             var user: IUserRecord = params['user'];
@@ -74,9 +92,11 @@ export class LoginService extends BaseLoginService
             {
                 // Redirect or return warning
                 return self.generateChangePasswordToken(user)
-                    .then(() =>
+                    .then((token: any) =>
                     {
-                        return resolve({navigateTo: 'changePassword'});
+                        result.accessToken = token;
+                        result.navigateTo = 'changePassword';
+                        return resolve(result);
                     });
             }
 
@@ -90,8 +110,6 @@ export class LoginService extends BaseLoginService
                      all assigned general roles (not domain specific)
                      top N assigned domains and all their roles (if applicable)
                      */
-                    let result = {accessToken: void 0, refreshToken: void 0, navigateTo: void 0};
-
                     return self.generateRefreshToken(user, params['request'])
                         .then(tt =>
                         {
@@ -125,9 +143,9 @@ export class LoginService extends BaseLoginService
                 case 'P':
                     // TODO Registration is not yet confirmed - resend email
                 {
-                    let result = {} as any;
                     result.navigateTo = 'registerNotComplete';
                     result.message = '';
+                    result.status = HTTPStatus.UNAUTHORIZED;
                     return resolve(result);
                 }
             }

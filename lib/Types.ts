@@ -72,6 +72,11 @@ export interface INAuth2Config
     tokenSecret?: string,
 
     /*
+     Secret for change password token
+     */
+    changePasswordTokenSecret?: string;
+
+    /*
      Lifetime of access token. By default: '1d'
      */
     tokenExpiresIn?: string;
@@ -86,6 +91,12 @@ export interface INAuth2Config
      Default: '1 day'
      */
     confirmTokenExpiresIn?: string;
+
+    /*
+     Lifetime of token to change expired or temporary password.
+     Default: '15 min'
+     */
+    changePasswordTokenExpiresIn?: string;
 
     /*
      Optional configuration for subdomains.
@@ -204,6 +215,7 @@ export interface INAuth2Config
 
     /*
      Link to navigate after user clicked [Change password] link in email
+     TODO Needed?
      */
     changePasswordEndpoint?: string,
 

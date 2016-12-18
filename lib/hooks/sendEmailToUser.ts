@@ -18,7 +18,7 @@ import Emailer = require('../Emailer');
  @param templateName : path to html template to generate email body
  @param subject : email subject. Can be template string in ECT format.
  */
-function sendEmailToUser(app:feathers.Application, cfg:Types.INAuth2Config,
+export function sendEmailToUser(app:feathers.Application, cfg:Types.INAuth2Config,
                          templateName:string, subject:string|Types.TemplateFunction,
                          emailField = 'email', condition?:Function)
 {
@@ -44,5 +44,3 @@ function sendEmailToUser(app:feathers.Application, cfg:Types.INAuth2Config,
     };
     return result;
 }
-
-export = sendEmailToUser;

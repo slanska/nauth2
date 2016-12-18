@@ -4,9 +4,7 @@
 
 import Types = require('../Types');
 import knex = require('knex');
-import * as DB from '../Consts';
 import Promise = require('bluebird');
-var knexServiceFactory = require('feathers-knex');
 import feathers = require("feathers");
 import nhooks = require('../hooks/index');
 import hooks = require('feathers-hooks');
@@ -19,7 +17,6 @@ import Qs = require('qs');
 import bcrypt = require('bcryptjs');
 var uuid = require('uuid');
 import objectHash = require('object-hash');
-// import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
 
@@ -28,6 +25,15 @@ import {BaseLoginService} from './baseLoginService';
  */
 export class ChangePasswordService extends BaseLoginService
 {
+    cfg:Types.INAuth2Config;
+
+    constructor(DBController: NAuth2.DBController)
+    {
+        super(DBController);
+        this.cfg = _.cloneDeep(this.DBController.cfg);
+        this.cfg.tokenSecret = this.cfg.changePasswordTokenSecret;
+    }
+
     /*
      POST /auth/changePassword
      */
@@ -66,7 +72,7 @@ export class ChangePasswordService extends BaseLoginService
             create: [
 
                 // Parse and verify token
-                auth.hooks.verifyToken(self.DBController.authCfg),
+                auth.hooks.verifyToken(self.cfg),
 
                 self.findUserByEmailOrName,
 
