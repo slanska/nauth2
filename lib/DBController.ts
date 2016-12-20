@@ -346,30 +346,30 @@ module NAuth2
         /*
          Configures service for POST /auth/login
          */
-        protected createUserLoginService()
-        {
-            var self = this;
-            self.Path.Login = `${self.cfg.basePath}/login`;
-            self.Services.Login = self.app.service(self.Path.Login, new LoginService(self));
-
-            self.Services.Login.after({
-                create: [
-                    // nhooks.afterUserLogin(this.app, this.cfg)
-                    /*
-                     TODO
-                     check if user active
-
-                     set default roles
-                     create log entry
-
-                     get access token
-                     get refresh token
-
-                     if domain login - add to domain, assign domain policy
-                     */
-                ]
-            });
-        }
+        // protected createUserLoginService()
+        // {
+        //     var self = this;
+        //     self.Path.Login = `${self.cfg.basePath}/login`;
+        //     self.Services.Login = self.app.service(self.Path.Login, new LoginService(self));
+        //
+        //     self.Services.Login.after({
+        //         create: [
+        //             // nhooks.afterUserLogin(this.app, this.cfg)
+        //             /*
+        //              TODO
+        //              check if user active
+        //
+        //              set default roles
+        //              create log entry
+        //
+        //              get access token
+        //              get refresh token
+        //
+        //              if domain login - add to domain, assign domain policy
+        //              */
+        //         ]
+        //     });
+        // }
 
         /*
          POST /changePassword
@@ -379,76 +379,76 @@ module NAuth2
          @param confirmPassword
          @param token
          */
-        protected createChangePasswordService()
-        {
-            var self = this;
-            self.Path.ChangePassword = `${self.cfg.basePath}/changePassword`;
-            self.Services.ChangePassword = self.app.service(self.Path.ChangePassword, {
-                create: (data, params: feathers.MethodParams) =>
-                {
-                    var token = data.accessToken;
-
-
-                    // Check token
-
-                    // Check newPassword === confirmPassword
-                    if (data.newPassword !== data.confirmPassword)
-                    {
-                        throw new Error(`Password mismatch`);
-                    }
-
-                    // Check if newPassword !== password
-                    if (data.password === data.newPassword)
-                    {
-                        throw new Error(`Cannot re-use old password`);
-                    }
-
-                    // Check newPassword is not in password history
-
-                    // Save new password: clear changePasswordOnNextLogin, set prePwdHash, pwdExpireOn
-
-                    // Automatically proceed with login: generate tokens etc.
-
-                    return {};
-                }
-            });
-
-            self.Services.ChangePassword.before({
-                create: [
-
-                    // Parse and verify token
-
-                    // Set attributes: oldPassword, password, confirmPassword
-                    (p: hooks.HookParams) =>
-                    {
-
-                    },
-
-
-                    nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
-
-                    // Compare old and new password - should not be the same, depending on configuration
-
-                    auth.hooks.hashPassword(this.authCfg)
-
-                    // Update Nauth2_Users
-
-
-                ]
-            });
-
-            self.Services.ChangePassword.after({
-                create: [
-                    // Init payload
-
-                    // Generate login tokens: accessToken and refreshToken
-
-                    // Set 'navigateTo' link
-
-                    // Send notification email ('Password has changed'), if configured
-                ]
-            });
-        }
+        // protected createChangePasswordService()
+        // {
+        //     var self = this;
+        //     self.Path.ChangePassword = `${self.cfg.basePath}/changePassword`;
+        //     self.Services.ChangePassword = self.app.service(self.Path.ChangePassword, {
+        //         create: (data, params: feathers.MethodParams) =>
+        //         {
+        //             var token = data.accessToken;
+        //
+        //
+        //             // Check token
+        //
+        //             // Check newPassword === confirmPassword
+        //             if (data.newPassword !== data.confirmPassword)
+        //             {
+        //                 throw new Error(`Password mismatch`);
+        //             }
+        //
+        //             // Check if newPassword !== password
+        //             if (data.password === data.newPassword)
+        //             {
+        //                 throw new Error(`Cannot re-use old password`);
+        //             }
+        //
+        //             // Check newPassword is not in password history
+        //
+        //             // Save new password: clear changePasswordOnNextLogin, set prePwdHash, pwdExpireOn
+        //
+        //             // Automatically proceed with login: generate tokens etc.
+        //
+        //             return {};
+        //         }
+        //     });
+        //
+        //     self.Services.ChangePassword.before({
+        //         create: [
+        //
+        //             // Parse and verify token
+        //
+        //             // Set attributes: oldPassword, password, confirmPassword
+        //             (p: hooks.HookParams) =>
+        //             {
+        //
+        //             },
+        //
+        //
+        //             nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
+        //
+        //             // Compare old and new password - should not be the same, depending on configuration
+        //
+        //             auth.hooks.hashPassword(this.authCfg)
+        //
+        //             // Update Nauth2_Users
+        //
+        //
+        //         ]
+        //     });
+        //
+        //     self.Services.ChangePassword.after({
+        //         create: [
+        //             // Init payload
+        //
+        //             // Generate login tokens: accessToken and refreshToken
+        //
+        //             // Set 'navigateTo' link
+        //
+        //             // Send notification email ('Password has changed'), if configured
+        //         ]
+        //     });
+        // }
 
         protected createRolesService()
         {
@@ -612,150 +612,150 @@ module NAuth2
     /*
      Internal service for user login
      */
-    class LoginService
-    {
-        constructor(protected DBController: DBController)
-        {
-
-        }
-
-        protected app: feathers.Application;
-
-        setup(app: feathers.Application)
-        {
-            this.app = app;
-        }
-
-        /*
-         Returns promise which will resolve to string 'navigateTo' (user's landing page)
-         which depends on primary user's role
-         SysAdmin: Admin dashboard
-         SysUserAdmin: User Admin
-         regular user: default home page
-         */
-        private getNavigateToLink(payload): Promise<string>
-        {
-            var self = this;
-            var roles = payload.roles;
-            return getSystemRoles(self.DBController.db)
-                .then(rr =>
-                {
-                    if (roles.indexOf(rr['SystemAdmin'].roleId) >= 0)
-                        return 'admin:dashboard';
-
-                    if (roles.indexOf(rr['UserAdmin'].roleId) >= 0)
-                        return 'admin:users';
-
-                    if (roles.indexOf(rr['DomainSuperAdmin'].roleId) >= 0)
-                        return 'admin:domains';
-
-                    return 'home';
-                });
-        }
-
-        create(data, params: feathers.MethodParams)
-        {
-            var self = this;
-            return new Promise((resolve, reject) =>
-            {
-                var user: IUserRecord = null;
-                // Load user by email or name
-                self.DBController.findUserByNameOrEmail(data.email)
-                    .then(user =>
-                    {
-                        if (!user)
-                            throw DBController.invalidLoginError();
-                        return user;
-                    })
-                    .then((uu: IUserRecord) =>
-                    {
-                        // Remember instance of user
-                        user = uu;
-                    })
-                    .then(() =>
-                    {
-                        // Verify password
-                        if (!bcrypt.compareSync(data.password, user.password))
-                        {
-                            return reject(DBController.invalidLoginError());
-                        }
-
-                        // TODO user.pwd_expires_at
-                        if (user.changePasswordOnNextLogin)
-                        {
-                            // Redirect or return warning
-                            return resolve({navigateTo: 'changePassword'});
-                        }
-
-                        switch (user.status)
-                        {
-                            case 'A':
-                                /*
-                                 TODO Payload includes:
-                                 userId
-                                 all assigned general roles (not domain specific)
-                                 top N assigned domains and all their roles (if applicable)
-                                 */
-                                var payload = {userId: user.userId, roles: [], domains: []};
-
-                                // load roles
-                                return self.DBController.db.select('roleId').from('NAuth2_UserRoles').where({userId: user.userId})
-                                    .then(rr =>
-                                    {
-                                        payload.roles = _.map(rr, 'roleId');
-
-                                        // load top 10 freshly used domains, based on refresh tokens history (if applicable)
-                                        return self.DBController.db.table('NAuth2_DomainUsers')
-                                            .where({userId: user.userId})
-                                            .limit(10); // TODO Use config for limit? How about orderBy
-                                    })
-                                    .then(dd =>
-                                    {
-                                        payload.domains = _.map(dd, 'domainId');
-                                        return self.getNavigateToLink(payload);
-                                    })
-                                    .then((navigateTo: string) =>
-                                    {
-                                        // generate tokens
-                                        let signOptions = {} as jwt.SignOptions;
-                                        signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
-                                        signOptions.subject = 'signin';
-                                        jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token) =>
-                                        {
-                                            if (err)
-                                                return reject(err);
-
-                                            self.DBController.createRefreshToken(user.userId, params as any)
-                                                .then(refreshToken =>
-                                                {
-                                                    return resolve({
-                                                        token,
-                                                        refreshToken,
-                                                        navigateTo
-                                                    });
-                                                });
-                                        });
-                                    });
-
-                            case 'S':
-                            case 'D':
-                                // suspended or deleted - return error
-                                return reject(DBController.invalidLoginError());
-
-
-                            case 'P':
-                                // TODO Registration is not yet confirmed - resend email
-                                return resolve({});
-                        }
-
-                    })
-                    .catch(err =>
-                    {
-                        return reject(err);
-                    });
-            });
-        }
-    }
+    // class LoginService
+    // {
+    //     constructor(protected DBController: DBController)
+    //     {
+    //
+    //     }
+    //
+    //     protected app: feathers.Application;
+    //
+    //     setup(app: feathers.Application)
+    //     {
+    //         this.app = app;
+    //     }
+    //
+    //     /*
+    //      Returns promise which will resolve to string 'navigateTo' (user's landing page)
+    //      which depends on primary user's role
+    //      SysAdmin: Admin dashboard
+    //      SysUserAdmin: User Admin
+    //      regular user: default home page
+    //      */
+    //     private getNavigateToLink(payload): Promise<string>
+    //     {
+    //         var self = this;
+    //         var roles = payload.roles;
+    //         return getSystemRoles(self.DBController.db)
+    //             .then(rr =>
+    //             {
+    //                 if (roles.indexOf(rr['SystemAdmin'].roleId) >= 0)
+    //                     return 'admin:dashboard';
+    //
+    //                 if (roles.indexOf(rr['UserAdmin'].roleId) >= 0)
+    //                     return 'admin:users';
+    //
+    //                 if (roles.indexOf(rr['DomainSuperAdmin'].roleId) >= 0)
+    //                     return 'admin:domains';
+    //
+    //                 return 'home';
+    //             });
+    //     }
+    //
+    //     create(data, params: feathers.MethodParams)
+    //     {
+    //         var self = this;
+    //         return new Promise((resolve, reject) =>
+    //         {
+    //             var user: IUserRecord = null;
+    //             // Load user by email or name
+    //             self.DBController.findUserByNameOrEmail(data.email)
+    //                 .then(user =>
+    //                 {
+    //                     if (!user)
+    //                         throw DBController.invalidLoginError();
+    //                     return user;
+    //                 })
+    //                 .then((uu: IUserRecord) =>
+    //                 {
+    //                     // Remember instance of user
+    //                     user = uu;
+    //                 })
+    //                 .then(() =>
+    //                 {
+    //                     // Verify password
+    //                     if (!bcrypt.compareSync(data.password, user.password))
+    //                     {
+    //                         return reject(DBController.invalidLoginError());
+    //                     }
+    //
+    //                     // TODO user.pwd_expires_at
+    //                     if (user.changePasswordOnNextLogin)
+    //                     {
+    //                         // Redirect or return warning
+    //                         return resolve({navigateTo: 'changePassword'});
+    //                     }
+    //
+    //                     switch (user.status)
+    //                     {
+    //                         case 'A':
+    //                             /*
+    //                              TODO Payload includes:
+    //                              userId
+    //                              all assigned general roles (not domain specific)
+    //                              top N assigned domains and all their roles (if applicable)
+    //                              */
+    //                             var payload = {userId: user.userId, roles: [], domains: []};
+    //
+    //                             // load roles
+    //                             return self.DBController.db.select('roleId').from('NAuth2_UserRoles').where({userId: user.userId})
+    //                                 .then(rr =>
+    //                                 {
+    //                                     payload.roles = _.map(rr, 'roleId');
+    //
+    //                                     // load top 10 freshly used domains, based on refresh tokens history (if applicable)
+    //                                     return self.DBController.db.table('NAuth2_DomainUsers')
+    //                                         .where({userId: user.userId})
+    //                                         .limit(10); // TODO Use config for limit? How about orderBy
+    //                                 })
+    //                                 .then(dd =>
+    //                                 {
+    //                                     payload.domains = _.map(dd, 'domainId');
+    //                                     return self.getNavigateToLink(payload);
+    //                                 })
+    //                                 .then((navigateTo: string) =>
+    //                                 {
+    //                                     // generate tokens
+    //                                     let signOptions = {} as jwt.SignOptions;
+    //                                     signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
+    //                                     signOptions.subject = 'signin';
+    //                                     jwt.sign(payload, self.DBController.authCfg.token.secret, signOptions, (err, token) =>
+    //                                     {
+    //                                         if (err)
+    //                                             return reject(err);
+    //
+    //                                         self.DBController.createRefreshToken(user.userId, params as any)
+    //                                             .then(refreshToken =>
+    //                                             {
+    //                                                 return resolve({
+    //                                                     token,
+    //                                                     refreshToken,
+    //                                                     navigateTo
+    //                                                 });
+    //                                             });
+    //                                     });
+    //                                 });
+    //
+    //                         case 'S':
+    //                         case 'D':
+    //                             // suspended or deleted - return error
+    //                             return reject(DBController.invalidLoginError());
+    //
+    //
+    //                         case 'P':
+    //                             // TODO Registration is not yet confirmed - resend email
+    //                             return resolve({});
+    //                     }
+    //
+    //                 })
+    //                 .catch(err =>
+    //                 {
+    //                     return reject(err);
+    //                 });
+    //         });
+    //     }
+    // }
 }
 
 export = NAuth2;

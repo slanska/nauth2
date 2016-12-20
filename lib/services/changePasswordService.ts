@@ -25,13 +25,14 @@ import {BaseLoginService} from './baseLoginService';
  */
 export class ChangePasswordService extends BaseLoginService
 {
-    cfg:Types.INAuth2Config;
+    authCfg:auth.AuthConfig;
 
     constructor(DBController: NAuth2.DBController)
     {
         super(DBController);
-        this.cfg = _.cloneDeep(this.DBController.cfg);
-        this.cfg.tokenSecret = this.cfg.changePasswordTokenSecret;
+        this.authCfg = _.cloneDeep(this.DBController.authCfg);
+        this.authCfg.token.secret = this.DBController.cfg.changePasswordTokenSecret;
+        this.authCfg.secret = this.DBController.cfg.changePasswordTokenSecret;
     }
 
     /*
@@ -72,11 +73,11 @@ export class ChangePasswordService extends BaseLoginService
             create: [
 
                 // Parse and verify token
-                auth.hooks.verifyToken(self.cfg),
+                auth.hooks.verifyToken(self.authCfg),
 
-                self.findUserByEmailOrName,
+                // self.findUserByEmailOrName,
 
-                nhooks.verifyNewPassword(this.DBController.cfg, 'newPassword', 'confirmPassword'),
+                // nhooks.verifyNewPassword(this.DBController.cfg, 'newPassword', 'confirmPassword'),
 
                 // Set attributes: oldPassword, password, confirmPassword
                 (p: hooks.HookParams) =>

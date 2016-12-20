@@ -15,6 +15,12 @@ import _ = require('lodash');
 var feathers = require('feathers-client');
 var Promise = require('promiz');
 
+/*
+ Local storage key names
+ */
+export const LocalStorage_AccessToken = 'nauth2.accessToken';
+export const LocalStorage_RefreshToken = 'nauth2.refreshToken';
+
 Vue.use(Framework7Vue);
 
 var isAndroid = Framework7.prototype.device.android === true;
@@ -27,8 +33,7 @@ Template7.global = {
 
 registerComponents();
 
-// TODO ?? Needed
-var $$ = Dom7;
+export const $$ = Dom7;
 
 if (!isIos)
 {
@@ -135,9 +140,7 @@ export interface Dom7AjaxOptions
     success?: Function;
     complete?: Function;
     statusCode?: Object;
-
 }
-
 
 /*
  Returns promise which resolves to auth configuration
@@ -187,6 +190,14 @@ export class http
             options.data = data;
             options.headers = headers;
             options.url = url;
+
+            var accessToken = window.localStorage.getItem(LocalStorage_AccessToken);
+            if (accessToken)
+            {
+                options.headers = options.headers || {};
+                options.headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+
             options.success = (data, status, xhr) =>
             {
                 if (status !== 200 && status !== 201)
@@ -260,9 +271,27 @@ export function toast(message: string)
         F7App.addNotification({title: message, closeOnClick: true, hold: 3000});
 }
 
-// TODO Needed?
+$$.ajaxSetup({
+    beforeSend: (xhr) =>
+    {
+        // var accessToken = window.localStorage.getItem(LocalStorage_AccessToken);
+        // if (accessToken)
+        // {
+        //     xhr.requestParameters.headers = xhr.requestParameters.headers || {};
+        //     xhr.requestParameters.headers['Authorization'] = `Bearer ${accessToken}`;
+        //     xhr.withCredentials = true;
+        // }
+    },
+
+    error: (xhr, status) =>
+    {
+        console.log(xhr);
+
+        // TODO If result is 'Expired token', use refresh token to get a new access token and repeat request
+    }
+});
+
 export var feathersApp = feathers();
-// feathersApp.configure(rest(),jquery($));
 
 
 

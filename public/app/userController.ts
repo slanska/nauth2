@@ -16,12 +16,12 @@
 
 var F7Vue = require('framework7-vue');
 import _ = require('lodash');
-import {initApp, http, getAuthConfig, showError, toast, F7App, nauth2MainView} from './app';
+import {
+    initApp, http, getAuthConfig, showError, toast, F7App, nauth2MainView,
+    LocalStorage_AccessToken, LocalStorage_RefreshToken
+} from './app';
 import {ProfileController} from "./profileController";
 import Vue = require('vue');
-
-const LocalStorage_AccessToken = 'nauth2.accessToken';
-const LocalStorage_RefreshToken = 'nauth2.refreshToken';
 
 class UserController
 {
@@ -42,13 +42,16 @@ class UserController
                 var url = `${cfg.basePath}/login`;
                 return http.post(url, {email: emailOrName, password: password});
             })
-            .then((res:ILoginResponse) =>
+            .then((res: ILoginResponse) =>
             {
                 if (res.navigateTo === 'changePassword')
                 // If password needs to be changed or has expired, there will not be refresh token and access token.
                 // Response will have a special token returned which can be only used for password change.
                 {
-                    nauth2MainView.router.load({pageName: 'changePassword'});
+                    window.localStorage.setItem(LocalStorage_AccessToken, res.accessToken);
+                    nauth2MainView.router.load({
+                        pageName: 'changePassword'
+                    });
                 }
                 else
                 {
@@ -156,15 +159,13 @@ class UserController
         getAuthConfig()
             .then(cfg =>
             {
-                var token = window.localStorage.getItem(LocalStorage_AccessToken);
                 var url = `${cfg.basePath}/changePassword`;
                 var data = {
                     password,
                     newPassword,
-                    confirmPassword,
-                    accessToken: token
+                    confirmPassword
                 };
-                return http.post(url, data);
+                return http.post(url, data, {'Content-Type': 'application/json'});
             })
             .then(() =>
             {

@@ -2,8 +2,6 @@
  * Created by slanska on 2016-12-08.
  */
 
-// /<reference path="../../typings/server.d.ts"/>
-
 import Types = require('../Types');
 import knex = require('knex');
 import Promise = require('bluebird');
