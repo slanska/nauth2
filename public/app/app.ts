@@ -14,6 +14,7 @@ import {registerComponents} from '../components/index';
 import _ = require('lodash');
 var feathers = require('feathers-client');
 var Promise = require('promiz');
+// import axios from 'axios';
 
 /*
  Local storage key names
@@ -187,6 +188,13 @@ export class http
         var result = new Promise((resolve, reject) =>
         {
             options.method = method;
+            if (typeof data === 'object')
+            {
+                options.dataType = 'json';
+                options.processData = false;
+                options.contentType = 'application/json';
+                data = JSON.stringify(data);
+            }
             options.data = data;
             options.headers = headers;
             options.url = url;

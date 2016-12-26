@@ -25,7 +25,7 @@ import {BaseLoginService} from './baseLoginService';
  */
 export class ChangePasswordService extends BaseLoginService
 {
-    authCfg:auth.AuthConfig;
+    authCfg: auth.AuthConfig;
 
     constructor(DBController: NAuth2.DBController)
     {
@@ -72,12 +72,17 @@ export class ChangePasswordService extends BaseLoginService
         self.asService.before({
             create: [
 
+                (p: hooks.HookParams) =>
+                {
+                    console.log(p);
+                },
+
                 // Parse and verify token
                 auth.hooks.verifyToken(self.authCfg),
 
                 // self.findUserByEmailOrName,
 
-                // nhooks.verifyNewPassword(this.DBController.cfg, 'newPassword', 'confirmPassword'),
+                nhooks.verifyNewPassword(this.DBController.cfg, 'newPassword', 'confirmPassword'),
 
                 // Set attributes: oldPassword, password, confirmPassword
                 (p: hooks.HookParams) =>

@@ -28,13 +28,14 @@
   "dependencies": {
     "vue": "^2.0.3",
     "Framework7-Vue": "https://github.com/nolimits4web/Framework7-Vue.git",
-    "Framework7": "framework7#^1.5",
     "feathers-client": "^1.6.2",
     "lodash": "^4.16.6",
     "fsmrouter": "*",
     "framework7-icons": "^0.8.7",
     "webix": "^4.1.0",
     "promiz": "^1.0.6",
-    "pure": "^0.6.0"
+    "pure": "^0.6.0",
+    "framework7": "^1.5.2",
+    "axios": "^0.15.3"
   }
 }

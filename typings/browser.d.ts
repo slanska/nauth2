@@ -8,6 +8,7 @@
 /// <reference path="vue/vue.d.ts" />
 /// <reference path="webix/webix.d.ts" />
 /// <reference path="shared.d.ts" />
+/// <reference path="../public/bower_components/axios/index.d.ts"/>
 
 declare var Framework7;
 declare var Template7;
