@@ -40,7 +40,8 @@ class UserController
             .then(cfg =>
             {
                 var url = `${cfg.basePath}/login`;
-                return http.post(url, {email: emailOrName, password: password});
+                var payload = {email: emailOrName, password: password};
+                return http.post(url, payload);
             })
             .then((res: ILoginResponse) =>
             {
@@ -165,7 +166,7 @@ class UserController
                     newPassword,
                     confirmPassword
                 };
-                return http.post(url, data, {'Content-Type': 'application/json'});
+                return http.post(url, data);
             })
             .then(() =>
             {

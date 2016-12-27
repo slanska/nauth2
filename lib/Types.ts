@@ -324,6 +324,13 @@ export interface INAuth2Config
 
      */
     returnUserProfileOnLogin?: 'auto' | 'yes' | 'no';
+
+    /*
+     Optional password lifetime duration. Should be set using ms syntax
+     (https://github.com/zeit/ms), typically, number of days, e.g. '90d' or '60 days'.
+     If omitted, no policy is enforced
+     */
+    passwordLifetime?: string;
 }
 
 /*

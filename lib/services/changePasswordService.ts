@@ -14,11 +14,13 @@ import errors = require('feathers-errors');
 import HTTPStatus = require('http-status');
 import _ = require('lodash');
 import Qs = require('qs');
-import bcrypt = require('bcryptjs');
-var uuid = require('uuid');
-import objectHash = require('object-hash');
+// import bcrypt = require('bcryptjs');
+// var uuid = require('uuid');
+// import objectHash = require('object-hash');
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
+var ms = require('ms');
+import moment = require('moment');
 
 /*
  Service for user password changing
@@ -47,13 +49,21 @@ export class ChangePasswordService extends BaseLoginService
         // Check token
 
         // Check newPassword is not in password history
+        let pwdExpireOn = void 0;
+        if (typeof self.DBController.cfg.passwordLifetime === 'string')
+        {
+            pwdExpireOn =  moment().add('ms', ms(self.DBController.cfg.passwordLifetime));
+        }
 
         // Save new password: clear changePasswordOnNextLogin, set prePwdHash, pwdExpireOn
-        return self.DBController.db('NAuth2_Users').update({})
+        return self.DBController.db('NAuth2_Users').update({
+            changePasswordOnNextLogin: false,
+            prevPwdHash: '',
+            pwdExpireOn: pwdExpireOn
+        })
             .then(() =>
             {
             });
-
 
         // Automatically proceed with login: generate tokens etc.
     }
@@ -71,12 +81,6 @@ export class ChangePasswordService extends BaseLoginService
 
         self.asService.before({
             create: [
-
-                (p: hooks.HookParams) =>
-                {
-                    console.log(p);
-                },
-
                 // Parse and verify token
                 auth.hooks.verifyToken(self.authCfg),
 
@@ -88,30 +92,25 @@ export class ChangePasswordService extends BaseLoginService
                 (p: hooks.HookParams) =>
                 {
                     const pwd = p.data['password'];
-                    p.data['oldPassword'] = pwd;
-                    p.data['password'] = p.data['newPassword'];
-                },
 
-                // Make sure that new password differs from old one
-                (p: hooks.HookParams) =>
-                {
-                    if (p.data.password === p.data.newPassword)
+                    // Make sure that new password differs from old one
+                    if (pwd === p.data.newPassword)
                         throw new Error(`Cannot re-use old password`);
-                },
 
-                // Compare old and new password - should not be the same, depending on configuration
-                (p: hooks.HookParams) =>
-                {
-
+                    p.data.password = p.data.newPassword;
                 },
 
                 // Remove attributes
                 //nhooks.
-                hooks.remove('oldPassword', 'confirmPassword'),
+                hooks.remove('newPassword', 'confirmPassword'),
 
-                auth.hooks.hashPassword(this.DBController.authCfg)
+                auth.hooks.hashPassword(this.DBController.authCfg),
 
                 // Update Nauth2_Users
+                (p: hooks.HookParams) =>
+                {
+
+                }
             ]
         });
 

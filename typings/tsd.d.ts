@@ -23,7 +23,6 @@
 /// <reference path="http-status/http-status.d.ts" />
 /// <reference path="bcryptjs/bcryptjs.d.ts" />
 /// <reference path="object-hash/object-hash.d.ts" />
-/// <reference path="axios/axios.d.ts" />
 /// <reference path="webix/webix.d.ts" />
 /// <reference path="moment/moment.d.ts" />
 // / <reference path="casperjs/casperjs.d.ts" />

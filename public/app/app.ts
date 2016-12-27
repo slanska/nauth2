@@ -194,6 +194,8 @@ export class http
                 options.processData = false;
                 options.contentType = 'application/json';
                 data = JSON.stringify(data);
+                headers = headers || {};
+                headers['Content-Type'] = 'application/json';
             }
             options.data = data;
             options.headers = headers;
