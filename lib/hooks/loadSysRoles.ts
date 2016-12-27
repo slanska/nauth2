@@ -46,7 +46,6 @@ export function getSystemRoleByName(db: Knex, roleName: string): Promise<Types.I
         })
 }
 
-
 /*
  Feathers JS hook. Ensures that system roles are loaded and added to cache
  */

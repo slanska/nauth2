@@ -141,3 +141,11 @@ lib/Types.js.map
 /lib/services/baseLoginService.js.map
 /lib/services/resetPasswordService.js
 /lib/services/resetPasswordService.js.map
+/lib/services/inviteNewUserService.js
+/lib/services/inviteNewUserService.js.map
+/lib/services/revokeTokenService.js
+/lib/services/mergeDomainsService.js.map
+/lib/services/revokeTokenService.js.map
+/lib/services/splitDomainService.js
+/lib/services/mergeDomainsService.js
+/lib/services/splitDomainService.js.map

@@ -14,9 +14,6 @@ import errors = require('feathers-errors');
 import HTTPStatus = require('http-status');
 import _ = require('lodash');
 import Qs = require('qs');
-// import bcrypt = require('bcryptjs');
-// var uuid = require('uuid');
-// import objectHash = require('object-hash');
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
 var ms = require('ms');
@@ -44,9 +41,7 @@ export class ChangePasswordService extends BaseLoginService
     {
         var self = this;
 
-        var token = data.accessToken;
-
-        // Check token
+        var user = params['user'] as IUserRecord;
 
         // Check newPassword is not in password history
         let pwdExpireOn = void 0;
@@ -54,6 +49,8 @@ export class ChangePasswordService extends BaseLoginService
         {
             pwdExpireOn =  moment().add('ms', ms(self.DBController.cfg.passwordLifetime));
         }
+
+        // Load user record - get prevPwdHash value (space separated list of hashes)
 
         // Save new password: clear changePasswordOnNextLogin, set prePwdHash, pwdExpireOn
         return self.DBController.db('NAuth2_Users').update({
@@ -100,17 +97,11 @@ export class ChangePasswordService extends BaseLoginService
                     p.data.password = p.data.newPassword;
                 },
 
-                // Remove attributes
-                //nhooks.
                 hooks.remove('newPassword', 'confirmPassword'),
 
                 auth.hooks.hashPassword(this.DBController.authCfg),
 
-                // Update Nauth2_Users
-                (p: hooks.HookParams) =>
-                {
-
-                }
+                self.findUserByIdHook
             ]
         });
 

@@ -19,6 +19,8 @@ import _ = require('lodash');
 // Services
 import {ChangePasswordService} from './services/changePasswordService';
 import {LoginService} from './services/loginService';
+import {InviteNewUserService} from "./services/inviteNewUserService";
+import {RegisterService} from "./services/registerService";
 
 /*
  index:
@@ -96,20 +98,39 @@ class Controller implements Types.INAuth2Controller
          */
         this.app.use(`${this.cfg.basePath}/changePassword`, new ChangePasswordService(this.DBController));
 
-        // register
+        /*
+         POST /register
+         */
+        this.app.use(`${this.cfg.basePath}/register`, new RegisterService(this.DBController));
 
-        // login
+        /*
+         POST /login
+         Payload:
+         @param emailOrName
+         @param password
+
+         Result:
+
+         */
         this.app.use(`${this.cfg.basePath}/login`, new LoginService(this.DBController));
 
         // logout
         // resetPassword
+
         // invite
+        this.app.use(`${this.cfg.basePath}/invite`, new InviteNewUserService(this.DBController));
+
         // mergeDomains
+        this.app.use(`${this.cfg.basePath}/domains/merge`, new LoginService(this.DBController));
+
         // splitDomains
+        this.app.use(`${this.cfg.basePath}/domains/split`, new LoginService(this.DBController));
+
         // renewToken
+        this.app.use(`${this.cfg.basePath}/renewToken`, new LoginService(this.DBController));
 
         // revokeToken
-
+        this.app.use(`${this.cfg.basePath}/revokeToken`, new LoginService(this.DBController));
     }
 }
 

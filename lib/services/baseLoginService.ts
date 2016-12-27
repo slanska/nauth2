@@ -102,6 +102,42 @@ export abstract class BaseLoginService
     }
 
     /*
+
+     */
+    public findUserById(userId)
+    {
+        var self = this;
+
+        return new Promise((resolve, reject) =>
+        {
+            self.DBController.db('NAuth2_Users').where({userId: userId})
+                .then(
+                    (users) =>
+                    {
+                        if (users && users.length === 1)
+                            return resolve(users[0]);
+
+                        return reject('User not found');
+                    }
+                );
+        });
+    }
+
+    /*
+     Hook to load user data based on token payload
+     Expected: p.params.payload.userId
+     Result: p.params.user:IUserRecord
+     */
+    public findUserByIdHook(p: hooks.HookParams)
+    {
+        return this.findUserById(p.params['payload'].userId)
+            .then(uu =>
+            {
+                p.params['user'] = uu;
+            });
+    }
+
+    /*
      Generates temporary token which is valid for changing password only
      Returns promise which resolves to token
      */
