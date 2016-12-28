@@ -47,7 +47,7 @@ export class ChangePasswordService extends BaseLoginService
         let pwdExpireOn = void 0;
         if (typeof self.DBController.cfg.passwordLifetime === 'string')
         {
-            pwdExpireOn =  moment().add('ms', ms(self.DBController.cfg.passwordLifetime));
+            pwdExpireOn = moment().add('ms', ms(self.DBController.cfg.passwordLifetime));
         }
 
         // Load user record - get prevPwdHash value (space separated list of hashes)
@@ -121,7 +121,7 @@ export class ChangePasswordService extends BaseLoginService
                 nhooks.sendEmailToUser(app, self.DBController.cfg, 'passwordChanged',
                     () =>
                     {
-                        return ''
+                        return 'Password change notification'
                     },
                     'email',
                     () => self.DBController.cfg.sendEmailOnChangePassword

@@ -19,11 +19,10 @@ import objectHash = require('object-hash');
 import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
 import jsonwebtoken = require('jsonwebtoken');
+import {BaseLoginService} from "./baseLoginService";
 import DBController = NAuth2.DBController;
 
-export class SplitDomainsService
+export class RenewTokenService extends BaseLoginService
 {
-    constructor(protected DBController: DBController)
-    {
-    }
+
 }

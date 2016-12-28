@@ -21,6 +21,11 @@ import {ChangePasswordService} from './services/changePasswordService';
 import {LoginService} from './services/loginService';
 import {InviteNewUserService} from "./services/inviteNewUserService";
 import {RegisterService} from "./services/registerService";
+import {ResetPasswordService} from "./services/resetPasswordService";
+import {MergeDomainsService} from "./services/mergeDomainsService";
+import {SplitDomainsService} from "./services/splitDomainService";
+import {RevokeTokenService} from "./services/revokeTokenService";
+import {RenewTokenService} from "./services/renewTokenService";
 
 /*
  index:
@@ -115,22 +120,25 @@ class Controller implements Types.INAuth2Controller
         this.app.use(`${this.cfg.basePath}/login`, new LoginService(this.DBController));
 
         // logout
+        // TODO revoke token?
+
         // resetPassword
+        // this.app.use(`${this.cfg.basePath}/resetPassword`, new ResetPasswordService(this.DBController));
 
         // invite
-        this.app.use(`${this.cfg.basePath}/invite`, new InviteNewUserService(this.DBController));
+        // this.app.use(`${this.cfg.basePath}/invite`, new InviteNewUserService(this.DBController));
 
         // mergeDomains
-        this.app.use(`${this.cfg.basePath}/domains/merge`, new LoginService(this.DBController));
+        // this.app.use(`${this.cfg.basePath}/domains/merge`, new MergeDomainsService(this.DBController));
 
         // splitDomains
-        this.app.use(`${this.cfg.basePath}/domains/split`, new LoginService(this.DBController));
+        // this.app.use(`${this.cfg.basePath}/domains/split`, new SplitDomainsService(this.DBController));
 
         // renewToken
-        this.app.use(`${this.cfg.basePath}/renewToken`, new LoginService(this.DBController));
+        // this.app.use(`${this.cfg.basePath}/renewToken`, new RenewTokenService(this.DBController));
 
         // revokeToken
-        this.app.use(`${this.cfg.basePath}/revokeToken`, new LoginService(this.DBController));
+        // this.app.use(`${this.cfg.basePath}/revokeToken`, new RevokeTokenService(this.DBController));
     }
 }
 

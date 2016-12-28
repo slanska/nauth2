@@ -21,6 +21,7 @@ import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
 import jsonwebtoken = require('jsonwebtoken');
+var ms = require('ms');
 
 /*
  Base class to serve login/signing calls
@@ -243,7 +244,7 @@ export abstract class BaseLoginService
     }
 
     /*
-
+     Generates refresh token
      */
     public generateRefreshToken(user: IUserRecord, req)
     {
@@ -267,7 +268,8 @@ export abstract class BaseLoginService
 
         let t = jsonwebtoken.decode(token);
         console.log(t);
-        it.validUntil = new Date(t.exp * 1000); // TODO
+
+        it.validUntil = new Date(Date.now() + ms(options.expiresIn));
         return self.DBController.db.table('NAuth2_RefreshTokens').insert(it)
             .then(() =>
             {

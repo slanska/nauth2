@@ -24,4 +24,3 @@ import {BaseLoginService} from "./baseLoginService";
 export class InviteNewUserService extends BaseLoginService
 {
 }
-}

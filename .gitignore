@@ -149,3 +149,5 @@ lib/Types.js.map
 /lib/services/splitDomainService.js
 /lib/services/mergeDomainsService.js
 /lib/services/splitDomainService.js.map
+/lib/services/renewTokenService.js
+/lib/services/renewTokenService.js.map
