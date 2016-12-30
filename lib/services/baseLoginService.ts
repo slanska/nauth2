@@ -252,7 +252,6 @@ export abstract class BaseLoginService
         const self = this;
         let it = {} as Types.IRefreshTokenRecord;
         it.tokenUuid = uuid.v4();
-        // var req = p.params['request'];
         it.userAgent = req.headers['user-agent'];
         it.userId = user.userId;
 

@@ -453,7 +453,7 @@ declare module "feathers-authentication"
 
             /*
              Hashes password with generated salt. Uses passwordField attribute in p.data and replaces it
-             with hashed value. Note: looks like it does not store salt
+             with hashed value. Note: salt is generated as a part of hashed value
              */
             export function hashPassword(cfg?: AuthConfig);
 

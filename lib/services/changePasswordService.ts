@@ -56,7 +56,8 @@ export class ChangePasswordService extends BaseLoginService
         return self.DBController.db('NAuth2_Users').update({
             changePasswordOnNextLogin: false,
             prevPwdHash: '',
-            pwdExpireOn: pwdExpireOn
+            pwdExpireOn: pwdExpireOn,
+            password: data.password
         })
             .then(() =>
             {
@@ -111,8 +112,8 @@ export class ChangePasswordService extends BaseLoginService
                 self.initPayload,
 
                 // Generate login tokens: accessToken and refreshToken
-                self.generateRefreshToken,
-                self.generateAccessToken,
+                self.generateRefreshTokenHook,
+                self.generateAccessTokenHook,
 
                 // Set 'navigateTo' link
                 self.getNavigateToLink,
