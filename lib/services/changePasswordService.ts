@@ -3,17 +3,17 @@
  */
 
 import Types = require('../Types');
-import knex = require('knex');
+// import knex = require('knex');
 import Promise = require('bluebird');
 import feathers = require("feathers");
 import nhooks = require('../hooks/index');
 import hooks = require('feathers-hooks');
 import auth  = require('feathers-authentication');
-import jwt = require('jsonwebtoken');
+// import jwt = require('jsonwebtoken');
 import errors = require('feathers-errors');
-import HTTPStatus = require('http-status');
+// import HTTPStatus = require('http-status');
 import _ = require('lodash');
-import Qs = require('qs');
+// import Qs = require('qs');
 import NAuth2 = require('../DBController');
 import {BaseLoginService} from './baseLoginService';
 var ms = require('ms');
@@ -66,8 +66,9 @@ export class ChangePasswordService extends BaseLoginService
         // Automatically proceed with login: generate tokens etc.
     }
 
-    private initPayload()
+    private initPayloadHook(p:hooks.HookParams)
     {
+        p.result = {};
     }
 
     /*
@@ -109,19 +110,20 @@ export class ChangePasswordService extends BaseLoginService
         self.asService.after({
             create: [
                 // Init payload
-                self.initPayload,
+                self.initPayloadHook,
 
                 // Generate login tokens: accessToken and refreshToken
                 self.generateRefreshTokenHook,
                 self.generateAccessTokenHook,
 
                 // Set 'navigateTo' link
-                self.getNavigateToLink,
+                self.getNavigateToLinkHook,
 
                 // Send notification email ('Password has changed'), if configured
                 nhooks.sendEmailToUser(app, self.DBController.cfg, 'passwordChanged',
                     () =>
                     {
+                        // TODO Translate
                         return 'Password change notification'
                     },
                     'email',

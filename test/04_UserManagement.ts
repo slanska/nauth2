@@ -6,7 +6,17 @@
 
 describe('User Management', ()=>
 {
-    it('get all users', (done)=>
+    it('get all users by admin', (done)=>
+    {
+        done();
+    });
+
+    it('cannot get users by non authenticated client', (done)=>
+    {
+        done();
+    });
+
+    it('cannot get users by non authorized user', (done)=>
     {
         done();
     });

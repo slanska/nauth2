@@ -151,3 +151,7 @@ lib/Types.js.map
 /lib/services/splitDomainService.js.map
 /lib/services/renewTokenService.js
 /lib/services/renewTokenService.js.map
+/test/08_ChangePassword.js.map
+/test/08_ChangePassword.js
+/test/09_RoleManagement.js
+/test/09_RoleManagement.js.map

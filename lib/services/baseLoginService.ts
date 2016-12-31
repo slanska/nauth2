@@ -73,11 +73,15 @@ export abstract class BaseLoginService
      regular user: default home page
 
      Expects:
-     * p.data.roles
+     * p.result.roles
      */
-    public setNavigateToLinkHook(p: hooks.HookParams)
+    public getNavigateToLinkHook(p: hooks.HookParams)
     {
-        return this.getNavigateToLink(p.data.roles);
+        return this.getNavigateToLink(p.result.roles)
+            .then(link =>
+            {
+                p.result.navigateTo = link;
+            });
     }
 
     /*
@@ -183,7 +187,9 @@ export abstract class BaseLoginService
         return this.generateAccessToken(p.params['user'])
             .then(tt =>
             {
-                p.result.accessToken = tt;
+                p.result.accessToken = tt.token;
+                p.result.roles = tt.roles;
+                p.result.domains = tt.domains;
             });
     }
 
@@ -197,7 +203,9 @@ export abstract class BaseLoginService
      * p.result.refreshToken
      * p.params.user
      Returns:
-     * p.result.accessToken (with subject 'access')
+     * token
+     * roles (array of role IDs)
+     * domains (array of recently used domain IDs)
      */
     public generateAccessToken(user: IUserRecord)
     {
@@ -224,7 +232,7 @@ export abstract class BaseLoginService
                 let signOptions = {} as jwt.SignOptions;
                 signOptions.expiresIn = self.DBController.cfg.tokenExpiresIn;
                 signOptions.subject = 'access';
-                return {roles, token: jsonwebtoken.sign(payload, self.DBController.authCfg.token.secret, signOptions)};
+                return {roles: payload.roles, domains: payload.domains, token: jsonwebtoken.sign(payload, self.DBController.authCfg.token.secret, signOptions)};
             });
     }
 

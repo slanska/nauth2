@@ -32,6 +32,15 @@ domains and have separately defined rules for accessing them (see details [here]
 * Captcha support (generate image and code to be used on client)
 * Written in TypeScript
 
+### Install and configuration
+
+```
+npm install nauth2 --save
+```
+
+
+
+
 ### Token management
 NAuth2 uses JWT (JavaScript Tokens) for authentication. Result of login is token
 that should be kept on client side and passed with every call. 

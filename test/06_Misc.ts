@@ -2,6 +2,9 @@
  * Created by slanska on 2016-11-08.
  */
 
+/*
+ Performs smoke tests on various database engines
+ */
 
 // Log
 
