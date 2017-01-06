@@ -67,18 +67,24 @@ describe('register', () =>
             })
             .then(() =>
             {
-                browser.fill('#inboxfield', uu.email);
                 return new Promise((resolve, reject) =>
                 {
+                    browser.fill('#inboxfield', uu.email);
                     browser.once('loaded', (document) =>
                     {
-                        return resolve();
+                        browser.wait(() =>
+                        {
+                            return resolve();
+                        });
                     });
 
                     browser.pressButton('Go!', (err) =>
                     {
                         if (err)
+                        {
                             console.error(err);
+                            return reject(err);
+                        }
 
                         console.log('Go handled');
                     });
@@ -86,18 +92,24 @@ describe('register', () =>
             })
             .then(() =>
             {
-                console.log(browser.url);
-                let node = browser.querySelectorAll('div > .outermail')[0].parentNode; //.attributes.onclick.nodeValue
                 return new Promise((resolve, reject) =>
                 {
+                    console.log(browser.url);
+                    let node = browser.querySelectorAll('div > .outermail')[0].parentNode; //.attributes.onclick.nodeValue
                     browser.once('loaded', () =>
                     {
-                        return resolve();
+                        browser.wait(() =>
+                        {
+                            return resolve();
+                        });
                     });
                     return browser.click(node, (err) =>
                     {
                         if (err)
+                        {
                             console.error(err);
+                            return reject(err);
+                        }
                         console.log('email selected');
                     });
                 });
@@ -105,8 +117,14 @@ describe('register', () =>
             .then(() =>
             {
                 console.log(browser.url);
-                return browser.click('Confirm Email Address', () =>
+                return new Promise((resolve, reject) =>
                 {
+                    browser.click('Confirm Email Address', (err) =>
+                    {
+                        if (err)
+                            return reject(err);
+                        return resolve();
+                    });
                 });
             })
             .then((result) =>
