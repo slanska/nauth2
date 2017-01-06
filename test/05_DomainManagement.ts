@@ -4,6 +4,8 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
+import {TestHelper} from './helper';
+
 describe('Login', ()=>
 {
     it('add user to domain', (done)=>
@@ -37,6 +39,11 @@ describe('Login', ()=>
     });
 
     it('list public domains', (done)=>
+    {
+        done();
+    });
+
+    it('cannot list private domains', (done)=>
     {
         done();
     });

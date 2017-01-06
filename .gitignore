@@ -9,7 +9,6 @@ lib/Consts.js
 lib/Consts.js.map
 lib/DBController.js
 lib/DBController.js.map
-lib/index.js
 lib/index.js.map
 node_modules/
 templates/ru/
@@ -92,8 +91,6 @@ lib/Types.js.map
 /config/apiservice.config.js
 /config/base.config.js.map
 /config/base.config.js
-/index.js
-/index.js.map
 /config/index.js.map
 /config/index.js
 /public/app/userController.js
@@ -105,7 +102,6 @@ lib/Types.js.map
 /test/benchmark/
 /test/benchmark/many_databases.js
 /test/benchmark/many_databases.js.map
-/test/helper.js
 /test/helper.js.map
 /test/05_DomainManagement.js
 /test/04_UserManagement.js
@@ -155,3 +151,4 @@ lib/Types.js.map
 /test/08_ChangePassword.js
 /test/09_RoleManagement.js
 /test/09_RoleManagement.js.map
+/test/helper.js

@@ -231,7 +231,7 @@ export interface INAuth2Config
      *Endpoint links are optional. If not set, integrated endpoints will be used
      Default value: 'website'
 
-     TODO? Confirm design: apiservice/website dilemman may be not relevant as type of application
+     TODO? Confirm design: apiservice/website dilemma may be not relevant as type of application
      can be determined based on AJAX and non-AJAX calls
      */
     run_mode: 'apiservice'|'website',
@@ -303,7 +303,9 @@ export interface INAuth2Config
      'homePhone', 'cellPhone', 'dayTimePhone']
      Fields can be:
      * array of strings
-     * object with field names as keys
+     * object with field names as keys, and boolean values (true - for required, false
+     * - for optional).
+     * For example:
      */
     registerFields?: string[];
 

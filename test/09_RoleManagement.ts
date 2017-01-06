@@ -4,12 +4,6 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-global.Promise = require('bluebird');
-import assert = require('assert');
-import mocha = require('mocha');
-import * as Types from '../lib/Types';
-var authentication = require('feathers-authentication/client');
-
 import {TestHelper} from './helper';
 
 describe('rolesManagement', () =>

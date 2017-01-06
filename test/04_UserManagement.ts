@@ -4,6 +4,8 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
+import {TestHelper} from './helper';
+
 describe('User Management', ()=>
 {
     it('get all users by admin', (done)=>

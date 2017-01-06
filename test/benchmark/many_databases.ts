@@ -4,6 +4,8 @@
 
 ///<reference path="../../typings/tsd.d.ts"/>
 
+import {TestHelper} from '../helper';
+
 describe('many databases', ()=>
 {
     before(done=>

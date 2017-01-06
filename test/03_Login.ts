@@ -6,25 +6,25 @@
 
 import {TestHelper} from './helper';
 
-function loadUsers(env:TestHelper)
+function loadUsers(env: TestHelper)
 {
     return env.req.get('/auth/users')
-        .end(err, users=>
+        .end((err, users) =>
         {
         });
 }
 
 var adminPassword = 'admin';
 
-function loginAsAdmin(env:TestHelper)
+function loginAsAdmin(env: TestHelper)
 {
-    return env.req.get('/auth/login').send({email: 'admin', password: adminPassword}).end(()=>
+    return env.req.get('/auth/login').send({email: 'admin', password: adminPassword}).end(() =>
     {
 
     });
 }
 
-function changePassword(env:TestHelper, email:string, password:string, newPassword:string, confirmPassword:string)
+function changePassword(env: TestHelper, email: string, password: string, newPassword: string, confirmPassword: string)
 {
     return env.req
         .post('/auth/changePassword')
@@ -38,14 +38,14 @@ function changePassword(env:TestHelper, email:string, password:string, newPasswo
 }
 
 
-describe('Login', ()=>
+describe('Login', () =>
 {
-    it('admin first login', (done)=>
+    it('admin first login', (done) =>
     {
         var env = new TestHelper();
         env.start()
-            .then(()=>loginAsAdmin(env))
-            .then(res=>
+            .then(() => loginAsAdmin(env))
+            .then(res =>
             {
                 // Expected: need to change password
                 adminPassword = env.generatePassword();
@@ -54,12 +54,12 @@ describe('Login', ()=>
             .then(done);
     });
 
-    it('admin login', (done)=>
+    it('admin login', (done) =>
     {
         done();
     });
 
-    it('random user login', (done)=>
+    it('random user login', (done) =>
     {
         // Generate few random users
 
@@ -72,12 +72,12 @@ describe('Login', ()=>
         done();
     });
 
-    it('wrong email or name', (done)=>
+    it('wrong email or name', (done) =>
     {
         done();
     });
 
-    it('wrong password', (done)=>
+    it('wrong password', (done) =>
     {
         // Create user
 
@@ -88,7 +88,7 @@ describe('Login', ()=>
         done();
     });
 
-    it('account suspended', (done)=>
+    it('account suspended', (done) =>
     {
         // Create user
 
@@ -99,7 +99,7 @@ describe('Login', ()=>
         done();
     });
 
-    it('password needs to be changed', (done)=>
+    it('password needs to be changed', (done) =>
     {
         // Create user
 
@@ -112,22 +112,22 @@ describe('Login', ()=>
         done();
     });
 
-    it('login by name', (done)=>
+    it('login by name', (done) =>
     {
         done();
     });
 
-    it('token expired', (done)=>
+    it('token expired', (done) =>
     {
         done();
     });
 
-    it('use token after server restart', (done)=>
+    it('use token after server restart', (done) =>
     {
         done();
     });
 
-    it('refresh token required', (done)=>
+    it('refresh token required', (done) =>
     {
         // Create user
 

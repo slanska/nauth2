@@ -18,6 +18,8 @@ import config = require('../config/index');
 import Promise = require('bluebird');
 import {exec} from 'child_process';
 
+global.Promise = Promise;
+
 // import Casper = require('casperjs');
 
 chai.use(chaiHttp);

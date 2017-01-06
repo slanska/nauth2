@@ -4,20 +4,21 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-global.Promise = require('bluebird');
 import assert = require('assert');
 import mocha = require('mocha');
 import * as Types from '../lib/Types';
 var authentication = require('feathers-authentication/client');
+var ZombieBrowser = require('zombie');
+ZombieBrowser.waitDuration = '60s';
 
 import {TestHelper} from './helper';
 
-function registerUser(env:TestHelper, user, done)
+function registerUser(env: TestHelper, user, done)
 {
     return env.req
         .post('/auth/register')
         .send(user)
-        .end(err=>
+        .end(err =>
         {
             done(err);
         });
@@ -25,6 +26,10 @@ function registerUser(env:TestHelper, user, done)
 
 describe('register', () =>
 {
+    var browser = new ZombieBrowser({
+        debug: true,
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36'
+    });
 
     //teardown after tests
     after(done =>
@@ -33,24 +38,108 @@ describe('register', () =>
 
     });
 
-    it('fails: wrong captcha', (done) =>
+    it('success', (done) =>
     {
         var env = new TestHelper();
+        var uu: IUserRecord;
 
         env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
         env.start()
-            .then(()=>
+            .then(() =>
             {
                 return env.createNewUser();
             })
-            .then(user=>
+            .then(user =>
             {
+                uu = user;
                 registerUser(env, user, done);
             })
-            .catch(err=>
+            .then(() =>
+            {
+                // Start verifying confirm email
+                return new Promise((resolve, reject) =>
+                {
+                    browser.visit('https://www.mailinator.com', () =>
+                    {
+                        return resolve();
+                    });
+                });
+            })
+            .then(() =>
+            {
+                browser.fill('#inboxfield', uu.email);
+                return new Promise((resolve, reject) =>
+                {
+                    browser.once('loaded', (document) =>
+                    {
+                        return resolve();
+                    });
+
+                    browser.pressButton('Go!', (err) =>
+                    {
+                        if (err)
+                            console.error(err);
+
+                        console.log('Go handled');
+                    });
+                });
+            })
+            .then(() =>
+            {
+                console.log(browser.url);
+                let node = browser.querySelectorAll('div > .outermail')[0].parentNode; //.attributes.onclick.nodeValue
+                return new Promise((resolve, reject) =>
+                {
+                    browser.once('loaded', () =>
+                    {
+                        return resolve();
+                    });
+                    return browser.click(node, (err) =>
+                    {
+                        if (err)
+                            console.error(err);
+                        console.log('email selected');
+                    });
+                });
+            })
+            .then(() =>
+            {
+                console.log(browser.url);
+                return browser.click('Confirm Email Address', () =>
+                {
+                });
+            })
+            .then((result) =>
+            {
+                done();
+            })
+            .catch(err =>
             {
                 done(err);
             });
+    });
+
+    it('fails: wrong captcha', (done) =>
+    {
+        done();
+        return;
+
+        // var env = new TestHelper();
+        //
+        // env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
+        // env.start()
+        //     .then(() =>
+        //     {
+        //         return env.createNewUser();
+        //     })
+        //     .then(user =>
+        //     {
+        //         registerUser(env, user, done);
+        //     })
+        //     .catch(err =>
+        //     {
+        //         done(err);
+        //     });
     });
 
     it('fails: weak password', (done) =>
@@ -71,22 +160,22 @@ describe('register', () =>
         done();
     });
 
-    it('user self-registered', (done)=>
+    it('user self-registered', (done) =>
     {
         done();
     });
 
-    it('100 users self-registered and confirmed', (done)=>
+    it('100 users self-registered and confirmed', (done) =>
     {
         done();
     });
 
-    it('user registered and pending approval', (done)=>
+    it('user registered and pending approval', (done) =>
     {
         done();
     });
 
-    it('user created by admin', (done)=>
+    it('user created by admin', (done) =>
     {
         done();
     });
