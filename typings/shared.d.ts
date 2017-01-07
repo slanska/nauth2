@@ -52,6 +52,11 @@ interface ILoginResponse
     status?: number;
 }
 
+interface Function
+{
+    sync(tt:any, ...args);
+}
+
 
 
 

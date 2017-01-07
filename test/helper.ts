@@ -2,7 +2,7 @@
  * Created by slanska on 2016-11-08.
  */
 
-// /<reference path="../typings/tsd.d.ts"/>
+///<reference path="../typings/tsd.d.ts"/>
 // /<reference path="../typings/casperjs/casperjs.d.ts"/>
 
 import * as Types from '../lib/Types';
@@ -53,13 +53,14 @@ export class TestHelper
 
     public start()
     {
+        var self = this;
         return new Promise((resolve, reject)=>
         {
-            this.app = AppFactory(this.config);
-            this.server = this.app.listen(3030);
-            this.server.once('listening', () =>
+            self.app = AppFactory(self.config);
+            self.server = self.app.listen(3030);
+            self.server.once('listening', () =>
             {
-                return resolve();
+                return resolve(self);
             });
         });
     }

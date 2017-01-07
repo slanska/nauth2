@@ -152,3 +152,7 @@ lib/Types.js.map
 /test/09_RoleManagement.js
 /test/09_RoleManagement.js.map
 /test/helper.js
+/test/zombieExt.js.map
+/test/zombieExt.js
+/test/emailAutomated/mailinator.js.map
+/test/emailAutomated/mailinator.js

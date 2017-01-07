@@ -253,6 +253,8 @@ ect.js
 Framework7
 vue.js
 mocha & chai
+zombie js
+syncho
 captchapng
 accesscontrol
 jsonwebtoken
