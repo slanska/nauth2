@@ -8,34 +8,83 @@ import assert = require('assert');
 import mocha = require('mocha');
 import * as Types from '../lib/Types';
 var authentication = require('feathers-authentication/client');
-var ZombieBrowser = require('zombie');
-ZombieBrowser.waitDuration = '60s';
-
-var Sync = require('syncho');
-
+import {MailinatorHelper} from './emailAutomated/mailinator';
 
 import {TestHelper} from './helper';
 
-function registerUser(env: TestHelper, user, done)
+/*
+ Makes API call: POST /auth/register
+ Returns promise
+ */
+export function registerUser(env: TestHelper, user)
 {
-    return env.req
-        .post('/auth/register')
-        .send(user)
-        .end(err =>
-        {
-            done(err);
-        });
+    return new Promise((resolve, reject) =>
+    {
+        return env.req
+            .post('/auth/register')
+            .send(user)
+            .end(err =>
+            {
+                if (err)
+                    return reject(err);
+                return resolve(user);
+            });
+    }) as Promise<IUserRecord>;
+}
+
+/*
+
+ */
+export function selfConfirmUserRegistration(env: TestHelper, user: IUserRecord): Promise<IUserRecord>
+{
+    return new Promise((resolve, reject) =>
+    {
+        const url = ``;
+        return env.req
+            .get('/auth/confirmRegister')
+            .send(user)
+            .end(err =>
+            {
+                if (err)
+                    return reject(err);
+                return resolve(user);
+            });
+    }) as Promise<IUserRecord>;
+}
+
+/*
+
+ */
+export function adminConfirmUserRegistration()
+{}
+
+/*
+ Performs all steps to register user:
+ * generate fake user data
+ * get captcha
+ * POST /auth/register
+ * GET /auth/confirmRegister
+
+ Returns promise to resolve as IUserRecord
+ */
+export function selfUserRegistration(env: TestHelper): Promise<IUserRecord>
+{
+    return env.createNewUser()
+        .then(user => registerUser(env, user))
+        .then(user => selfConfirmUserRegistration(env, user));
+}
+
+/*
+
+ */
+export function userRegistrationByAdmin(env: TestHelper)
+{
+
 }
 
 describe('register', () =>
 {
-    var browser = new ZombieBrowser({
-        debug: true,
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36'
-    });
-    browser.debug = true;
-
-    //teardown after tests
+    //tear down after tests
     after(done =>
     {
         done();
@@ -52,54 +101,9 @@ describe('register', () =>
 
     afterEach((done) =>
     {
-        env.server.close();
+        if (env && env.server)
+            env.server.close();
         done();
-    });
-
-    it('mailinator', (done) =>
-    {
-        new Promise((resolve, reject) =>
-        {
-            Sync(() =>
-            {
-                try
-                {
-                    browser.visit.sync(browser, 'https://www.mailinator.com');
-                }
-                catch (err)
-                {
-                    // Ignore
-                    console.error(err);
-                }
-
-                try
-                {
-                    browser.fill('#inboxfield', 'Emerald78@mailinator.com');
-
-                    browser.pressButton.sync(browser, 'Go!');
-                    console.log(browser.url);
-                    let node = browser.querySelectorAll('div > .outermail')[0].parentNode; //.attributes.onclick.nodeValue
-
-                    browser.click.sync(browser, node);
-                    console.log('email selected');
-                    resolve();
-
-                }
-                catch (err)
-                {
-                    console.error(err);
-                    reject(err);
-                }
-            });
-        })
-            .then(() =>
-            {
-                done();
-            })
-            .catch((err) =>
-            {
-                done(err);
-            });
     });
 
     it('success', (done) =>
@@ -115,110 +119,13 @@ describe('register', () =>
             .then(user =>
             {
                 uu = user;
-                registerUser(env, user, done);
+                return registerUser(env, user);
             })
             .then(() =>
             {
-                // Start verifying confirm email
-                return new Promise((resolve, reject) =>
-                {
-                    browser.visit('https://www.mailinator.com', (err) =>
-                    {
-                        browser.fill('#inboxfield', uu.email);
-
-                        browser.pressButton('Go!', (err) =>
-                        {
-                            if (err)
-                            {
-                                console.error(err);
-                                return reject(err);
-                            }
-
-                            browser.visit(browser.url, () =>
-                            {
-                                console.log(browser.url);
-                                let node = browser.querySelectorAll('div > .outermail')[0].parentNode; //.attributes.onclick.nodeValue
-
-                                browser.click(node, (err) =>
-                                {
-                                    if (err)
-                                    {
-                                        console.error(err);
-                                        return reject(err);
-                                    }
-                                    console.log('email selected');
-                                    return resolve();
-                                });
-                            });
-                        });
-                    });
-                });
+                return new MailinatorHelper().processConfirmEmail(uu.email);
             })
-            // .then(() =>
-            // {
-            //     return new Promise((resolve, reject) =>
-            //     {
-            //         browser.fill('#inboxfield', uu.email);
-            //
-            //         browser.pressButton('Go!', (err) =>
-            //         {
-            //             if (err)
-            //             {
-            //                 console.error(err);
-            //                 return reject(err);
-            //             }
-            //
-            //             return resolve();
-            //         });
-            //     });
-            // })
-            // .then(() =>
-            // {
-            //     // Start verifying confirm email
-            //     return new Promise((resolve, reject) =>
-            //     {
-            //         browser.visit(browser.url, () =>
-            //         {
-            //             return resolve();
-            //         });
-            //     });
-            // })
-            // .then(() =>
-            // {
-            //     return new Promise((resolve, reject) =>
-            //     {
-            //         console.log(browser.url);
-            //         let node = browser.querySelectorAll('div > .outermail')[0].parentNode; //.attributes.onclick.nodeValue
-            //
-            //         return new Promise((resolve, reject) =>
-            //         {
-            //             browser.click(node, (err) =>
-            //             {
-            //                 if (err)
-            //                 {
-            //                     console.error(err);
-            //                     return reject(err);
-            //                 }
-            //                 console.log('email selected');
-            //                 return resolve();
-            //             });
-            //         });
-            //     });
-            // })
-            // .then(() =>
-            // {
-            //     console.log(browser.url);
-            //     return new Promise((resolve, reject) =>
-            //     {
-            //         browser.click('Confirm Email Address', (err) =>
-            //         {
-            //             if (err)
-            //                 return reject(err);
-            //             return resolve();
-            //         });
-            //     });
-            // })
-            .then((result) =>
+            .then(() =>
             {
                 done();
             })
@@ -231,41 +138,20 @@ describe('register', () =>
     it('fails: wrong captcha', (done) =>
     {
         done();
-        return;
-
-        // var env = new TestHelper();
-        //
-        // env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
-        // env.start()
-        //     .then(() =>
-        //     {
-        //         return env.createNewUser();
-        //     })
-        //     .then(user =>
-        //     {
-        //         registerUser(env, user, done);
-        //     })
-        //     .catch(err =>
-        //     {
-        //         done(err);
-        //     });
     });
 
     it('fails: weak password', (done) =>
     {
-        // assert.ok(app.service('menus'));
         done();
     });
 
     it('fails: password and confirm password mismatch', (done) =>
     {
-        // assert.ok(app.service('menus'));
         done();
     });
 
     it('fails: email already used', (done) =>
     {
-        // assert.ok(app.service('menus'));
         done();
     });
 
@@ -289,5 +175,4 @@ describe('register', () =>
         done();
     });
 
-})
-;
+});

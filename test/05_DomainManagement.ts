@@ -6,7 +6,7 @@
 
 import {TestHelper} from './helper';
 
-describe('Login', ()=>
+describe('Domain Management', ()=>
 {
     it('add user to domain', (done)=>
     {

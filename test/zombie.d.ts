@@ -88,7 +88,7 @@ declare module "zombie"
          :valid	input:valid	Selects all input elements with a valid value	3
          :visited	a:visited	Selects all visited links	1
          */
-        export type Selector = string | Node | Element;
+        export type Selector = string | Node;
     }
 
     /*
@@ -124,9 +124,21 @@ declare module "zombie"
          */
         constructor(options?: ZombieBrowser.BrowserOptions);
 
+        /*
+        ms value for operation waiting timeout
+        Example: '60s', '1min'
+         */
+        static waitDuration:string;
+
         runScripts: boolean;
-        debug: boolean;
+        // debug: boolean;
+        debug();
         userAgent: string;
+
+        /*
+         to disable console output from scripts
+         */
+        silent:boolean;
 
         /*
          Loads document from the specified URL, processes all events in the queue, and finally invokes the callback.
@@ -265,6 +277,11 @@ declare module "zombie"
         location: Location;
 
         /*
+         Current url
+         */
+        url: string;
+
+        /*
          Returns the status code returned for this page request (200, 303, etc).
          */
         statusCode: number;
@@ -347,6 +364,16 @@ declare module "zombie"
          Returns nothing.
          */
         pressButton(selector: ZombieBrowser.Selector, callback?: Function);
+
+        /*
+         Click on the element and returns a promise.
+
+         selector - Element or CSS selector
+         callback - Called with error or nothing
+
+         If called without callback, returns a promise
+         */
+        click(selector: ZombieBrowser.Selector, callback?: Function);
 
         /*
          Selects an option. The first argument can be the field name, label text or a CSS selector. The second value is the option to select, by value or label.
@@ -544,7 +571,7 @@ declare module "zombie"
          in which case that many events are processed. It can be a function, which is called after each event;
          processing stops when the function returns the value false.
          */
-        wait(callback: Function);
+        wait(callback?: Function);
         wait(terminator: number, callback: Function);
         wait(terminator: Function, callback: Function);
 
@@ -586,12 +613,6 @@ declare module "zombie"
          */
         log(...args: Object[]);
         log(fn: Function);
-
-        /*
-         Views the current document in a real Web browser. Uses the default system browser on OS X, BSD and Linux.
-         Probably errors on Windows.
-         */
-        viewInBrowser(name?: string);
     }
 
     export = ZombieBrowser;

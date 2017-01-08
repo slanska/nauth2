@@ -33,7 +33,7 @@ class Emailer
 {
     // sendMailAsync:(options:nodemailer.SendMailOptions)=>Promise<hooks.HookParams>;
 
-    constructor(protected app:feathers.Application, protected cfg:Types.INAuth2Config)
+    constructor(protected app: feathers.Application, protected cfg: Types.INAuth2Config)
     {
         // this.sendMailAsync = Promise.promisify<hooks.HookParams>(cfg.emailTransport.sendMail);
     }
@@ -58,8 +58,8 @@ class Emailer
      Otherwise, template with name /<culture>/<templateName>.subject.html will be rendered)
 
      */
-    send(emailOptions:nodemailer.SendMailOptions, templateName:string,
-         params:hooks.HookParams, culture = 'en'):Promise<hooks.HookParams>
+    send(emailOptions: nodemailer.SendMailOptions, templateName: string,
+         params: hooks.HookParams, culture = 'en'): Promise<hooks.HookParams>
     {
         var self = this;
         var dd = _.cloneDeep(params.data);
@@ -73,7 +73,7 @@ class Emailer
              actionTitle
              */
 
-            renderer.render(`${culture}/${templateName}`, dd, (err, html)=>
+            renderer.render(`${culture}/${templateName}`, dd, (err, html) =>
             {
                 if (err)
                     reject(err);
@@ -81,18 +81,15 @@ class Emailer
                 {
                     emailOptions.html = html;
 
-                    self.cfg.emailTransport.sendMail(emailOptions, (error:Error, info:nodemailer.SentMessageInfo)=>
+                    self.cfg.emailTransport.sendMail(emailOptions, (error: Error, info: nodemailer.SentMessageInfo) =>
                     {
                         if (error)
-                            reject(err);
-                        else
-                        {
-                            resolve(params);
-                        }
+                            return reject(err);
+
+                        resolve(params);
                     });
                 }
             });
-
         });
     }
 }

@@ -36,7 +36,7 @@ chai.use(chaiHttp);
  */
 export class TestHelper
 {
-    public config:Types.INAuth2Config;
+    public config: Types.INAuth2Config;
 
     // public casper = Casper.create();
 
@@ -48,13 +48,13 @@ export class TestHelper
 
     public should = chai.should();
 
-    public app:feathers.Application;
+    public app: feathers.Application;
     public server;
 
     public start()
     {
         var self = this;
-        return new Promise((resolve, reject)=>
+        return new Promise((resolve, reject) =>
         {
             self.app = AppFactory(self.config);
             self.server = self.app.listen(3030);
@@ -75,13 +75,13 @@ export class TestHelper
         return Faker;
     }
 
-    createNewUser():Promise<any>
+    createNewUser(): Promise<IUserRecord>
     {
         var self = this;
         return self.req.get('/auth/captcha')
-            .then(res=>
+            .then(res =>
             {
-                var captcha:Types.ICaptcha;
+                var captcha: Types.ICaptcha;
                 captcha = res.body as Types.ICaptcha;
                 var password = self.generatePassword();
                 return {
@@ -89,31 +89,35 @@ export class TestHelper
                     password: password, confirmPassword: password,
                     extData: {_p: password},
                     captcha: {hash: captcha.hash, value: captcha.value}
-                };
-            }) as Promise<any>;
+                } as any;
+            }) as any;
+    }
+
+    /*
+     Performs user login by calling POST /auth/login
+     Stores access token and refresh token for future use
+     */
+    loginUser(emailOrName: string)
+    {
+        let self = this;
+        return self.req.post('/auth/login');
+    }
+
+    private _userAccessToken = '';
+    get userAccessToken()
+    {
+        return this._userAccessToken;
+    }
+
+    private _userRefreshToken = '';
+    get userRefreshToken()
+    {
+        return this._userRefreshToken;
     }
 
     generatePassword()
     {
         return this.faker.internet.password(8, false, null, '@1zX');
-    }
-
-    /*
-     Executes casper.js test.
-     Returns promise
-     */
-    runCasper()
-    {
-        return new Promise((resolve, reject)=>
-        {
-            exec('casperjs', (err, stdout, stderr)=>
-            {
-                if (err)
-                    return reject(err);
-
-                resolve(stdout);
-            });
-        });
     }
 }
 
