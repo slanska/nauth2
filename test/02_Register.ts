@@ -10,13 +10,13 @@ import * as Types from '../lib/Types';
 var authentication = require('feathers-authentication/client');
 import {MailinatorHelper} from './emailAutomated/mailinator';
 
-import {TestHelper} from './helper';
+import {TestService} from './helper';
 
 /*
  Makes API call: POST /auth/register
  Returns promise
  */
-export function registerUser(env: TestHelper, user)
+export function registerUser(env: TestService, user)
 {
     return new Promise((resolve, reject) =>
     {
@@ -35,7 +35,7 @@ export function registerUser(env: TestHelper, user)
 /*
 
  */
-export function selfConfirmUserRegistration(env: TestHelper, user: IUserRecord): Promise<IUserRecord>
+export function selfConfirmUserRegistration(env: TestService, user: IUserRecord): Promise<IUserRecord>
 {
     return new Promise((resolve, reject) =>
     {
@@ -56,7 +56,9 @@ export function selfConfirmUserRegistration(env: TestHelper, user: IUserRecord):
 
  */
 export function adminConfirmUserRegistration()
-{}
+{
+
+}
 
 /*
  Performs all steps to register user:
@@ -67,35 +69,42 @@ export function adminConfirmUserRegistration()
 
  Returns promise to resolve as IUserRecord
  */
-export function selfUserRegistration(env: TestHelper): Promise<IUserRecord>
+export function userRegisterAndConfirm(env: TestService): Promise<IUserRecord>
 {
-    return env.createNewUser()
+    env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
+    return env.start()
+        .then(() => env.createNewUser())
         .then(user => registerUser(env, user))
         .then(user => selfConfirmUserRegistration(env, user));
+}
+
+export function userSelfRegister(env: TestService): Promise<IUserRecord>
+{
+    env.config.userCreateMode = Types.UserCreateMode.SelfStart;
+    return env.start()
+        .then(() => env.createNewUser())
+        .then(user => registerUser(env, user));
 }
 
 /*
 
  */
-export function userRegistrationByAdmin(env: TestHelper)
+export function userRegistrationByAdmin(env: TestService)
 {
 
 }
 
-describe('register', () =>
+/*
+ * UserCreateMode: SelfStart
+ */
+describe('user register', () =>
 {
-    //tear down after tests
-    after(done =>
-    {
-        done();
-
-    });
-
-    var env: TestHelper;
+    let env: TestService;
 
     beforeEach((done) =>
     {
-        env = new TestHelper();
+        env = new TestService();
+        env.config.userCreateMode = Types.UserCreateMode.SelfStart;
         done();
     });
 
@@ -106,10 +115,93 @@ describe('register', () =>
         done();
     });
 
-    it('success', (done) =>
+    it('register user and notify admin', (done) =>
     {
-        var uu: IUserRecord;
+        done();
+    });
 
+    it('register user and auto complete', (done) =>
+    {
+        done();
+    });
+
+    it('cannot register because only admin can create new users', (done) =>
+    {
+        env.config.userCreateMode = Types.UserCreateMode.ByAdminOnly;
+        env.start()
+            .then(() =>
+            {
+                return env.createNewUser();
+            })
+            .then(user =>
+            {
+                return registerUser(env, user);
+            })
+            .then(() =>
+            {
+                assert.ifError(null);
+                done();
+            })
+            .catch(err =>
+            {
+                assert.ifError(err);
+                env.should.equal(err.message, 'Error');
+                done(err);
+            });
+    });
+
+    it('register user and confirm', (done) =>
+    {
+        let uu: IUserRecord;
+
+        env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
+        env.start()
+            .then(() => env.createNewUser())
+            .then(user =>
+            {
+                uu = user;
+                return registerUser(env, user);
+            })
+            .then(() => new MailinatorHelper().checkPresenseOfItemInInbox(uu.email, 'Confirm your email', true))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+    it('wrong captcha', (done) =>
+    {
+        env.start()
+            .then(() =>
+            {
+
+            })
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+    it('weak password', (done) =>
+    {
+        env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
+        env.start()
+            .then(() => env.createNewUser())
+            .then(user =>
+            {
+                user.password = user['confirmPassword'] = '1';
+                return registerUser(env, user);
+            })
+            .then(() =>
+            {
+                assert.ifError(null);
+                done();
+            })
+            .catch(err =>
+            {
+                assert.ifError(err);
+                done(err);
+            });
+    });
+
+    it('password and confirm password mismatch', (done) =>
+    {
         env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
         env.start()
             .then(() =>
@@ -118,46 +210,60 @@ describe('register', () =>
             })
             .then(user =>
             {
-                uu = user;
+                user['confirmPassword'] = user.password + '1';
                 return registerUser(env, user);
             })
             .then(() =>
             {
-                return new MailinatorHelper().processConfirmEmail(uu.email);
-            })
-            .then(() =>
-            {
+                assert.ifError(null);
                 done();
             })
             .catch(err =>
             {
+                assert.ifError(err);
                 done(err);
             });
     });
 
-    it('fails: wrong captcha', (done) =>
+    /*
+     Creates new user (in self-start mode)
+     Then tries to register another user with the same email
+     */
+    it('email already used', (done) =>
     {
-        done();
-    });
-
-    it('fails: weak password', (done) =>
-    {
-        done();
-    });
-
-    it('fails: password and confirm password mismatch', (done) =>
-    {
-        done();
-    });
-
-    it('fails: email already used', (done) =>
-    {
-        done();
+        let user1: IUserRecord;
+        let user2: IUserRecord;
+        env.config.userCreateMode = Types.UserCreateMode.SelfStart;
+        env.start()
+            .then(() => userSelfRegister(env))
+            .then((uu) =>
+            {
+                user1 = uu;
+                return env.createNewUser();
+            })
+            .then((uu) =>
+            {
+                user2 = uu;
+                user2.email = user1.email;
+                return registerUser(env, user2);
+            })
+            .then(() =>
+            {
+                assert.ifError(null);
+                done();
+            })
+            .catch(err =>
+            {
+                assert.ifError(err);
+                done(err);
+            });
     });
 
     it('user self-registered', (done) =>
     {
-        done();
+        userSelfRegister(env)
+            .then(() => done())
+            .catch(err => done(err));
     });
 
     it('100 users self-registered and confirmed', (done) =>
@@ -172,7 +278,11 @@ describe('register', () =>
 
     it('user created by admin', (done) =>
     {
-        done();
+        env.start()
+            .then(() => env.loadUserAdmin())
+            .then(() => done())
+            .catch(err => done(err));
     });
 
 });
+

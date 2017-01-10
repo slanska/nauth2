@@ -4,9 +4,9 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-import {TestHelper} from './helper';
+import {TestService} from './helper';
 
-function loadUsers(env: TestHelper)
+function loadUsers(env: TestService)
 {
     return env.req.get('/auth/users')
         .end((err, users) =>
@@ -16,7 +16,7 @@ function loadUsers(env: TestHelper)
 
 var adminPassword = 'admin';
 
-function loginAsAdmin(env: TestHelper)
+function loginAsAdmin(env: TestService)
 {
     return env.req.get('/auth/login').send({email: 'admin', password: adminPassword}).end(() =>
     {
@@ -24,7 +24,7 @@ function loginAsAdmin(env: TestHelper)
     });
 }
 
-function changePassword(env: TestHelper, email: string, password: string, newPassword: string, confirmPassword: string)
+function changePassword(env: TestService, email: string, password: string, newPassword: string, confirmPassword: string)
 {
     return env.req
         .post('/auth/changePassword')
@@ -42,7 +42,7 @@ describe('Login', () =>
 {
     it('admin first login', (done) =>
     {
-        var env = new TestHelper();
+        var env = new TestService();
         env.start()
             .then(() => loginAsAdmin(env))
             .then(res =>

@@ -4,7 +4,7 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-import {TestHelper} from './helper';
+import {TestService} from './helper';
 
 /*
  Performs smoke tests on various database engines
@@ -19,3 +19,5 @@ import {TestHelper} from './helper';
 // MariaDB
 
 // PostgreSQL
+
+// Custom base path

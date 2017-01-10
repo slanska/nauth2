@@ -4,7 +4,7 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-import {TestHelper} from './helper';
+import {TestService} from './helper';
 
 describe('User Management', ()=>
 {
@@ -59,6 +59,21 @@ describe('User Management', ()=>
     });
 
     it('revoke roles from user', (done)=>
+    {
+        done();
+    });
+
+    it('suspend user', (done)=>
+    {
+        done();
+    });
+
+    it('delete user', (done)=>
+    {
+        done();
+    });
+
+    it('update user profile', (done)=>
     {
         done();
     });

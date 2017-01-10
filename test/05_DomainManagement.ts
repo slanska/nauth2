@@ -4,7 +4,7 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-import {TestHelper} from './helper';
+import {TestService} from './helper';
 
 describe('Domain Management', ()=>
 {

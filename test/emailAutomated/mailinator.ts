@@ -28,7 +28,11 @@ export class MailinatorHelper
         });
     }
 
-    processConfirmEmail(email: string)
+    /*
+     Loads mailinator.com home page
+     Returns promise
+     */
+    open()
     {
         let self = this;
         return new Promise(
@@ -45,12 +49,36 @@ export class MailinatorHelper
                     })
                     .catch(err =>
                     {
+                        // This 404 for external ad resource can be ignored
                         if (err.message.indexOf('Server returned status code 404 from https://player.vimeo.com') !== 0)
                             return reject(err);
 
                         return resolve(self.browser);
                     });
             })
+    }
+
+    /*
+     Complete helper utility which
+     * opens mailinator.com
+     * navigates to the inbox by given email
+     * finds inbox item by its (partial) title
+
+     Returns promise which resolves to boolean: true if item was found, false - otherwise
+     */
+    checkPresenseOfItemInInbox(email: string, title: string, partialTitle = true)
+    {
+        let self = this;
+        self.open()
+            .then(() => self.navigateToInbox(email))
+            .then(() => self.findEmailItem(title, partialTitle))
+            .then((nn:Node) => !_.isEmpty(nn));
+    }
+
+    processConfirmEmail(email: string)
+    {
+        let self = this;
+        return self.open()
             .then(() => self.navigateToInbox(email))
             .then(() => self.navigateToEmail('Confirm your email'))
             .then(() => self.clickActionButton('Confirm Email Address'));
@@ -66,11 +94,10 @@ export class MailinatorHelper
     }
 
     /*
-
+     Finds item in the current inbox, by its (partial) caption
      */
-    navigateToEmail(value: string, partialMatch = true)
+    findEmailItem(value: string, partialMatch = true): Node
     {
-        let self = this;
         // Retrieve all inbox items
         let nodes = this.browser.querySelectorAll('div[onclick^=showTheMessage] div.innermail');
 
@@ -85,6 +112,19 @@ export class MailinatorHelper
 
             return nn.textContent === value;
         }) as Node;
+        return nn;
+    }
+
+    /*
+     Finds item in the inbox list and emulates clicking on it.
+
+     NOTE: for some reason click processing does not work (looks like browser stays on the same page, the same context),
+     so using this function does not make sense
+     */
+    navigateToEmail(value: string, partialMatch = true)
+    {
+        let self = this;
+        let nn = this.findEmailItem(value, partialMatch);
 
         // Not found? Error!
         if (!nn)
@@ -95,6 +135,10 @@ export class MailinatorHelper
             .then(() => self.browser.wait());
     }
 
+    /*
+     Assuming email item opened, finds action button by its (partial) title
+     and emulates clicking activity
+     */
     clickActionButton(buttonText: string)
     {
         let btn = this.browser.querySelector('a.btn-primary[itemprop=url][rel=nofollow]');

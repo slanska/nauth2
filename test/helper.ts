@@ -3,7 +3,6 @@
  */
 
 ///<reference path="../typings/tsd.d.ts"/>
-// /<reference path="../typings/casperjs/casperjs.d.ts"/>
 
 import * as Types from '../lib/Types';
 import chai = require('chai');
@@ -16,7 +15,7 @@ import Faker = require('faker');
 import feathers = require('feathers');
 import config = require('../config/index');
 import Promise = require('bluebird');
-import {exec} from 'child_process';
+import knex = require('knex');
 
 global.Promise = Promise;
 
@@ -26,7 +25,14 @@ chai.use(chaiHttp);
 
 /*
  Test environment
- Provides access to config, app, request, faker and other test related modules
+ Provides access to:
+ * config
+ * app
+ * request
+ * faker and other test related modules
+
+ Allows:
+ * initialize new SQLite database
 
  Use:
  var env = new TestHelper();
@@ -34,11 +40,19 @@ chai.use(chaiHttp);
  // change config as needed
  env.start(done);
  */
-export class TestHelper
+export class TestService
 {
     public config: Types.INAuth2Config;
 
-    // public casper = Casper.create();
+    private _db: knex = void 0;
+    public get db(): knex
+    {
+        if (!this._db)
+        {
+            this._db = knex(this.config.dbConfig);
+        }
+        return this._db;
+    }
 
     constructor()
     {
@@ -75,10 +89,13 @@ export class TestHelper
         return Faker;
     }
 
+    /*
+     Returns promise which resolves to IUserRecord with user's fake data
+     */
     createNewUser(): Promise<IUserRecord>
     {
-        var self = this;
-        return self.req.get('/auth/captcha')
+        let self = this;
+        return self.req.get(`/${self.config.basePath}/captcha`)
             .then(res =>
             {
                 var captcha: Types.ICaptcha;
@@ -100,7 +117,7 @@ export class TestHelper
     loginUser(emailOrName: string)
     {
         let self = this;
-        return self.req.post('/auth/login');
+        return self.req.post(`/${self.config.basePath}/login`);
     }
 
     private _userAccessToken = '';
@@ -115,9 +132,51 @@ export class TestHelper
         return this._userRefreshToken;
     }
 
+    /*
+     Generates password which conforms to default password rules
+     */
     generatePassword()
     {
         return this.faker.internet.password(8, false, null, '@1zX');
+    }
+
+    /*
+     Loads user admin (or admin if user admin does not exist)
+     Returns promise which resolves to IUserRecord, with roles and domains
+     */
+    loadUserAdmin():Promise<IUserRecord>
+    {
+        let self = this;
+        return self.loadAnyUserWithRole('UserAdmin')
+            .then((user) =>
+            {
+                if (user)
+                    return Promise.resolve(user);
+
+                return self.loadAnyUserWithRole('SystemAdmin');
+            });
+    }
+
+    /*
+     Loads first found user who has given role assigned.
+     Returns promise which resolves to IUserRecord, with roles and domains
+     */
+    loadAnyUserWithRole(roleName: string):Promise<IUserRecord>
+    {
+        let self = this;
+        return self.db.select('*')
+            .from('NAuth2_Users')
+            .leftJoin('NAuth2_UserRoles', 'userId', 'userId')
+            .leftJoin('NAuth_Roles', 'roleId', 'roleId')
+            .where({roleName: roleName})
+            .limit(1)
+            .then((rows) =>
+            {
+                if (rows && rows.length > 0)
+                    return rows[0];
+
+                return void 0;
+            }) as Promise<IUserRecord>;
     }
 }
 

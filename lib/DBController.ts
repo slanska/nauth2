@@ -224,20 +224,6 @@ module NAuth2
         }
 
         /*
-         Creates entry for refresh token
-         */
-        // createRefreshToken(userId: number, userAgent: Object): Promise<Types.IRefreshTokenRecord>
-        // {
-        //     var self = this;
-        //     var it = {} as Types.IRefreshTokenRecord;
-        //     it.tokenUuid = uuid.v4();
-        //     it.userAgent = userAgent;
-        //     it.userId = userId;
-        //     it.signatureHash = objectHash(userAgent, {});
-        //     return self.db.table('NAuth2_RefreshTokens').insert(it);
-        // }
-
-        /*
          Finds user by his/her email or name. Returns promise
          */
         findUserByNameOrEmail(emailOrName: string): Promise<IUserRecord>
@@ -326,11 +312,6 @@ module NAuth2
             // TODO Needed?
             svc.before({find: []});
         }
-
-        // private verifyUserOnLogin()
-        // {
-        //     // TODO
-        // }
 
         static invalidLoginError()
         {
