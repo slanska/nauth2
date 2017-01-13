@@ -67,10 +67,11 @@ export class TestService
 
     public start()
     {
-        var self = this;
-        return new Promise((resolve, reject) =>
+        let self = this;
+        return new Promise((resolve) =>
         {
             self.app = AppFactory(self.config);
+            self._req = void 0;
             self.server = self.app.listen(3030);
             self.server.once('listening', () =>
             {
@@ -79,9 +80,12 @@ export class TestService
         });
     }
 
+    private _req = void 0;
     public get req()
     {
-        return chai.request(this.app);
+        if (!this._req)
+            this._req = chai.request(this.app);
+        return this._req;
     }
 
     public get faker()
