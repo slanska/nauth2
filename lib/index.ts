@@ -26,6 +26,7 @@ import {MergeDomainsService} from "./services/mergeDomainsService";
 import {SplitDomainsService} from "./services/splitDomainService";
 import {RevokeTokenService} from "./services/revokeTokenService";
 import {RenewTokenService} from "./services/renewTokenService";
+import {ConfirmRegisterService} from "./services/confirmRegisterService";
 
 /*
  index:
@@ -105,8 +106,17 @@ class Controller implements Types.INAuth2Controller
 
         /*
          POST /register
+         GET /confirmRegister
          */
-        this.app.use(`${this.cfg.basePath}/register`, new RegisterService(this.DBController));
+        switch (this.cfg.userCreateMode)
+        {
+            case Types.UserCreateMode.SelfAndApproveByAdmin:
+            case Types.UserCreateMode.SelfAndConfirm:
+            case  Types.UserCreateMode.SelfStart:
+                this.app.use(`${this.cfg.basePath}/register`, new RegisterService(this.DBController));
+                this.app.use(`${this.cfg.basePath}/confirmRegister`, new ConfirmRegisterService(this.DBController));
+                break;
+        }
 
         /*
          POST /login

@@ -50,30 +50,30 @@ var knex = Knex(config.dbConfig);
  Since Knex does natively support executing SQL-agnostic multi-statement raw script, here is the solution
  */
 
-type ScriptRunner = (db, script:string, callback:Function)=>void;
+type ScriptRunner = (db, script: string, callback: Function) => void;
 
-var scriptRunners:{[clientName:string]:ScriptRunner} = {
-    'sqlite3': (db, script:string, callback:Function)=>
+var scriptRunners: {[clientName: string]: ScriptRunner} = {
+    'sqlite3': (db, script: string, callback: Function) =>
     {
         db.exec(script, callback);
     },
-    'pg': (db, script:string, callback:Function)=>
+    'pg': (db, script: string, callback: Function) =>
     {
         db.query(script, callback);
     },
-    'mysql': (db, script:string, callback:Function)=>
+    'mysql': (db, script: string, callback: Function) =>
     {
         db.query(script, callback);
     }
 };
 
-function runSqlScript(script:string)
+function runSqlScript(script: string)
 {
-    return new Promise((resolve, reject)=>
+    return new Promise((resolve, reject) =>
     {
-        knex.client.pool.acquire((error, db)=>
+        knex.client.pool.acquire((error, db) =>
         {
-            scriptRunners[config.dbConfig.client](db, script, (err, result)=>
+            scriptRunners[config.dbConfig.client](db, script, (err, result) =>
             {
                 if (err)
                     reject(err);
@@ -86,7 +86,7 @@ function runSqlScript(script:string)
 /*
  Initializes SQLite specific database for better performance
  */
-function preinitDB(knex:Knex):Promise<any>
+function preinitDB(knex: Knex): Promise<any>
 {
     if (config.dbConfig.client === 'sqlite3')
     {
@@ -106,13 +106,13 @@ function preinitDB(knex:Knex):Promise<any>
  SQL expressions to get current UTC timestamp
  */
 const utc_ts =
-{
-    'sqlite3': 'julianday()',
-    'mysql': 'UTC_TIMESTAMP()',
-    'pg': "now() at time zone 'UTC'"
-};
+    {
+        'sqlite3': 'julianday()',
+        'mysql': 'UTC_TIMESTAMP()',
+        'pg': "now() at time zone 'UTC'"
+    };
 
-function addJsonColumn(tbl:Knex.TableBuilder, columnName:string)
+function addJsonColumn(tbl: Knex.TableBuilder, columnName: string)
 {
     switch (config.dbConfig.client)
     {
@@ -130,25 +130,36 @@ function addJsonColumn(tbl:Knex.TableBuilder, columnName:string)
     }
 }
 
-function addCreatedAt(tbl:Knex.TableBuilder)
+function addCreatedAt(tbl: Knex.TableBuilder)
 {
     tbl.specificType(`created_at`, `datetime default (${utc_ts[config.dbConfig.client]})`);
 }
 
-function addTimestamps(tbl:Knex.TableBuilder)
+function addTimestamps(tbl: Knex.TableBuilder)
 {
     addCreatedAt(tbl);
     tbl.dateTime(`updated_at`).nullable();
 }
 
-function createTables(knex:Knex)
+function createTables(knex: Knex)
 {
     return knex.schema
+        .createTable('NAuth2_DomainTypes', function(tbl)
+        {
+            tbl.increments('domainTypeId');
+            tbl.string('domainTypeName', 50).notNullable().unique();
+            addTimestamps(tbl);
+
+            console.info('Domain Types table initialization');
+        })
         .createTable('NAuth2_Domains',
             function (tbl)
             {
                 tbl.increments('domainId');
                 tbl.boolean('active').notNullable().defaultTo(true);
+
+                tbl.integer('domainTypeId').notNullable()
+                    .references('domainTypeId').inTable('NAuth2_DomainTypes').onDelete('restrict').onUpdate('restrict');
 
                 /*
                  Hierarchical domain name, with optional multiple segments separated by dot.
@@ -200,7 +211,6 @@ function createTables(knex:Knex)
                 addTimestamps(tbl);
 
                 console.info('Domains table initialization');
-
             })
         .createTable('NAuth2_Users',
             function (tbl)
@@ -246,7 +256,7 @@ function createTables(knex:Knex)
             tbl.bigInteger('userId').notNullable().unique()
                 .references('userId').inTable('NAuth2_Users').onDelete('cascade').onUpdate('cascade');
         })
-        .createTable('NAuth2_RefreshTokens', tbl=>
+        .createTable('NAuth2_RefreshTokens', tbl =>
         {
             tbl.uuid('tokenUuid').notNullable().primary();
 
@@ -351,7 +361,7 @@ function createTables(knex:Knex)
 /*
 
  */
-function createTriggers(knex:Knex)
+function createTriggers(knex: Knex)
 {
     if (['pg', 'sqlite3', 'mysql'].indexOf(config.dbConfig.client) < 0)
         throw new Error(`Triggers generation is not support for ${config.dbConfig.client} database`);
@@ -371,7 +381,7 @@ function createTriggers(knex:Knex)
     return runSqlScript(sql);
 }
 
-function initData(knex:Knex)
+function initData(knex: Knex)
 {
     console.info('Initializing data');
     return knex.insert([
@@ -402,7 +412,7 @@ function initData(knex:Knex)
     ]).into('NAuth2_Roles');
 }
 
-function insertAdmin(knex:Knex)
+function insertAdmin(knex: Knex)
 {
     var pp = {} as hooks.HookParams;
     pp.type = 'before';
@@ -420,7 +430,7 @@ function insertAdmin(knex:Knex)
         password: pwd,
         status: 'A' // Active
     }]).into('NAuth2_Users')
-        .then(users=>
+        .then(users =>
         {
             adminId = users[0];
             var result = knex.select('roleId').from('NAuth2_Roles').where({
@@ -428,7 +438,7 @@ function insertAdmin(knex:Knex)
             });
             return result;
         })
-        .then((roles)=>
+        .then((roles) =>
         {
             roleId = roles[0].roleId;
             return knex.insert([
@@ -440,28 +450,28 @@ function insertAdmin(knex:Knex)
 }
 
 preinitDB(knex)
-    .then(()=>
+    .then(() =>
     {
         return createTables(knex);
     })
-    .then(()=>
+    .then(() =>
     {
         return createTriggers(knex);
     })
-    .then(()=>
+    .then(() =>
     {
         return initData(knex);
     })
-    .then(()=>
+    .then(() =>
     {
         return insertAdmin(knex);
     })
-    .then(()=>
+    .then(() =>
     {
         console.info('Done!');
         return knex.destroy();
     })
-    .catch(err=>
+    .catch(err =>
     {
         knex.destroy();
         console.error(`${err}. Rolling back`);
@@ -469,13 +479,14 @@ preinitDB(knex)
             knex.schema.dropTableIfExists('NAuth2_UserRoles'),
             knex.schema.dropTableIfExists('NAuth2_DomainUsers'),
             knex.schema.dropTableIfExists('NAuth2_Domains'),
+            knex.schema.dropTableIfExists('NAuth2_DomainTypes'),
             knex.schema.dropTableIfExists('NAuth2_UserNames'),
             knex.schema.dropTableIfExists('NAuth2_Users'),
             knex.schema.dropTableIfExists('NAuth2_Roles'),
             knex.schema.dropTableIfExists('NAuth2_Log')
         ]);
     })
-    .finally(()=>
+    .finally(() =>
     {
         knex.destroy();
     });

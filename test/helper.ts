@@ -89,18 +89,23 @@ export class TestService
         return Faker;
     }
 
+    generateCaptcha(): Promise<Types.ICaptcha>
+    {
+        let self = this;
+        return self.req.get(`/${self.config.basePath}/captcha`)
+            .then(res => res.body as Types.ICaptcha) as any;
+    }
+
     /*
      Returns promise which resolves to IUserRecord with user's fake data
      */
     createNewUser(): Promise<IUserRecord>
     {
         let self = this;
-        return self.req.get(`/${self.config.basePath}/captcha`)
-            .then(res =>
+        return self.generateCaptcha()
+            .then(captcha =>
             {
-                var captcha: Types.ICaptcha;
-                captcha = res.body as Types.ICaptcha;
-                var password = self.generatePassword();
+                let password = self.generatePassword();
                 return {
                     email: self.faker.internet.userName() + '@mailinator.com',
                     password: password, confirmPassword: password,
@@ -144,7 +149,7 @@ export class TestService
      Loads user admin (or admin if user admin does not exist)
      Returns promise which resolves to IUserRecord, with roles and domains
      */
-    loadUserAdmin():Promise<IUserRecord>
+    loadUserAdmin(): Promise<IUserRecord>
     {
         let self = this;
         return self.loadAnyUserWithRole('UserAdmin')
@@ -161,7 +166,7 @@ export class TestService
      Loads first found user who has given role assigned.
      Returns promise which resolves to IUserRecord, with roles and domains
      */
-    loadAnyUserWithRole(roleName: string):Promise<IUserRecord>
+    loadAnyUserWithRole(roleName: string): Promise<IUserRecord>
     {
         let self = this;
         return self.db.select('*')
@@ -179,9 +184,4 @@ export class TestService
             }) as Promise<IUserRecord>;
     }
 }
-
-
-
-
-
 

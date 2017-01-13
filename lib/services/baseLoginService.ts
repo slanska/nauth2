@@ -21,23 +21,15 @@ import {getSystemRoles} from "../hooks/loadSysRoles";
 import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
 import jsonwebtoken = require('jsonwebtoken');
+import {BaseService} from "./baseService";
 var ms = require('ms');
 
 /*
  Base class to serve login/signing calls
  Provides standard hooks and database operations needed for user login
  */
-export abstract class BaseLoginService
+export abstract class BaseLoginService extends BaseService
 {
-    constructor(protected DBController: NAuth2.DBController)
-    {
-    }
-
-    protected get asService(): feathers.Service
-    {
-        return this as any;
-    }
-
     /*
      Returns promise which will resolve to string 'navigateTo' (user's landing page)
      which depends on primary user's role

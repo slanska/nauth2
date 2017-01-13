@@ -33,6 +33,16 @@ export function registerUser(env: TestService, user)
 }
 
 /*
+ Handy shortcut to start server, create a new user and register him/her
+ */
+export function startServerAndCreateAndRegisterUser(env: TestService): Promise<IUserRecord>
+{
+    return env.start()
+        .then(() => env.createNewUser())
+        .then(user => registerUser(env, user));
+}
+
+/*
 
  */
 export function selfConfirmUserRegistration(env: TestService, user: IUserRecord): Promise<IUserRecord>
@@ -72,18 +82,14 @@ export function adminConfirmUserRegistration()
 export function userRegisterAndConfirm(env: TestService): Promise<IUserRecord>
 {
     env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
-    return env.start()
-        .then(() => env.createNewUser())
-        .then(user => registerUser(env, user))
+    return startServerAndCreateAndRegisterUser(env)
         .then(user => selfConfirmUserRegistration(env, user));
 }
 
 export function userSelfRegister(env: TestService): Promise<IUserRecord>
 {
     env.config.userCreateMode = Types.UserCreateMode.SelfStart;
-    return env.start()
-        .then(() => env.createNewUser())
-        .then(user => registerUser(env, user));
+    return startServerAndCreateAndRegisterUser(env);
 }
 
 /*
@@ -91,7 +97,8 @@ export function userSelfRegister(env: TestService): Promise<IUserRecord>
  */
 export function userRegistrationByAdmin(env: TestService)
 {
-
+    env.config.userCreateMode = Types.UserCreateMode.SelfAndApproveByAdmin;
+    return startServerAndCreateAndRegisterUser(env);
 }
 
 /*
@@ -115,28 +122,25 @@ describe('user register', () =>
         done();
     });
 
-    it('register user and notify admin', (done) =>
+    it('register user: self and approve by admin', (done) =>
     {
-        done();
+        userRegistrationByAdmin(env)
+            .then(() => done())
+            .catch(err => done(err));
     });
 
-    it('register user and auto complete', (done) =>
+    it('register user: self start', (done) =>
     {
-        done();
+        env.config.userCreateMode = Types.UserCreateMode.SelfStart;
+        startServerAndCreateAndRegisterUser(env)
+            .then(() => done())
+            .catch(err => done(err));
     });
 
     it('cannot register because only admin can create new users', (done) =>
     {
         env.config.userCreateMode = Types.UserCreateMode.ByAdminOnly;
-        env.start()
-            .then(() =>
-            {
-                return env.createNewUser();
-            })
-            .then(user =>
-            {
-                return registerUser(env, user);
-            })
+        startServerAndCreateAndRegisterUser(env)
             .then(() =>
             {
                 assert.ifError(null);
@@ -170,9 +174,11 @@ describe('user register', () =>
     it('wrong captcha', (done) =>
     {
         env.start()
-            .then(() =>
+            .then((captcha) => env.createNewUser())
+            .then((item:any) =>
             {
-
+                item.captcha.value = item.captcha.value + 2;
+                return registerUser(env, item);
             })
             .then(() => done())
             .catch(err => done(err));

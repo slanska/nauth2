@@ -25,19 +25,94 @@ export class RegisterService extends BaseLoginService
 {
     protected app: feathers.Application;
 
+    /*
+     Sets status for new user as 'A'(Active), if user create mode is SelfStart
+     */
+    private setNewUserStatusHook()
+    {
+        var self = this;
+        var result = (p: hooks.HookParams) =>
+        {
+            if (self.DBController.cfg.userCreateMode === Types.UserCreateMode.SelfStart)
+                p.data.status = 'A';
+        };
+        return result;
+    }
+
+    /*
+
+     */
+    private setRolesToNewUser()
+    {
+        var self = this;
+
+        var result = (p: hooks.HookParams) =>
+        {
+            return self.DBController.db.table('NAuth2_Roles').where({'name': {$in: self.DBController.cfg.newMemberRoles || []}})
+                .then(rr =>
+                {
+                    let roles = _.map(rr, (r: any) =>
+                    {
+                        return {userId: p.result.userId, roleId: r.roleId};
+                    });
+
+                    if (roles.length === 0)
+                        return Promise.resolve();
+
+                    return self.DBController.db.table('NAuth2_UserRoles')
+                        .insert(roles);
+                });
+
+        };
+        return result;
+    }
+
     setup(app: feathers.Application)
     {
         this.app = app;
         this.asService.before({
-            create: []
+            create: [
+                nhooks.verifyCaptcha('captcha'),
+                nhooks.verifyNewPassword(this.DBController.cfg, 'password', 'confirmPassword'),
+                hooks.remove('captcha'),
+                hooks.remove('confirmPassword'),
+                auth.hooks.hashPassword(this.DBController.authCfg),
+                nhooks.verifyEmail(),
+                nhooks.verifyUniqueUserEmail(),
+                this.setNewUserStatusHook(),
+                nhooks.jsonDataStringify()
+            ],
+            get: [hooks.disable('external')],
+            find: [hooks.disable('external')],
+            update: [hooks.disable('external')],
+            remove: [hooks.disable('external')],
+            patch: [hooks.disable('external')],
         });
         this.asService.after({
-            create: []
+            create: [
+                this.setRolesToNewUser(),
+                hooks.pluck('email'),
+
+                // TODO afterUserRegister
+                nhooks.setRegisterConfirmActionUrl(this.DBController.cfg, this.DBController.authCfg),
+                nhooks.sendEmailToUser(this.app, this.DBController.cfg, 'welcomeAndConfirm',
+                    // TODO Localize
+                    _.template('Welcome to <%-companyName%>! Confirm your email')),
+
+                (p: hooks.HookParams) =>
+                {
+                    p.result = {} as feathers.ResponseBody;
+                    p.result.name = 'Success';
+                    p.result.className = 'success';
+                    p.result.code = HTTPStatus.OK;
+                    p.result.message = 'Registration successful. Check your email';
+                }
+            ]
         });
     }
 
-    create(data, params: feathers.MethodParams)
-    {
-
-    }
+    // create(data, params: feathers.MethodParams)
+    // {
+    //
+    // }
 }

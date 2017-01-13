@@ -156,3 +156,9 @@ lib/Types.js.map
 /test/zombieExt.js
 /test/emailAutomated/mailinator.js.map
 /test/emailAutomated/mailinator.js
+/lib/services/domainService.js.map
+/lib/services/domainService.js
+/lib/services/userService.js.map
+/lib/services/userService.js
+/lib/services/confirmRegisterService.js.map
+/lib/services/confirmRegisterService.js

@@ -111,98 +111,7 @@ module NAuth2
             return this.Services.Users;
         }
 
-        /*
-
-         */
-        private setRolesToNewUser()
-        {
-            var self = this;
-
-            var result = (p: hooks.HookParams) =>
-            {
-                return self.db.table('NAuth2_Roles').where({'name': {$in: self.cfg.newMemberRoles || []}})
-                    .then(rr =>
-                    {
-                        var roles = _.map(rr, (r: any) =>
-                        {
-                            return {userId: p.result.userId, roleId: r.roleId};
-                        });
-
-                        if (roles.length === 0)
-                            return Promise.resolve();
-
-                        return self.db.table('NAuth2_UserRoles')
-                            .insert(roles);
-                    });
-
-            };
-            return result;
-        }
-
-        /*
-         Sets status for new user as 'A'(Active), if user create mode is SelfStart
-         */
-        private setNewUserStatusHook()
-        {
-            var self = this;
-            var result = (p: hooks.HookParams) =>
-            {
-                if (self.cfg.userCreateMode === Types.UserCreateMode.SelfStart)
-                    p.data.status = 'A';
-            };
-            return result;
-        }
-
-        /*
-         Configures service for POST /auth/register
-         */
-        protected createUserRegisterService()
-        {
-            this.Path.Register = `${this.cfg.basePath}/register`;
-            this.Services.RegisterUsers = this.initUserService(this.Path.Register);
-            this.Services.RegisterUsers.before({
-                create: [
-                    nhooks.verifyCaptcha('captcha'),
-                    nhooks.verifyNewPassword(this.cfg, 'password', 'confirmPassword'),
-                    hooks.remove('captcha'),
-                    hooks.remove('confirmPassword'),
-                    auth.hooks.hashPassword(this.authCfg),
-                    nhooks.verifyEmail(),
-                    nhooks.verifyUniqueUserEmail(),
-                    this.setNewUserStatusHook(),
-                    nhooks.jsonDataStringify()
-                ],
-                get: [hooks.disable('external')],
-                find: [hooks.disable('external')],
-                update: [hooks.disable('external')],
-                remove: [hooks.disable('external')],
-                patch: [hooks.disable('external')],
-            });
-
-            this.Services.RegisterUsers.after({
-                create: [
-                    this.setRolesToNewUser(),
-                    hooks.pluck('email'),
-
-                    // TODO afterUserRegister
-                    nhooks.setRegisterConfirmActionUrl(this.cfg, this.authCfg),
-                    nhooks.sendEmailToUser(this.app, this.cfg, 'welcomeAndConfirm',
-                        // TODO Localize
-                        _.template('Welcome to <%-companyName%>! Confirm your email')),
-
-                    (p: hooks.HookParams) =>
-                    {
-                        p.result = {} as feathers.ResponseBody;
-                        p.result.name = 'Success';
-                        p.result.className = 'success';
-                        p.result.code = HTTPStatus.OK;
-                        p.result.message = 'Registration successful. Check your email';
-                    }
-                ]
-            });
-        }
-
-        /*
+         /*
          Populates user data based on data.userId field
          */
         populateUserHook()
@@ -243,74 +152,6 @@ module NAuth2
                         return resolve(users[0]);
                     });
             }) as any;
-        }
-
-        protected createRegisterConfirmService()
-        {
-            var self = this;
-            var path = `${self.cfg.basePath}/confirmRegister`;
-            var svc = self.app.service(path, {
-                find: (params: feathers.MethodParams) =>
-                {
-                    return new Promise((resolve, reject) =>
-                    {
-                        jwt.verify(params.query.t, self.authCfg.token.secret,
-                            (err, decoded) =>
-                            {
-                                if (err)
-                                    return reject(err);
-
-                                // Update status of user to '(A)ctive'
-                                return this.Services.RegisterUsers.find(
-                                    {query: {email: decoded.email}, paginate: {limit: 1}})
-                                    .then(users =>
-                                    {
-                                        // Check if user is found
-                                        // Check if user is marked as suspended or deleted
-                                        if (!users || users.length !== 1 || users[0].status === 'D' || users[0].status === 'S')
-                                        {
-                                            // TODO Translate
-                                            reject(new errors.NotFound('User not found or suspended'));
-                                        }
-
-                                        // Finally, update its status
-                                        return this.Services.RegisterUsers.patch(users[0].userId,
-                                            {status: 'A'},
-                                            {});
-                                    })
-                                    .then(d =>
-                                    {
-                                        // Redirects or renders default page
-                                        if (self.cfg.run_mode === 'website')
-                                        {
-
-                                        }
-                                        else
-                                        {
-
-                                        }
-                                        var result = {} as feathers.ResponseBody;
-                                        result.name = 'Success';
-                                        result.className = 'success';
-                                        result.code = HTTPStatus.OK;
-
-                                        // TODO Send confirmation email, if applicable
-                                        result.message = 'Registration successful. Check your email';
-                                        return resolve(result);
-                                    })
-                                    .catch(err =>
-                                    {
-                                        return reject(err);
-                                    });
-
-                            });
-
-                    });
-                }
-            });
-
-            // TODO Needed?
-            svc.before({find: []});
         }
 
         static invalidLoginError()
@@ -399,16 +240,6 @@ module NAuth2
 
             // Log
             this.createLogService();
-
-            switch (cfg.userCreateMode)
-            {
-                case  Types.UserCreateMode.SelfAndApproveByAdmin:
-                case Types.UserCreateMode.SelfAndConfirm:
-                case  Types.UserCreateMode.SelfStart:
-                    this.createUserRegisterService();
-                    this.createRegisterConfirmService();
-                    break;
-            }
 
             if (cfg.subDomains)
             {
