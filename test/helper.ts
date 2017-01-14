@@ -96,7 +96,7 @@ export class TestService
     generateCaptcha(): Promise<Types.ICaptcha>
     {
         let self = this;
-        return self.req.get(`/${self.config.basePath}/captcha`)
+        return self.req.get(`${self.config.basePath}captcha`)
             .then(res => res.body as Types.ICaptcha) as any;
     }
 
@@ -126,7 +126,7 @@ export class TestService
     loginUser(emailOrName: string)
     {
         let self = this;
-        return self.req.post(`/${self.config.basePath}/login`);
+        return self.req.post(`${self.config.basePath}login`);
     }
 
     private _userAccessToken = '';

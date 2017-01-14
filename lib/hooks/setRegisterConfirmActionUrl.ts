@@ -38,7 +38,7 @@ function setRegisterConfirmActionUrl(cfg:Types.INAuth2Config, authCfg:auth.AuthC
                 else
                 {
                     var qry = Qs.stringify({t: token});
-                    p.data['actionUrl'] = `${cfg.publicHostUrl}${cfg.basePath}/confirmRegister?${qry}`;
+                    p.data['actionUrl'] = `${cfg.publicHostUrl}${cfg.basePath}confirmRegister?${qry}`;
                     p.data['actionTitle'] = 'Confirm Email Address'; // TODO Localize
                     p.data['companyName'] = cfg.companyName;
                     resolve(p);

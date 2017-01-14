@@ -23,28 +23,34 @@ module.exports = {
     },
     resolve: {
         alias: {
-            'framework7': path.join(__dirname, './public/bower_components/Framework7/dist/js/framework7.js'),
-            'framework7-vue': path.join(__dirname, './public/bower_components/Framework7-Vue/dist/framework7-vue.js'),
-            'feathers-client': path.join(__dirname, './public/bower_components/feathers-client/dist/feathers.js'),
-            'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.js'),
-            'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.js'),
-            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.js')
+            'framework7': path.join(__dirname, './public/bower_components/Framework7/dist/js/framework7.min.js'),
+            'framework7-vue': path.join(__dirname, './public/bower_components/Framework7-Vue/dist/framework7-vue.min.js'),
+            'feathers-client': path.join(__dirname, './public/bower_components/feathers-client/dist/feathers.min.js'),
+            'lodash': path.join(__dirname, './public/bower_components/lodash/dist/lodash.min.js'),
+            'vue': path.join(__dirname, './public/bower_components/vue/dist/vue.min.js'),
+            'promiz': path.join(__dirname, './public/bower_components/promiz/promiz.min.js')
         },
         extensions: ['', '.vue', '.ts', '.js', '.jsx', '.json', '.tsx']
     },
     // Empty list of plugins
     plugins: [
-        // new webpack.ProvidePlugin(
-        //     {
-        //         'Framework7': 'framework7',
-        //         'Template7': 'framework7',
-        //         "$$": 'framework7'
-        //     }
-        // ),
         new webpack.optimize.CommonsChunkPlugin(
             {
                 names: ['admin', 'index', 'components'], chunks: ['admin', 'index']
-            })
+            }),
+
+        // new webpack.optimize.UglifyJsPlugin({
+        //     test: /components\.js/,
+        //     debug: true,
+        //     minimize: true,
+        //     sourceMap: true,
+        //     output: {
+        //         comments: false
+        //     },
+        //     compressor: {
+        //         warnings: false
+        //     }
+        // })
     ],
 
     module: {

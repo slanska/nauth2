@@ -60,7 +60,7 @@ export interface INAuth2Config
      '_sub/:domainName/auth/users' - for domain users
      '_sub/:domainName/auth/userroles' - for domain user roles
 
-     Default: 'auth'
+     Default: '/auth/'
      */
     basePath?: string;
 

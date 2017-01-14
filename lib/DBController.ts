@@ -220,11 +220,11 @@ module NAuth2
 
             this.Path = {
                 Users: authCfg.userEndpoint,
-                Roles: `${cfg.basePath}/roles`,
-                UserRoles: `${cfg.basePath}/userroles`,
-                Log: `${cfg.basePath}/log`,
-                Login: `${cfg.basePath}/login`,
-                ResetPassword: `${cfg.basePath}/resetPassword`
+                Roles: `${cfg.basePath}roles`,
+                UserRoles: `${cfg.basePath}userroles`,
+                Log: `${cfg.basePath}log`,
+                Login: `${cfg.basePath}login`,
+                ResetPassword: `${cfg.basePath}resetPassword`
             };
 
             this.Services = {} as any;
@@ -243,9 +243,9 @@ module NAuth2
 
             if (cfg.subDomains)
             {
-                this.Path.Domains = `/${cfg.basePath}/domains`;
-                this.Path.DomainUsers = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/users`;
-                this.Path.DomainLogin = `/${cfg.subDomains.namespace}/:domain/${cfg.basePath}/login`;
+                this.Path.Domains = `${cfg.basePath}domains`;
+                this.Path.DomainUsers = `${cfg.subDomains.namespace}:domain${cfg.basePath}users`;
+                this.Path.DomainLogin = `${cfg.subDomains.namespace}:domain${cfg.basePath}login`;
 
                 // Domains
                 this.createDomainsService();

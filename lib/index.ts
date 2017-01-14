@@ -83,7 +83,7 @@ class Controller implements Types.INAuth2Controller
         this.DBController = new DBController(this.app, this.cfg, this.AuthConfig);
         this.Emailer = new Emailer(this.app, this.cfg);
 
-        var captchaPath = `${this.cfg.basePath}/captcha`;
+        var captchaPath = `${this.cfg.basePath}captcha`;
         Captcha.init(this.app, captchaPath, this.cfg.debug);
 
         this.initRoutes();
@@ -102,7 +102,7 @@ class Controller implements Types.INAuth2Controller
          a) regular accessToken
          b) special 'change_password' token (valid for change password only)
          */
-        this.app.use(`${this.cfg.basePath}/changePassword`, new ChangePasswordService(this.DBController));
+        this.app.use(`${this.cfg.basePath}changePassword`, new ChangePasswordService(this.DBController));
 
         /*
          POST /register
@@ -113,8 +113,8 @@ class Controller implements Types.INAuth2Controller
             case Types.UserCreateMode.SelfAndApproveByAdmin:
             case Types.UserCreateMode.SelfAndConfirm:
             case  Types.UserCreateMode.SelfStart:
-                this.app.use(`${this.cfg.basePath}/register`, new RegisterService(this.DBController));
-                this.app.use(`${this.cfg.basePath}/confirmRegister`, new ConfirmRegisterService(this.DBController));
+                this.app.use(`${this.cfg.basePath}register`, new RegisterService(this.DBController));
+                this.app.use(`${this.cfg.basePath}confirmRegister`, new ConfirmRegisterService(this.DBController));
                 break;
         }
 
@@ -127,7 +127,7 @@ class Controller implements Types.INAuth2Controller
          Result:
 
          */
-        this.app.use(`${this.cfg.basePath}/login`, new LoginService(this.DBController));
+        this.app.use(`${this.cfg.basePath}login`, new LoginService(this.DBController));
 
         // logout
         // TODO revoke token?

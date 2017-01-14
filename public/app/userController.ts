@@ -39,7 +39,7 @@ class UserController
         return getAuthConfig()
             .then(cfg =>
             {
-                var url = `${cfg.basePath}/login`;
+                var url = `${cfg.basePath}login`;
                 var payload = {email: emailOrName, password: password};
                 return http.post(url, payload);
             })
@@ -107,7 +107,7 @@ class UserController
         return getAuthConfig()
             .then(cfg =>
             {
-                var url = `${cfg.basePath}/resetPassword`;
+                var url = `${cfg.basePath}resetPassword`;
                 return http.post(url, {email: email});
             })
             .then(res =>
@@ -160,7 +160,7 @@ class UserController
         getAuthConfig()
             .then(cfg =>
             {
-                var url = `${cfg.basePath}/changePassword`;
+                var url = `${cfg.basePath}changePassword`;
                 var data = {
                     password,
                     newPassword,

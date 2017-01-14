@@ -8,11 +8,11 @@
  */
 var Vue = require('vue');
 var Framework7Vue = require('framework7-vue');
+require('script-loader!framework7');
 var index_1 = require('../components/index');
 var _ = require('lodash');
 var feathers = require('feathers-client');
 var Promise = require('promiz');
-// import axios from 'axios';
 /*
  Local storage key names
  */

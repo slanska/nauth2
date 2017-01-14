@@ -23,7 +23,7 @@ export = (controller:Types.INAuth2Controller) =>
      */
     // this.AuthConfig.token = {expiresIn: '1d'} as any;
     controller.AuthConfig.idField = 'userId';
-    controller.AuthConfig.userEndpoint = `/${controller.cfg.basePath}/users`;
+    controller.AuthConfig.userEndpoint = `${controller.cfg.basePath}users`;
     if (!_.isEmpty(controller.cfg.tokenSecret))
         controller.AuthConfig.token = {
             secret: controller.cfg.tokenSecret,

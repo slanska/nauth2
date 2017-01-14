@@ -148,3 +148,9 @@ lib/Types.js.map
 /public/_build/components.js.map
 /public/bower_components/
 /npm-debug*.*
+/public/app/app.js
+/public/app/app.js.map
+/public/app/adminController.js
+/public/app/adminController.js.map
+/index.js
+/index.js.map
