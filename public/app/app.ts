@@ -10,11 +10,13 @@
 
 import Vue = require('vue');
 var Framework7Vue = require('framework7-vue');
+require('script-loader!framework7');
 import {registerComponents} from '../components/index';
 import _ = require('lodash');
 var feathers = require('feathers-client');
 var Promise = require('promiz');
-// import axios from 'axios';
+
+declare var Framework7;
 
 /*
  Local storage key names

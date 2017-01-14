@@ -4,7 +4,7 @@
 
 ///<reference path="testing.d.ts"/>
 
-import assert = require('assert');
+// import assert = require('assert');
 import mocha = require('mocha');
 import * as Types from '../lib/Types';
 var authentication = require('feathers-authentication/client');
@@ -143,12 +143,13 @@ describe('user register', () =>
         startServerAndCreateAndRegisterUser(env)
             .then(() =>
             {
-                assert.ifError(null);
+                // assert.ifError(null);
                 done();
             })
             .catch(err =>
             {
-                assert.ifError(err);
+                // browser.assert.
+                // assert.ifError(err);
                 env.should.equal(err.message, 'Error');
                 done(err);
             });
@@ -196,12 +197,12 @@ describe('user register', () =>
             })
             .then(() =>
             {
-                assert.ifError(null);
+                // assert.ifError(null);
                 done();
             })
             .catch(err =>
             {
-                assert.ifError(err);
+                // assert.ifError(err);
                 done(err);
             });
     });
@@ -221,12 +222,12 @@ describe('user register', () =>
             })
             .then(() =>
             {
-                assert.ifError(null);
+                // assert.ifError(null);
                 done();
             })
             .catch(err =>
             {
-                assert.ifError(err);
+                // assert.ifError(err);
                 done(err);
             });
     });
@@ -255,12 +256,12 @@ describe('user register', () =>
             })
             .then(() =>
             {
-                assert.ifError(null);
+                // assert.ifError(null);
                 done();
             })
             .catch(err =>
             {
-                assert.ifError(err);
+                // assert.ifError(err);
                 done(err);
             });
     });
