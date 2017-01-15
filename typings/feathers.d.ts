@@ -519,41 +519,63 @@ declare module "feathers-knex"
 {
     import * as feathers from 'feathers';
     import * as Knex from 'knex';
+    import * as hooks from 'feathers-hooks';
+    import * as express from 'express';
 
-    interface PaginateConfig
+    namespace k
     {
-        "default": number;
-        max: number;
+        export class Service implements feathers.Service
+        {
+            constructor(cfg: ServiceConfig);
+
+            before(hooks: hooks.Hook): Service;
+
+            after(hooks: hooks.Hook): Service;
+
+            on(callback: Function): Service;
+            on(eventName: string, callback: Function): Service;
+
+            once(callback: Function): Service;
+            once(eventName: string, callback: Function): Service;
+
+            emit(eventName: string): Service;
+        }
+
+        export interface PaginateConfig
+        {
+            "default": number;
+            max: number;
+        }
+
+        export interface ServiceConfig
+        {
+            /*
+             Required. The KnexJS database instance
+             */
+            Model: Knex,
+
+            /*
+             Required. The name of the table
+             */
+            name: string,
+
+            /*
+             [optional] - The name of the id property.
+             default: 'id'
+             */
+            id?: string | string[],
+
+            /*
+             A pagination object (optional)
+             */
+            paginate?: PaginateConfig;
+
+        }
     }
 
-    interface ServiceConfig
-    {
-        /*
-         Required. The KnexJS database instance
-         */
-        Model: Knex.Config,
+    function k(cfg: k.ServiceConfig): feathers.Service;
 
-        /*
-         Required. The name of the table
-         */
-        name: string,
-
-        /*
-         [optional] - The name of the id property.
-         default: 'id'
-         */
-        id?: string | string[],
-
-        /*
-         A pagination object (optional)
-         */
-        paginate?: PaginateConfig;
-
-    }
-
-    function f(cfg: ServiceConfig): feathers.Service;
-
-    export = f;
+    export = k;
 }
 
 declare module "feathers-mailer"

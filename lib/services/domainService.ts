@@ -2,7 +2,6 @@
  * Created by slanska on 2017-01-12.
  */
 
-
 import Types = require('../Types');
 import knex = require('knex');
 import Promise = require('bluebird');
@@ -20,25 +19,26 @@ import objectHash = require('object-hash');
 import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
 import jsonwebtoken = require('jsonwebtoken');
-import {BaseService} from "./baseService";
+import {BaseDBService} from "./basicDBService";
 
 /*
  Controller for all domains related features
  */
-export class DomainService extends BaseService
+export class DomainService extends BaseDBService
 {
     constructor(DBController: NAuth2.DBController)
     {
-        super(DBController);
+        super(DBController, {name: 'NAuth2_Domains', id: 'domainId'});
     }
 
     setup(app: feathers.Application)
     {
-        this.app = app;
-        this.asService.before({
+        super.setup(app);
+
+        this.before({
             create: []
         });
-        this.asService.after({
+        this.after({
             create: []
         });
     }

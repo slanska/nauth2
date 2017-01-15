@@ -27,6 +27,9 @@ import {SplitDomainsService} from "./services/splitDomainService";
 import {RevokeTokenService} from "./services/revokeTokenService";
 import {RenewTokenService} from "./services/renewTokenService";
 import {ConfirmRegisterService} from "./services/confirmRegisterService";
+import {DomainService} from "./services/domainService";
+import {DomainTypeService} from "./services/domainTypeService";
+import {UserService} from "./services/userService";
 
 /*
  index:
@@ -128,6 +131,15 @@ class Controller implements Types.INAuth2Controller
 
          */
         this.app.use(`${this.cfg.basePath}login`, new LoginService(this.DBController));
+
+        this.app.use(`${this.cfg.basePath}domains`, new DomainService(this.DBController));
+
+        this.app.use(`${this.cfg.basePath}domainTypes`, new DomainTypeService(this.DBController));
+
+        this.app.use(`${this.cfg.basePath}users`, new UserService(this.DBController));
+
+        // this.app.use(`${this.cfg.basePath}roles`, new RoleService(this.DBController));
+
 
         // logout
         // TODO revoke token?

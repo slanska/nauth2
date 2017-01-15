@@ -154,3 +154,13 @@ lib/Types.js.map
 /public/app/adminController.js.map
 /index.js
 /index.js.map
+/lib/services/basicDBService.js
+/lib/services/basicDBService.js.map
+/lib/services/domainTypeService.js
+/lib/services/domainTypeService.js.map
+/lib/services/userRoleService.js.map
+/lib/services/userRoleService.js
+/lib/services/domainUserService.js.map
+/lib/services/domainUserService.js
+/lib/services/roleService.js.map
+/lib/services/roleService.js

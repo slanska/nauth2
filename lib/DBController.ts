@@ -6,8 +6,6 @@ import Types = require('./Types');
 import knex = require('knex');
 import * as DB from './Consts';
 import Promise = require('bluebird');
-var knexServiceFactory = require('feathers-knex');
-import feathers = require("feathers");
 import nhooks = require('./hooks/index');
 import hooks = require('feathers-hooks');
 import auth  = require('feathers-authentication');
@@ -15,6 +13,8 @@ import jwt = require('jsonwebtoken');
 import errors = require('feathers-errors');
 import HTTPStatus = require('http-status');
 import _ = require('lodash');
+var knexServiceFactory = require('feathers-knex');
+import feathers = require("feathers");
 
 module NAuth2
 {

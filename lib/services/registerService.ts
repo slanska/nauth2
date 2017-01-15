@@ -19,11 +19,18 @@ import objectHash = require('object-hash');
 import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
 import jsonwebtoken = require('jsonwebtoken');
-import {BaseLoginService} from "./baseLoginService";
+import {BaseDBService} from "./basicDBService";
+import {ServiceConfig} from "feathers-knex";
 
-export class RegisterService extends BaseLoginService
+export class RegisterService extends BaseDBService
 {
-    protected app: feathers.Application;
+    constructor(DBController: NAuth2.DBController)
+    {
+        super(DBController, {
+            name: 'NAuth2_Users',
+            id: 'userID'
+        });
+    }
 
     /*
      Sets status for new user as 'A'(Active), if user create mode is SelfStart
@@ -69,8 +76,9 @@ export class RegisterService extends BaseLoginService
 
     setup(app: feathers.Application)
     {
-        this.app = app;
-        this.asService.before({
+        super.setup(app);
+
+        this.before({
             create: [
                 nhooks.verifyCaptcha('captcha'),
                 nhooks.verifyNewPassword(this.DBController.cfg, 'password', 'confirmPassword'),
@@ -88,7 +96,7 @@ export class RegisterService extends BaseLoginService
             remove: [hooks.disable('external')],
             patch: [hooks.disable('external')],
         });
-        this.asService.after({
+        this.after({
             create: [
                 this.setRolesToNewUser(),
                 hooks.pluck('email'),
@@ -110,9 +118,4 @@ export class RegisterService extends BaseLoginService
             ]
         });
     }
-
-    // create(data, params: feathers.MethodParams)
-    // {
-    //
-    // }
 }
