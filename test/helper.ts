@@ -16,12 +16,38 @@ import feathers = require('feathers');
 import config = require('../config/index');
 import Promise = require('bluebird');
 import knex = require('knex');
+// var chaiAsPromised = require("chai-as-promised");
+// var chaiThings = require('chai-things');
 
 global.Promise = Promise;
 
-// import Casper = require('casperjs');
-
+chai.should();
+// chai.use(chaiThings);
+// chai.use(chaiAsPromised);
 chai.use(chaiHttp);
+
+/*
+ Promise oriented helper routines
+ */
+export function expectToBeRejected(promise: Promise<any>, done: Function, expectedError?: string)
+{
+    promise
+        .then(() => done(new Error(`Expected to fail: ${expectedError}`)))
+        .catch(err =>
+        {
+            if (expectedError !== void 0 && err.message !== expectedError)
+                return done(err);
+            return done();
+        });
+}
+
+export function expectToBeResolved(promise: Promise<any>, done: Function)
+{
+    promise
+        .then(() => done())
+        .catch(err => done(err));
+}
+
 
 /*
  Test environment
@@ -65,9 +91,13 @@ export class TestService
     public app: feathers.Application;
     public server;
 
-    public start()
+    public start(userCreateMode?: Types.UserCreateMode)
     {
         let self = this;
+
+        if (userCreateMode)
+            self.config.userCreateMode = userCreateMode;
+
         return new Promise((resolve) =>
         {
             self.app = AppFactory(self.config);

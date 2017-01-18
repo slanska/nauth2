@@ -20,7 +20,6 @@ import NAuth2 = require('../DBController');
 import assign = require("lodash/assign");
 import jsonwebtoken = require('jsonwebtoken');
 import {BaseDBService} from "./basicDBService";
-import {ServiceConfig} from "feathers-knex";
 
 export class RegisterService extends BaseDBService
 {

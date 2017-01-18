@@ -69,7 +69,7 @@ export class MailinatorHelper
     checkPresenseOfItemInInbox(email: string, title: string, partialTitle = true)
     {
         let self = this;
-        self.open()
+        return self.open()
             .then(() => self.navigateToInbox(email))
             .then(() => self.findEmailItem(title, partialTitle))
             .then((nn:Node) => !_.isEmpty(nn));

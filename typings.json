@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "chai-as-promised": "registry:npm/chai-as-promised#5.1.0+20160310030142"
+  }
+}
