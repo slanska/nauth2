@@ -4,7 +4,7 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-import {TestService} from './helper';
+import {TestService, expectReject, expectOK} from './helper';
 
 function loadUsers(env: TestService)
 {
@@ -74,7 +74,7 @@ describe('Login', () =>
 
     it('wrong email or name', (done) =>
     {
-        done();
+        expectReject(Promise.reject(1), done);
     });
 
     it('wrong password', (done) =>

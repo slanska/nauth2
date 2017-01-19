@@ -29,7 +29,7 @@ chai.use(chaiHttp);
 /*
  Promise oriented helper routines
  */
-export function expectToBeRejected(promise: Promise<any>, done: Function, expectedError?: string)
+export function expectReject(promise: Promise<any>, done: Function, expectedError?: string)
 {
     promise
         .then(() => done(new Error(`Expected to fail: ${expectedError}`)))
@@ -37,11 +37,15 @@ export function expectToBeRejected(promise: Promise<any>, done: Function, expect
         {
             if (expectedError !== void 0 && err.message !== expectedError)
                 return done(err);
+
+            if (!expectedError)
+                console.warn(`Rejected with error: ${err.message}`);
+
             return done();
         });
 }
 
-export function expectToBeResolved(promise: Promise<any>, done: Function)
+export function expectOK(promise: Promise<any>, done: Function)
 {
     promise
         .then(() => done())

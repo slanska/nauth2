@@ -4,7 +4,7 @@
 
 ///<reference path="../typings/tsd.d.ts"/>
 
-import {TestService} from './helper';
+import {TestService, expectOK, expectReject} from './helper';
 
 describe('Domain Management', ()=>
 {
@@ -49,6 +49,21 @@ describe('Domain Management', ()=>
     });
 
     it('register user via domain', (done)=>
+    {
+        done();
+    });
+
+    it('split domain', (done)=>
+    {
+        done();
+    });
+
+    it('merge domains', (done)=>
+    {
+        done();
+    });
+
+    it('change domain name', (done)=>
     {
         done();
     });

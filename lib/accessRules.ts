@@ -10,7 +10,7 @@ import Promise = require('bluebird');
 import Knex = require('knex');
 import _ = require('lodash');
 
-export var ruleList = [
+export const ruleList = [
     /*
      Users tables
      */
@@ -34,7 +34,7 @@ export var ruleList = [
     },
     {role: ["SystemAdmin", "UserAdmin"], resource: "users", action: "delete:any"},
 
-    // create and delete are not allowed
+    // Only update is allowed for the owner. Create and delete are not allowed
     {
         role: "Member", resource: "users", action: "update:own",
         attributes: ['*', '!prevPwdHash', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
@@ -53,6 +53,25 @@ export var ruleList = [
         role: "Guest", resource: "users", action: "create:any",
         attributes: ['*', '!prevPwdHash', '!userID', '!pwdExpireOn', '!changePwdOnNextLogin', '!suspended', '!created_at',
             '!updated_at', '!maxCreatedDomains']
+    },
+
+    /*
+     Domain Types
+     */
+    {
+        role: "SystemAdmin", resource: "domainTypes", action: "create:any", attributes: ["*"]
+    },
+
+    {
+        role: "SystemAdmin", resource: "domainTypes", action: "update:any", attributes: ["*"]
+    },
+
+    {
+        role: ["SystemAdmin", "DomainAdmin"], resource: "domainTypes", action: "read:any", attributes: ["*"]
+    },
+
+    {
+        role: "SystemAdmin", resource: "domainTypes", action: "delete:any", attributes: ["*"]
     },
 
     /*
@@ -128,7 +147,7 @@ export var ruleList = [
     /*
      Log
      */
-    {role: "SystemAdmin", resource: "log", action: "read:any", attributes: ['*']}
+    {role: ["SystemAdmin", "LogAnalyst"], resource: "log", action: "read:any", attributes: ['*']}
 ];
 
 /*

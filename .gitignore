@@ -164,3 +164,5 @@ lib/Types.js.map
 /lib/services/domainUserService.js
 /lib/services/roleService.js.map
 /lib/services/roleService.js
+/test/10_DomainTypes.js.map
+/test/10_DomainTypes.js

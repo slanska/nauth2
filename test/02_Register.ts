@@ -8,7 +8,7 @@ import mocha = require('mocha');
 import * as Types from '../lib/Types';
 var authentication = require('feathers-authentication/client');
 import {MailinatorHelper} from './emailAutomated/mailinator';
-import {TestService, expectToBeRejected, expectToBeResolved} from './helper';
+import {TestService, expectReject, expectOK} from './helper';
 import Promise = require('bluebird');
 
 /*
@@ -60,14 +60,6 @@ export function selfConfirmUserRegistration(env: TestService, user: IUserRecord)
                 return resolve(user);
             });
     }) as Promise<IUserRecord>;
-}
-
-/*
-
- */
-export function adminConfirmUserRegistration()
-{
-
 }
 
 /*
@@ -125,26 +117,26 @@ describe('user register', () =>
     it('register user: self and approve by admin', (done) =>
     {
         env.config.userCreateMode = Types.UserCreateMode.SelfAndApproveByAdmin;
-        expectToBeResolved(userRegistrationByAdmin(env), done);
+        expectOK(userRegistrationByAdmin(env), done);
     });
 
     it('register user: self start', (done) =>
     {
         env.config.userCreateMode = Types.UserCreateMode.SelfStart;
-        expectToBeResolved(startServerAndCreateAndRegisterUser(env), done);
+        expectOK(startServerAndCreateAndRegisterUser(env), done);
     });
 
     it('cannot register because only admin can create new users', (done) =>
     {
         env.config.userCreateMode = Types.UserCreateMode.ByAdminOnly;
-        expectToBeRejected(startServerAndCreateAndRegisterUser(env), done);
+        expectReject(startServerAndCreateAndRegisterUser(env), done);
     });
 
     it('register user and confirm', (done) =>
     {
         let uu: IUserRecord;
         env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
-        expectToBeResolved(
+        expectOK(
             env.start()
                 .then(() => env.createNewUser())
                 .then(user =>
@@ -158,7 +150,7 @@ describe('user register', () =>
 
     it('wrong captcha', (done) =>
     {
-        expectToBeRejected(
+        expectReject(
             env.start()
                 .then((captcha) => env.createNewUser())
                 .then((item: any) =>
@@ -171,7 +163,7 @@ describe('user register', () =>
     it('weak password', (done) =>
     {
         env.config.userCreateMode = Types.UserCreateMode.SelfAndConfirm;
-        expectToBeRejected(
+        expectReject(
             env.start()
                 .then(() => env.createNewUser())
                 .then(user =>
@@ -183,7 +175,7 @@ describe('user register', () =>
 
     it('password and confirm password mismatch', (done) =>
     {
-        expectToBeRejected(
+        expectReject(
             env.start(Types.UserCreateMode.SelfStart)
                 .then(() => env.createNewUser())
                 .then(user =>
@@ -202,7 +194,7 @@ describe('user register', () =>
         let user1: IUserRecord;
         let user2: IUserRecord;
         env.config.userCreateMode = Types.UserCreateMode.SelfStart;
-        expectToBeRejected(
+        expectReject(
             env.start()
                 .then(() => userSelfRegister(env))
                 .then((uu) =>
@@ -220,9 +212,7 @@ describe('user register', () =>
 
     it('user self-registered', (done) =>
     {
-        userSelfRegister(env)
-            .then(() => done())
-            .catch(err => done(err));
+        expectOK(userSelfRegister(env), done);
     });
 
     it('100 users self-registered and confirmed', (done) =>
@@ -253,7 +243,7 @@ describe('user register', () =>
 
     it('user created by admin', (done) =>
     {
-        expectToBeResolved(
+        expectOK(
             env.start()
                 .then(() => env.loadUserAdmin()), done);
     });
