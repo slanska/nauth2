@@ -7,9 +7,10 @@
 /// <reference path="bluebird/bluebird-2.0.d.ts" />
 /// <reference path="vue/vue.d.ts" />
 /// <reference path="shared.d.ts" />
+///<reference path="framework7/framework7.d.ts"/>
 
-declare var Framework7;
-declare var Template7;
-declare var Dom7;
+// declare var Framework7;
+// declare var Template7;
+// declare var Dom7;
 
 

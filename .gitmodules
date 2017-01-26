@@ -1,0 +1,3 @@
+[submodule "typings/framework7"]
+	path = typings/framework7
+	url = https://github.com/JasonKleban/Framework7.d.ts.git

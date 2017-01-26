@@ -15,8 +15,9 @@ import {registerComponents} from '../components/index';
 import _ = require('lodash');
 var feathers = require('feathers-client');
 var Promise = require('promiz');
+import Framework7 = require('Framework7');
 
-declare var Framework7;
+// declare var Framework7;
 
 /*
  Local storage key names
